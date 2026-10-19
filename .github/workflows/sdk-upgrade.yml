@@ -38,6 +38,9 @@ jobs:
           done
           npx expo install expo-splash-screen --npm
           npx expo install --fix --npm
+          # Apply only non-breaking semver-compatible advisory fixes, never --force.
+          npm audit fix --no-fund || true
+          npx expo install --fix --npm
       - name: Verify clean install and test
         working-directory: mobile
         run: |
