@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { computeProgress, baseXP, levelFromTotalXP, xpForLevel, dayKey } from '../src/game/gamification';
 import { questsForDay } from '../src/game/quests';
-import { INITIAL_STATE } from '../src/game/store';
+import { INITIAL_STATE, normalizeState } from '../src/game/store';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
 import { intervalStatus, pomodoroStatus, sessionMinutes, createSession } from '../src/game/session';
 import { serializeBackup, parseBackup } from '../src/game/backup';
@@ -189,4 +189,19 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(sessionMinutes(s, t0 + 31 * 60_000), 31);
 }
 
+{
+  const migrated = normalizeState({ version: 1, activities: [], questCompletions: [] });
+  assert.equal(migrated.version, 2);
+  assert.deepEqual(migrated.bodyMeasurements, []);
+  assert.deepEqual(migrated.profile, { goalWeightKg: null });
+  assert.deepEqual(normalizeState(null).programDays, []);
+
+  const corrupt = { ...state([]), questCompletions: 'not-an-array' };
+  assert.throws(() => parseBackup(serializeBackup(corrupt)), /sérült/);
+  const brokenActivity = { ...state([]), activities: [{ ...workout('a', today), duration: -1 }] };
+  assert.throws(() => parseBackup(serializeBackup(brokenActivity)), /sérült/);
+  const linked = { ...state([workout('a', today)]),
+    programDays: [{ programId: 'saitama30', runStart: today, day: 1, date: today, activityId: 'a' }] };
+  assert.deepEqual(parseBackup(serializeBackup(linked)).programDays, linked.programDays);
+}
 console.log('Minden játéklogika teszt átment.');

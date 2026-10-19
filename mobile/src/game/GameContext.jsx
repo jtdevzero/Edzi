@@ -80,8 +80,9 @@ export function GameProvider({ children }) {
       return activity;
     }
 
-    function programDayEntry() {
+    function programDayEntry(activityId = null) {
       return {
+        ...(activityId ? { activityId } : {}),
         programId: state.program.id,
         runStart: state.program.startDate,
         day: programStatus.doneCount + 1,
@@ -131,7 +132,7 @@ export function GameProvider({ children }) {
         let nextState = { ...state, activities: [...state.activities, activity] };
         let finishedProgram = false;
         if (completesProgram) {
-          const entry = programDayEntry();
+          const entry = programDayEntry(activity.id);
           finishedProgram = entry.day >= programStatus.program.days.length;
           nextState = { ...nextState, programDays: [...state.programDays, entry], program: finishedProgram ? null : state.program };
         }
@@ -139,7 +140,12 @@ export function GameProvider({ children }) {
         return { ...commit(nextState), programDay: completesProgram, finishedProgram };
       },
       deleteActivity(id) {
-        setState((s) => ({ ...s, activities: s.activities.filter((a) => a.id !== id) }));
+        setState((s) => ({
+          ...s,
+          activities: s.activities.filter((a) => a.id !== id),
+          // XP for a program day linked to the deleted workout must also disappear.
+          programDays: s.programDays.filter((d) => d.activityId !== id)
+        }));
       },
       completeQuest(questId) {
         if (completedToday.has(questId)) return null;
@@ -177,6 +183,7 @@ export function GameProvider({ children }) {
         setState((s) => ({ ...s, lastBackupAt: new Date().toISOString() }));
       },
       importState(imported) {
+        setSession(null);
         setState({ ...imported, lastBackupAt: new Date().toISOString() });
       },
       resetAll() {
