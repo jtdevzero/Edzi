@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Linking } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Linking, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGame } from '../game/GameContext';
 import { EXERCISE_LIBRARY, youtubeSearchUrl } from '../game/templates';
 import {
-  REST_OPTIONS, INTERVAL_PRESETS, elapsedSeconds, restRemaining, intervalStatus, formatClock
+  REST_OPTIONS, INTERVAL_PRESETS, elapsedSeconds, restRemaining, intervalStatus, formatClock, setValue, formatSet
 } from '../game/session';
 import { beep, keepScreenAwake, unlockAudio } from '../utils/device';
 import { confirm } from '../utils/notify';
@@ -31,6 +31,7 @@ export default function WorkoutSessionScreen() {
   const { session, updateSession, discardSession, finishSession } = useGame();
   const now = useTicker(true);
   const [counter, setCounter] = useState(0);
+  const [weightInput, setWeightInput] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [intensity, setIntensity] = useState(7);
@@ -44,7 +45,9 @@ export default function WorkoutSessionScreen() {
   const stopwatch = session.stopwatchStartedAt ? elapsedSeconds(session.stopwatchStartedAt, now) : null;
 
   useEffect(() => {
-    setCounter(ex?.target ?? ex?.sets.at(-1) ?? 0);
+    setCounter(ex?.target ?? setValue(ex?.sets.at(-1)) ?? 0);
+    const prior = ex?.sets.at(-1);
+    setWeightInput(prior && typeof prior === 'object' ? String(prior.weightKg ?? '') : '');
   }, [session.current]);
 
   useEffect(() => {
@@ -78,7 +81,10 @@ export default function WorkoutSessionScreen() {
   function completeRepSet() {
     if (counter <= 0) return;
     unlockAudio();
-    updateSession((s) => ({ ...addSet(s, s.current, counter), restEndsAt: Date.now() + s.restSeconds * 1000 }));
+    const kg = Number(weightInput.replace(',', '.'));
+    if (ex.weighted && (weightInput.trim() === '' || !Number.isFinite(kg) || kg < 0 || kg > 1500)) return;
+    const entry = ex.weighted ? { reps: counter, weightKg: Math.round(kg * 10) / 10 } : counter;
+    updateSession((s) => ({ ...addSet(s, s.current, entry), restEndsAt: Date.now() + s.restSeconds * 1000 }));
   }
 
   function toggleStopwatch() {
@@ -113,7 +119,7 @@ export default function WorkoutSessionScreen() {
   function addExercise(item) {
     updateSession((s) => ({
       ...s,
-      exercises: [...s.exercises, { name: item.name, unit: item.unit, search: item.search, target: null, sets: [] }],
+      exercises: [...s.exercises, { name: item.name, unit: item.unit, weighted: !!item.weighted, search: item.search, target: null, sets: [] }],
       current: s.exercises.length
     }));
     setShowAdd(false);
@@ -127,7 +133,7 @@ export default function WorkoutSessionScreen() {
     announceReward(result, { title: 'Edzés kész', message: [session.title, ...extra].join('\n') });
   }
 
-  const unitLabel = (e, v) => (e.unit === 'sec' ? formatClock(v) : `${v}`);
+  const unitLabel = (e, v) => formatSet(v, e.unit);
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 8 }]}>
@@ -166,7 +172,7 @@ export default function WorkoutSessionScreen() {
               {EXERCISE_LIBRARY.map((item) => (
                 <Pressable key={item.name} onPress={() => addExercise(item)} style={styles.libItem}>
                   <Text style={styles.libText}>{item.name}</Text>
-                  <Text style={styles.muted}>{item.unit === 'sec' ? 'időre' : 'ismétlés'}</Text>
+                  <Text style={styles.muted}>{item.unit === 'sec' ? 'időre' : item.weighted ? 'súlyzós' : 'ismétlés'}</Text>
                 </Pressable>
               ))}
             </View>
@@ -201,7 +207,7 @@ export default function WorkoutSessionScreen() {
               ))}
             </View>
             {ex.target && ex.sets.length > 0 && (
-              <Text style={styles.muted}>Összesen: {ex.sets.reduce((a, b) => a + b, 0)} / {ex.target}</Text>
+              <Text style={styles.muted}>Összesen: {ex.sets.reduce((a, b) => a + setValue(b), 0)} / {ex.target}</Text>
             )}
 
             {ex.unit === 'reps' ? (
@@ -212,7 +218,21 @@ export default function WorkoutSessionScreen() {
                   <Pressable onPress={() => setCounter((c) => c + 1)} style={styles.counterBtn}><Text style={styles.counterBtnText}>+1</Text></Pressable>
                   <Pressable onPress={() => setCounter((c) => c + 5)} style={styles.counterBtn}><Text style={styles.counterBtnText}>+5</Text></Pressable>
                 </View>
-                <Pressable disabled={counter <= 0} onPress={completeRepSet} style={[styles.primary, counter <= 0 && styles.disabled]}>
+                {ex.weighted && (
+                  <View style={styles.weightRow}>
+                    <Text style={styles.muted}>Súly (kg)</Text>
+                    <TextInput
+                      style={styles.weightInput}
+                      value={weightInput}
+                      onChangeText={(value) => setWeightInput(value.replace(/[^0-9.,]/g, ''))}
+                      keyboardType="decimal-pad"
+                      placeholder="pl. 60"
+                      placeholderTextColor={colors.textMuted}
+                      maxLength={6}
+                    />
+                  </View>
+                )}
+                <Pressable disabled={counter <= 0 || (ex.weighted && (weightInput.trim() === '' || !Number.isFinite(Number(weightInput.replace(',', '.')))))} onPress={completeRepSet} style={[styles.primary, counter <= 0 && styles.disabled]}>
                   <Text style={styles.primaryText}>✓ Sorozat kész ({counter})</Text>
                 </Pressable>
               </>
@@ -340,6 +360,8 @@ const styles = StyleSheet.create({
   sets: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   setChip: { backgroundColor: '#14532d', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
   setText: { color: '#bbf7d0', fontWeight: '700', fontSize: 13 },
+  weightRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  weightInput: { flex: 1, borderRadius: 12, backgroundColor: colors.input, color: colors.text, height: 48, paddingHorizontal: 14, fontSize: 18 },
   counterRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   counter: { flex: 1, color: colors.text, fontSize: 48, fontWeight: '800', textAlign: 'center' },
   counterBtn: { width: 56, height: 56, borderRadius: 14, backgroundColor: colors.input, alignItems: 'center', justifyContent: 'center' },

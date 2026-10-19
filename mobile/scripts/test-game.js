@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { computeProgress, baseXP, levelFromTotalXP, xpForLevel, dayKey } from '../src/game/gamification';
 import { questsForDay } from '../src/game/quests';
 import { INITIAL_STATE, normalizeState } from '../src/game/store';
+import { parseMeasurement, bodySummary } from '../src/game/body';
+import { setValue, setWeightKg, formatSet } from '../src/game/session';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
 import { intervalStatus, pomodoroStatus, sessionMinutes, createSession } from '../src/game/session';
 import { serializeBackup, parseBackup } from '../src/game/backup';
@@ -203,5 +205,27 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   const linked = { ...state([workout('a', today)]),
     programDays: [{ programId: 'saitama30', runStart: today, day: 1, date: today, activityId: 'a' }] };
   assert.deepEqual(parseBackup(serializeBackup(linked)).programDays, linked.programDays);
+}
+{
+  assert.deepEqual(parseMeasurement({ weightKg: '86,5', waistCm: '89,1' }), {
+    weightKg: 86.5, waistCm: 89.1, chestCm: null, hipsCm: null, armCm: null, thighCm: null
+  });
+  assert.throws(() => parseMeasurement({ weightKg: 'nem szám' }));
+  const measurements = [{ id: 'a', date: '2026-10-01T12:00:00Z', weightKg: 87 },
+    { id: 'b', date: '2026-10-09T12:00:00Z', weightKg: 86.5 }];
+  assert.equal(bodySummary(measurements).changeKg, -0.5);
+  assert.equal(bodySummary([]).latest, null);
+  assert.equal(setValue({ reps: 8, weightKg: 60 }), 8);
+  assert.equal(setWeightKg(10), 0);
+  assert.equal(formatSet({ reps: 8, weightKg: 60 }, 'reps'), '8 × 60 kg');
+  assert.equal(formatSet(10, 'reps'), '10 ism.');
+  const weighted = { ...workout('w', today),
+    exercises: [{ name: 'Fekvenyomás', unit: 'reps',
+      sets: [{ reps: 8, weightKg: 60 }, { reps: 6, weightKg: 70 }] }] };
+  const r = computeExerciseRecords(state([weighted]))['Fekvenyomás'];
+  assert.equal(r.bestSet, 8);
+  assert.equal(r.bestWeightKg, 70);
+  assert.equal(r.volumeKg, 900);
+  assert.deepEqual(parseBackup(serializeBackup({ ...state([weighted]), bodyMeasurements: measurements })).bodyMeasurements, measurements);
 }
 console.log('Minden játéklogika teszt átment.');

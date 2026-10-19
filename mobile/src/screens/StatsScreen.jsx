@@ -5,6 +5,7 @@ import Screen from '../components/Screen';
 import { useGame } from '../game/GameContext';
 import { computeStats, computeExerciseRecords } from '../game/stats';
 import { formatClock } from '../game/session';
+import BodyTracker from '../components/BodyTracker';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
 import { colors, card } from '../theme';
 
@@ -135,6 +136,8 @@ function ExerciseRecords({ records }) {
         <Record value={fmt(current.bestSession)} label="Max egy edzésen" />
         <Record value={fmt(current.total)} label="Összesen" />
         <Record value={current.sessions} label="Edzés" />
+        {current.bestWeightKg > 0 && <Record value={`${current.bestWeightKg} kg`} label="Legnagyobb súly" />}
+        {current.volumeKg > 0 && <Record value={`${Math.round(current.volumeKg)} kg`} label="Összes mozgatott tömeg" />}
       </View>
       <Text style={styles.muted}>Fejlődés (napi legjobb sorozat)</Text>
       {current.history.length >= 2 ? (
@@ -171,6 +174,7 @@ export default function StatsScreen() {
         <Record value={formatMinutes(records.totalMinutes)} label="Összesen" />
       </View>
 
+      <BodyTracker />
       <ExerciseRecords records={exerciseRecords} />
 
       <View style={card}>

@@ -6,6 +6,7 @@ import { computeAchievements, newlyUnlocked } from './achievements';
 import { programRunStatus, getProgram } from './programs';
 import { computeExerciseRecords, newRecords } from './stats';
 import { sessionMinutes } from './session';
+import { parseMeasurement } from './body';
 
 const SESSION_KEY = 'animefitness:session';
 
@@ -168,6 +169,23 @@ export function GameProvider({ children }) {
           program: finished ? null : state.program
         });
         return { ...result, finished };
+      },
+      addBodyMeasurement(input) {
+        const measurement = parseMeasurement(input);
+        setState((s) => ({
+          ...s,
+          bodyMeasurements: [...s.bodyMeasurements, { ...measurement, id: newId(), date: new Date().toISOString() }]
+        }));
+      },
+      deleteBodyMeasurement(id) {
+        setState((s) => ({ ...s, bodyMeasurements: s.bodyMeasurements.filter((m) => m.id !== id) }));
+      },
+      setGoalWeight(raw) {
+        const weight = raw == null || String(raw).trim() === '' ? null : Number(String(raw).replace(',', '.'));
+        if (weight !== null && (!Number.isFinite(weight) || weight < 20 || weight > 600)) {
+          throw new Error('A céltestsúly 20 és 600 kg között lehet.');
+        }
+        setState((s) => ({ ...s, profile: { ...s.profile, goalWeightKg: weight } }));
       },
       setWeeklyGoal(goal) {
         const from = weekKey(today);

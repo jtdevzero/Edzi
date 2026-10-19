@@ -72,6 +72,12 @@ export const WORKOUT_TEMPLATES = [
 ];
 
 export const EXERCISE_LIBRARY = [
+  { name: 'Fekvenyomás', unit: 'reps', weighted: true, search: 'bench press proper form' },
+  { name: 'Guggolás rúddal', unit: 'reps', weighted: true, search: 'barbell squat proper form' },
+  { name: 'Felhúzás', unit: 'reps', weighted: true, search: 'deadlift proper form' },
+  { name: 'Evezés rúddal', unit: 'reps', weighted: true, search: 'barbell row proper form' },
+  { name: 'Vállból nyomás', unit: 'reps', weighted: true, search: 'overhead press proper form' },
+  { name: 'Bicepsz kézisúlyzóval', unit: 'reps', weighted: true, search: 'dumbbell curl form' },
   { name: 'Fekvőtámasz', unit: 'reps', search: 'push up proper form' },
   { name: 'Húzódzkodás', unit: 'reps', search: 'pull up proper form' },
   { name: 'Guggolás', unit: 'reps', search: 'bodyweight squat proper form' },
@@ -89,5 +95,5 @@ export const EXERCISE_LIBRARY = [
 export function sessionExercisesFromTemplate(template) {
   return template.exercises
     .filter((e) => e.unit !== 'none')
-    .map((e) => ({ name: e.name, unit: e.unit, search: e.search, sets: [] }));
+    .map((e) => ({ name: e.name, unit: e.unit, weighted: !!e.weighted, search: e.search, sets: [] }));
 }
