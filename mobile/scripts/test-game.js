@@ -4,6 +4,8 @@ import { questsForDay } from '../src/game/quests';
 import { INITIAL_STATE, normalizeState } from '../src/game/store';
 import { parseMeasurement, bodySummary } from '../src/game/body';
 import { setValue, setWeightKg, formatSet } from '../src/game/session';
+import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
+import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
 import { intervalStatus, pomodoroStatus, sessionMinutes, createSession } from '../src/game/session';
 import { serializeBackup, parseBackup } from '../src/game/backup';
@@ -227,5 +229,25 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(r.bestWeightKg, 70);
   assert.equal(r.volumeKg, 900);
   assert.deepEqual(parseBackup(serializeBackup({ ...state([weighted]), bodyMeasurements: measurements })).bodyMeasurements, measurements);
+}
+{
+  const entries = ['2026-10-19', '2026-10-20', '2026-10-21'].map((d, i) => workout(`w${i}`, d));
+  const st = state([...entries, { ...workout('study', today), type: 'study', duration: 60 }]);
+  const trials = trialsForWeek(st, '2026-10-19', weekKey, dayKey);
+  assert.deepEqual(trials.map((t) => t.completed), [true, false, true]);
+  const reward = earnedWeeklyTrials(st, weekKey, dayKey);
+  assert.equal(reward.xp, 100);
+  assert.equal(reward.completed, 2);
+  assert.equal(computeProgress(st, '2026-10-21').weeklyTrialXP, 100);
+  const removed = { ...st, activities: st.activities.filter((a) => a.id !== 'w2') };
+  assert.equal(computeProgress(removed, '2026-10-21').weeklyTrialXP, 40);
+  const achievements = computeAchievements(st, computeProgress(st, '2026-10-21'));
+  assert.equal(achievements.find((a) => a.id === 'trial_1').unlocked, true);
+  const withSets = { ...st, activities: [...st.activities, {
+    ...workout('weights', today),
+    exercises: [{ name: 'Fekvenyomás', unit: 'reps',
+      sets: [{ reps: 5, weightKg: 100 }, { reps: 5, weightKg: 100 }] }]
+  }] };
+  assert.equal(computeAchievements(withSets, computeProgress(withSets, today)).find((a) => a.id === 'volume_5000').current, 1000);
 }
 console.log('Minden játéklogika teszt átment.');

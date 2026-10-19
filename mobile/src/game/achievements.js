@@ -1,5 +1,6 @@
 import { dayKey } from './gamification';
 import { finishedPrograms } from './programs';
+import { setValue, setWeightKg } from './session';
 
 function countBy(list, fn) {
   return list.reduce((n, x) => n + (fn(x) ? 1 : 0), 0);
@@ -17,12 +18,21 @@ function buildContext(state, progress) {
   const hours = state.activities.map((a) => new Date(a.date).getHours());
   const exerciseTotal = (name) =>
     state.activities.reduce(
-      (sum, a) => sum + (a.exercises ?? []).filter((e) => e.name === name).reduce((s, e) => s + e.sets.reduce((x, y) => x + y, 0), 0),
+      (sum, a) => sum + (a.exercises ?? []).filter((e) => e.name === name).reduce((s, e) => s + e.sets.reduce((x, y) => x + setValue(y), 0), 0),
       0
     );
+  const resistanceSets = state.activities.reduce((n, a) =>
+    n + (a.exercises || []).reduce((total, e) =>
+      total + (e.unit === 'reps' ? e.sets.length : 0), 0), 0);
+  const volumeKg = state.activities.reduce((n, a) =>
+    n + (a.exercises || []).reduce((total, e) =>
+      total + (e.unit === 'reps' ? e.sets.reduce((v, s) =>
+        v + setValue(s) * setWeightKg(s), 0) : 0), 0), 0);
   return {
     state,
     progress,
+    resistanceSets,
+    volumeKg,
     pushups: exerciseTotal('Fekvőtámasz'),
     pullups: exerciseTotal('Húzódzkodás'),
     plankSec: exerciseTotal('Plank'),
@@ -41,6 +51,10 @@ function buildContext(state, progress) {
 const at = (current, target) => ({ current: Math.min(current, target), target });
 
 export const ACHIEVEMENTS = [
+  { id: 'trial_1', emoji: '🌟', title: 'Első hőspróba', description: 'Teljesíts egy heti hőspróbát.', check: (c) => at(c.progress.weeklyTrialsCompleted, 1) },
+  { id: 'trial_10', emoji: '✨', title: 'Kitartás legendája', description: 'Teljesíts 10 heti hőspróbát.', check: (c) => at(c.progress.weeklyTrialsCompleted, 10) },
+  { id: 'sets_30', emoji: '🏋️', title: 'Acélakarat', description: 'Rögzíts 30 ismétléses sorozatot.', check: (c) => at(c.resistanceSets, 30) },
+  { id: 'volume_5000', emoji: '⚙️', title: 'Vaslovag', description: 'Mozgass meg összesen 5000 kg-ot naplózott súlyzós sorozatokkal.', check: (c) => at(c.volumeKg, 5000) },
   { id: 'first_log', emoji: '🌱', title: 'Az ébredés', description: 'Az első bejegyzés.', check: (c) => at(c.logs, 1) },
   { id: 'logs_10', emoji: '📒', title: 'Rendszeres', description: '10 bejegyzés.', check: (c) => at(c.logs, 10) },
   { id: 'logs_50', emoji: '📚', title: 'Krónikás', description: '50 bejegyzés.', check: (c) => at(c.logs, 50) },

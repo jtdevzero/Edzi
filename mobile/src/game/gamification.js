@@ -1,6 +1,7 @@
 import { getClass, evolutionStage } from './characters';
 import { QUEST_POOL } from './quests';
 import { programDayXP } from './programs';
+import { earnedWeeklyTrials } from './weeklyTrials';
 
 export const ACTIVITY_TYPES = {
   workout: { label: 'Edzés', emoji: '💪', xpMultiplier: 1.5 },
@@ -77,10 +78,15 @@ export function levelFromTotalXP(totalXP) {
 function attributeGains(activity) {
   const points = Math.max(1, Math.round((activity.duration * activity.intensity) / 100));
   switch (activity.type) {
-    case 'workout':
+    case 'workout': {
+      // Actual logged resistance sets contribute modest additional strength.
+      const loggedSets = (activity.exercises || []).reduce((n, ex) =>
+        n + (ex.unit === 'reps' ? ex.sets?.length || 0 : 0), 0);
+      const trainingBonus = Math.min(3, Math.floor(loggedSets / 3));
       return activity.intensity >= 7
-        ? { strength: points, stamina: points, agility: Math.ceil(points / 2) }
-        : { strength: Math.ceil(points / 2), stamina: points };
+        ? { strength: points + trainingBonus, stamina: points, agility: Math.ceil(points / 2) }
+        : { strength: Math.ceil(points / 2) + trainingBonus, stamina: points };
+    }
     case 'study':
       return { intelligence: points };
     case 'journal':
@@ -155,6 +161,8 @@ export function computeProgress(state, today = dayKey()) {
       totalXP += WEEKLY_GOAL_BONUS;
     }
   }
+  const trialRewards = earnedWeeklyTrials(state, weekKey, dayKey);
+  totalXP += trialRewards.xp;
   const thisWeek = weekKey(today);
   const weeklyGoal = weeklyGoalFor(state.settings, thisWeek);
   const thisWeekActiveDays = activeDaysByWeek[thisWeek]?.size ?? 0;
@@ -184,6 +192,8 @@ export function computeProgress(state, today = dayKey()) {
     weeklyGoal,
     thisWeekActiveDays,
     weeksGoalMet,
+    weeklyTrialsCompleted: trialRewards.completed,
+    weeklyTrialXP: trialRewards.xp,
     xpById
   };
 }

@@ -7,6 +7,7 @@ import { programRunStatus, getProgram } from './programs';
 import { computeExerciseRecords, newRecords } from './stats';
 import { sessionMinutes } from './session';
 import { parseMeasurement } from './body';
+import { trialsForWeek } from './weeklyTrials';
 
 const SESSION_KEY = 'animefitness:session';
 
@@ -48,6 +49,7 @@ export function GameProvider({ children }) {
     );
     const quests = questsForDay(today).map((q) => ({ ...q, completed: completedToday.has(q.id) }));
     const programStatus = programRunStatus(state, today);
+    const weeklyTrials = trialsForWeek(state, weekKey(today), weekKey, dayKey);
 
     function commit(nextState) {
       const after = computeProgress(nextState, today);
@@ -97,6 +99,7 @@ export function GameProvider({ children }) {
       achievements,
       quests,
       programStatus,
+      weeklyTrials,
       createCharacter(name, classId) {
         setState((s) => ({ ...s, character: { name, classId, createdAt: new Date().toISOString() } }));
       },
