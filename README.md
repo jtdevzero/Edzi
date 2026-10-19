@@ -54,3 +54,17 @@ Push a `main` branchre → a GitHub Action buildel és kiteszi a `gh-pages` bran
 - Expo Doctor, játéklogikai tesztek, webes build, mobilméretű Chromium teszt és npm audit a CI-ben.
 - Kritikus npm audit figyelmeztetés esetén a CI meghiúsul. Fennmaradó magas/közepes audit és eszközspecifikus ellenőrzések: https://github.com/jtdevzero/Edzi/issues/2
 - Natív iOS/Android és Safari kézi teszt szükséges később. A böngészős adatok továbbra is helyiek.
+
+## Edzi ASCENSION – UI és stabilitási megújítás (4 fázis)
+
+1. **ASCENSION design system:** sötét indigó alap, cyan–lila–arany hangsúlyok, prémium tipográfiai hierarchia, új kártyák, főoldal, karakterlap, onboarding és alsó navigáció.
+2. **Gyorsabb naplózás és analitika:** edzés gyorsindító, közvetlen sablonok, súlyok gyors állítása, kereshető gyakorlatlista, hangsúlyos rekordok és követhető testmérési trendek.
+3. **RPG animációk:** animált karakterkártya, XP-sáv, új quest kijelző, jelvényszoba és nem blokkoló jutalom-overlay.
+4. **Offline PWA és biztonság:** verziózott statikus cache, telepítési útmutató, offline állapotjelzés, helyi mentés hibajelzése, browser smoke offline teszt.
+
+**Fontos:** a service worker kizárólag a statikus app-shell elemeket tárolja; személyes egészség-, edzés- és naplóadatokat nem másol a Cache API-ba. A felhasználói adatokat továbbra is az eszköz helyi tárolója tartja. Rendszeresen exportálj mentést.
+
+### Kiadásellenőrzés
+`npm ci && npm test && npm run build:web && npx expo-doctor@latest`
+CI-ben: 390×844-es mobilméretű Chromium, karakterlétrehozás, mérés és visszaolvasás, súlyzós edzés, offline újratöltés.
+Natív iOS/Android és tényleges Safari-készülékteszt továbbra is külön szükséges. A még nyitott magas/közepes függőségi jelzéseket a #2 issue követi.

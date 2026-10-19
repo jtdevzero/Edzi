@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
+import SectionHeading from '../components/SectionHeading';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '../game/GameContext';
 import { CATEGORY_LABELS } from '../game/quests';
 import { PROGRAMS, programDayXP } from '../game/programs';
@@ -91,7 +93,13 @@ export default function QuestsScreen() {
   }
 
   return (
-    <Screen title="Questek" subtitle="Napi questek és kihívás programok.">
+    <Screen title="Questek" subtitle="Napi küldetések, heti hőspróbák és legendás kihívások." eyebrow="HUNTER'S GUILD">
+      <LinearGradient colors={['#272659','#101C38']} style={styles.missionHero}>
+        <Text style={styles.missionEyebrow}>✦  QUEST BOARD / LIVE</Text>
+        <Text style={styles.missionHeroTitle}>{quests.filter(q=>q.completed).length}/{quests.length} <Text style={styles.missionHeroUnit}>MAI KÜLDETÉS</Text></Text>
+        <Text style={styles.missionHeroCaption}>Minden teljesített feladat hozzáad a történetedhez.</Text>
+      </LinearGradient>
+      <SectionHeading eyebrow="MAIN CAMPAIGN" title="Aktív történetszál"/>
       {programStatus ? (
         <ActiveProgram
           status={programStatus}
@@ -110,6 +118,7 @@ export default function QuestsScreen() {
         <ProgramPicker onStart={start} />
       )}
 
+      <SectionHeading eyebrow="ELITE OPERATIONS" title="Heti hőspróbák"/>
       <View style={[card, styles.gap]}>
         <Text style={styles.sectionTitle}>🌟 Heti hőspróbák</Text>
         <Text style={styles.muted}>Valódi edzések és fókuszidő alapján teljesülnek. A jutalom automatikus, és visszavonódik, ha törlöd az alapjául szolgáló naplóbejegyzést.</Text>
@@ -128,7 +137,7 @@ export default function QuestsScreen() {
         ))}
       </View>
 
-      <Text style={styles.heading}>Napi questek</Text>
+      <SectionHeading eyebrow="DAILY MISSIONS" title="Napi questek"/>
       <Text style={styles.muted}>Minden nap 3 új quest. Éjfélkor frissülnek.</Text>
       {allDone && (
         <View style={[card, styles.celebrate]}>
@@ -155,6 +164,11 @@ export default function QuestsScreen() {
 }
 
 const styles = StyleSheet.create({
+  missionHero: { borderWidth: 1, borderColor: '#4F4C9D', borderRadius: 26, padding: 21, gap: 7 },
+  missionEyebrow: { color: colors.cyan, fontSize: 10, fontWeight: '900', letterSpacing: 2 },
+  missionHeroTitle: { color: colors.text, fontSize: 35, fontWeight: '900', letterSpacing: -1 },
+  missionHeroUnit: { color: colors.primarySoft, fontSize: 13, letterSpacing: 1 },
+  missionHeroCaption: { color: colors.textMuted, fontSize: 12, lineHeight: 19 },
   flex: { flex: 1 },
   gap: { gap: 8 },
   heading: { color: colors.text, fontSize: 18, fontWeight: '700', marginTop: 4 },
@@ -169,21 +183,21 @@ const styles = StyleSheet.create({
   programCard: { borderColor: colors.gold },
   programTag: { color: colors.gold, fontWeight: '700', fontSize: 13, flex: 1 },
   task: { color: colors.text, fontSize: 15 },
-  track: { height: 8, backgroundColor: '#1e1b4b', borderRadius: 4, overflow: 'hidden', marginTop: 4 },
+  track: { height: 9, backgroundColor: colors.track, borderRadius: 8, overflow: 'hidden', marginTop: 4 },
   fill: { height: '100%', backgroundColor: colors.gold },
   workoutBtn: { backgroundColor: colors.green, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   workoutText: { color: '#052e16', fontWeight: '800', fontSize: 15 },
   abandon: { color: colors.textMuted, fontSize: 12, textAlign: 'center', textDecorationLine: 'underline', paddingVertical: 6 },
   celebrate: { borderColor: colors.gold, alignItems: 'center' },
   celebrateText: { color: colors.gold, fontWeight: '700', fontSize: 15, textAlign: 'center' },
-  quest: { gap: 8 },
+  quest: { gap: 12, borderColor: '#3A4B6B', paddingVertical: 19 },
   questDone: { opacity: 0.6 },
   badges: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   badge: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, fontSize: 12, fontWeight: '700', overflow: 'hidden' },
   xp: { color: colors.primarySoft, fontWeight: '800', fontSize: 14 },
-  title: { color: colors.text, fontSize: 18, fontWeight: '700' },
+  title: { color: colors.text, fontSize: 18, fontWeight: '900' },
   desc: { color: colors.textMuted, fontSize: 14 },
-  button: { backgroundColor: colors.primary, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+  button: { backgroundColor: colors.primary, borderRadius: 15, height: 51, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   buttonDone: { backgroundColor: '#14532d' },
   buttonText: { color: '#fff', fontWeight: '800', fontSize: 15 }
 });

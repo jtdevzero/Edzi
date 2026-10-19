@@ -4,6 +4,7 @@ import { questsForDay } from '../src/game/quests';
 import { INITIAL_STATE, normalizeState } from '../src/game/store';
 import { parseMeasurement, bodySummary } from '../src/game/body';
 import { setValue, setWeightKg, formatSet } from '../src/game/session';
+import { rewardPresentation } from '../src/game/rewardPresentation';
 import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
 import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
@@ -253,5 +254,12 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
       sets: [{ reps: 5, weightKg: 100 }, { reps: 5, weightKg: 100 }] }]
   }] };
   assert.equal(computeAchievements(withSets, computeProgress(withSets, today)).find((a) => a.id === 'volume_5000').current, 1000);
+}
+{
+  const level = rewardPresentation({ xpGained: 32, leveledUp: true, level: 4, achievements: [] }, 'Edzés kész');
+  assert.equal(level.heading, 'SZINTLÉPÉS!');
+  assert.equal(level.xp, 32);
+  assert.equal(rewardPresentation({ xpGained: 0, evolved: true }).heading, 'EVOLÚCIÓ!');
+  assert.equal(rewardPresentation(null).xp, 0);
 }
 console.log('Minden játéklogika teszt átment.');

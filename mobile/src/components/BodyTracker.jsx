@@ -19,7 +19,7 @@ function WeightChart({ history }) {
   }));
   return (
     <View style={styles.center}>
-      <Svg width={W} height={H}>
+      <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
         <Polyline points={coords.map((v) => `${v.x},${v.y}`).join(' ')} stroke={colors.green} strokeWidth={2.5} fill="none" />
         {coords.map((v, i) => <Circle key={points[i].id} cx={v.x} cy={v.y} r={3.5} fill={colors.green} />)}
         <SvgText x={p} y={H - 2} fontSize={10} fill={colors.textMuted}>{min.toFixed(1)} kg</SvgText>
@@ -54,6 +54,7 @@ export default function BodyTracker() {
   }
   return (
     <View style={[card, styles.gap]}>
+      <Text style={styles.eyebrow}>YOUR BODY / YOUR BASELINE</Text>
       <Text style={styles.title}>⚖️ Testösszetétel és mérések</Text>
       <Text style={styles.muted}>Testsúly, körfogatok és időbeli változás. A mérések nem minősülnek egészségügyi értékelésnek.</Text>
       {summary.latest ? (
@@ -108,12 +109,13 @@ export default function BodyTracker() {
   );
 }
 const styles = StyleSheet.create({
-  gap: { gap: 10 }, title: { color: colors.text, fontWeight: '800', fontSize: 17 },
+  eyebrow: { color: colors.cyan, fontWeight: '900', fontSize: 10, letterSpacing: 1.8 },
+  gap: { gap: 13 }, title: { color: colors.text, fontWeight: '900', fontSize: 18 },
   subtitle: { color: colors.text, fontWeight: '700', fontSize: 14 },
   muted: { color: colors.textMuted, fontSize: 12 }, center: { alignItems: 'center' },
   metricRow: { flexDirection: 'row', gap: 8 }, metric: { flex: 1, padding: 10, borderRadius: 12, backgroundColor: colors.input, gap: 4 },
-  big: { color: colors.text, fontWeight: '800', fontSize: 19 },
-  button: { backgroundColor: colors.primary, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  big: { color: colors.text, fontWeight: '900', fontSize: 22 },
+  button: { backgroundColor: colors.primary, height: 51, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   smallBtn: { backgroundColor: colors.primary, height: 48, paddingHorizontal: 14, borderRadius: 12, justifyContent: 'center' },
   buttonText: { color: '#fff', fontWeight: '800' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },

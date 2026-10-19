@@ -23,8 +23,8 @@
       "favicon": "./assets/favicon.png",
       "name": "Edzi",
       "shortName": "Edzi",
-      "themeColor": "#0a0a1a",
-      "backgroundColor": "#0a0a1a"
+      "themeColor": "#060916",
+      "backgroundColor": "#060916"
     },
     "experiments": {
       "baseUrl": "/Edzi"
