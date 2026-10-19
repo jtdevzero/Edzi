@@ -48,3 +48,9 @@ Push a `main` branchre → a GitHub Action buildel és kiteszi a `gh-pages` bran
 3. Súlyzós edzés: két sorozat rögzítése, rekord megjelenítése, edzés törlése.
 4. Heti hőspróba teljesítése és XP-egyezőség ellenőrzése a Statisztika fülön.
 5. Csak sikeres PR-ellenőrzés után kerüljön a `main` ágba.
+
+## Technológiai és biztonsági frissítés (2026-10)
+- Expo SDK 58 / React Native 0.88 / React 19.3, SDK-hoz igazított csomagverziókkal.
+- Expo Doctor, játéklogikai tesztek, webes build, mobilméretű Chromium teszt és npm audit a CI-ben.
+- Kritikus npm audit figyelmeztetés esetén a CI meghiúsul. Fennmaradó magas/közepes audit és eszközspecifikus ellenőrzések: https://github.com/jtdevzero/Edzi/issues/2
+- Natív iOS/Android és Safari kézi teszt szükséges később. A böngészős adatok továbbra is helyiek.
