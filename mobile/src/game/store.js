@@ -3,21 +3,34 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const STORAGE_KEY = 'animefitness:state';
 
 export const INITIAL_STATE = {
-  version: 1,
+  version: 2,
   character: null,
   activities: [],
   questCompletions: [],
   settings: { weeklyGoals: [] },
   program: null,
   programDays: [],
+  bodyMeasurements: [],
+  profile: { goalWeightKg: null },
   lastBackupAt: null
 };
 
 export function normalizeState(raw) {
+  const data = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const array = (key) => Array.isArray(data[key]) ? data[key] : [];
+  const settings = data.settings && typeof data.settings === 'object' ? data.settings : {};
+  const profile = data.profile && typeof data.profile === 'object' ? data.profile : {};
   return {
     ...INITIAL_STATE,
-    ...raw,
-    settings: { ...INITIAL_STATE.settings, ...raw.settings }
+    ...data,
+    version: 2,
+    activities: array('activities'),
+    questCompletions: array('questCompletions'),
+    programDays: array('programDays'),
+    bodyMeasurements: array('bodyMeasurements'),
+    settings: { ...INITIAL_STATE.settings, ...settings,
+      weeklyGoals: Array.isArray(settings.weeklyGoals) ? settings.weeklyGoals : [] },
+    profile: { ...INITIAL_STATE.profile, ...profile }
   };
 }
 

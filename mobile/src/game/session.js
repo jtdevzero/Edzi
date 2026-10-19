@@ -1,3 +1,14 @@
+export function setValue(entry) {
+  return typeof entry === 'number' ? entry : (entry && typeof entry.reps === 'number' ? entry.reps : 0);
+}
+export function setWeightKg(entry) {
+  return typeof entry === 'object' && entry && Number.isFinite(entry.weightKg) ? entry.weightKg : 0;
+}
+export function formatSet(entry, unit) {
+  if (unit === 'sec') return formatClock(setValue(entry));
+  const kg = setWeightKg(entry);
+  return kg > 0 ? `${setValue(entry)} × ${kg} kg` : `${setValue(entry)} ism.`;
+}
 export const REST_OPTIONS = [60, 90, 120];
 export const INTERVAL_PRESETS = [
   { label: '40/20 × 8', work: 40, rest: 20, rounds: 8 },
@@ -11,7 +22,7 @@ export function createSession({ title, templateId = null, program = null, exerci
     title,
     templateId,
     program,
-    exercises: exercises.map((e) => ({ name: e.name, unit: e.unit, search: e.search, target: e.target ?? null, sets: [] })),
+    exercises: exercises.map((e) => ({ name: e.name, unit: e.unit, weighted: !!e.weighted, search: e.search, target: e.target ?? null, sets: [] })),
     current: 0,
     restSeconds: 90,
     restEndsAt: null,

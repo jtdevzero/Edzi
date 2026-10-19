@@ -1,4 +1,6 @@
-import { dayKey, addDays, weekKey, QUEST_XP } from './gamification';
+import { dayKey, addDays, weekKey, QUEST_XP, weeklyGoalFor, WEEKLY_GOAL_BONUS } from './gamification';
+import { programDayXP } from './programs';
+import { weeklyRewardsByWeek } from './weeklyTrials';
 
 export const HEATMAP_WEEKS = 12;
 export const CHART_WEEKS = 8;
@@ -26,6 +28,9 @@ export function computeStats(state, progress, today = dayKey()) {
   for (const c of state.questCompletions) {
     dayOf(c.date).xp += QUEST_XP[c.questId] ?? 0;
   }
+  for (const p of state.programDays || []) {
+    dayOf(p.date).xp += programDayXP(p.programId, p.day);
+  }
 
   const weeks = {};
   for (const [key, d] of Object.entries(days)) {
@@ -34,6 +39,20 @@ export function computeStats(state, progress, today = dayKey()) {
     w.minutes += d.minutes;
   }
 
+  // Include computed weekly goal and trial bonuses so weekly bars reconcile to overall XP.
+  const activeByWeek = {};
+  for (const a of state.activities) {
+    const week = weekKey(dayKey(a.date));
+    (activeByWeek[week] ??= new Set()).add(dayKey(a.date));
+  }
+  for (const [week, days] of Object.entries(activeByWeek)) {
+    if (days.size >= weeklyGoalFor(state.settings, week)) {
+      (weeks[week] ??= { xp: 0, minutes: 0 }).xp += WEEKLY_GOAL_BONUS;
+    }
+  }
+  for (const [week, xp] of Object.entries(weeklyRewardsByWeek(state, weekKey, dayKey))) {
+    (weeks[week] ??= { xp: 0, minutes: 0 }).xp += xp;
+  }
   const thisWeek = weekKey(today);
   const heatmapStart = addDays(thisWeek, -7 * (HEATMAP_WEEKS - 1));
   const heatmap = Array.from({ length: HEATMAP_WEEKS }, (_, w) =>
@@ -68,19 +87,30 @@ export function computeStats(state, progress, today = dayKey()) {
   };
 }
 
+import { setValue, setWeightKg } from './session';
+
+// Legacy numeric sets are preserved; resistance sets may contain { reps, weightKg }.
 export function computeExerciseRecords(state) {
   const records = {};
   const sorted = [...state.activities].sort((a, b) => a.date.localeCompare(b.date));
   for (const a of sorted) {
     for (const ex of a.exercises ?? []) {
       if (!ex.sets?.length) continue;
-      const r = (records[ex.name] ??= { name: ex.name, unit: ex.unit, bestSet: 0, bestSession: 0, total: 0, sessions: 0, history: [] });
-      const best = Math.max(...ex.sets);
-      const sum = ex.sets.reduce((x, y) => x + y, 0);
+      const r = (records[ex.name] ??= {
+        name: ex.name, unit: ex.unit, bestSet: 0, bestSession: 0,
+        total: 0, sessions: 0, history: [], bestWeightKg: 0, volumeKg: 0
+      });
+      const values = ex.sets.map(setValue);
+      const best = Math.max(...values);
+      const sum = values.reduce((x, y) => x + y, 0);
       r.bestSet = Math.max(r.bestSet, best);
       r.bestSession = Math.max(r.bestSession, sum);
       r.total += sum;
       r.sessions += 1;
+      if (ex.unit === 'reps') {
+        r.bestWeightKg = Math.max(r.bestWeightKg, ...ex.sets.map(setWeightKg));
+        r.volumeKg += ex.sets.reduce((n, s) => n + setValue(s) * setWeightKg(s), 0);
+      }
       const day = dayKey(a.date);
       const last = r.history[r.history.length - 1];
       if (last?.day === day) last.value = Math.max(last.value, best);
@@ -90,7 +120,8 @@ export function computeExerciseRecords(state) {
   return records;
 }
 
-// A first-ever entry is not announced as a record, only beating an existing best.
+// Announce improvement over an earlier session, not the initial measurement.
 export function newRecords(before, after, names) {
-  return names.filter((n) => before[n] && after[n] && after[n].bestSet > before[n].bestSet);
+  return names.filter((n) => before[n] && after[n] &&
+    (after[n].bestSet > before[n].bestSet || after[n].bestWeightKg > before[n].bestWeightKg));
 }

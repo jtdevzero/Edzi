@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { computeProgress, baseXP, levelFromTotalXP, xpForLevel, dayKey } from '../src/game/gamification';
 import { questsForDay } from '../src/game/quests';
-import { INITIAL_STATE } from '../src/game/store';
+import { INITIAL_STATE, normalizeState } from '../src/game/store';
+import { parseMeasurement, bodySummary } from '../src/game/body';
+import { setValue, setWeightKg, formatSet } from '../src/game/session';
+import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
+import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
 import { intervalStatus, pomodoroStatus, sessionMinutes, createSession } from '../src/game/session';
 import { serializeBackup, parseBackup } from '../src/game/backup';
@@ -108,7 +112,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   const four = computeProgress(state(week), '2026-10-15');
   assert.equal(three.weeksGoalMet, 0);
   assert.equal(four.weeksGoalMet, 1);
-  assert.equal(four.totalXP - three.totalXP, four.xpById.w3 + 50, 'goal bonus is +50');
+  assert.equal(four.totalXP - three.totalXP, four.xpById.w3 + 50 + 50, 'goal bonus +50 and 120-minute weekly trial +50');
   assert.equal(four.thisWeekActiveDays, 4);
 
   const loweredLater = { ...state(week.slice(0, 2)), settings: { weeklyGoals: [{ from: '2026-10-19', goal: 1 }] } };
@@ -189,4 +193,65 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(sessionMinutes(s, t0 + 31 * 60_000), 31);
 }
 
+{
+  const migrated = normalizeState({ version: 1, activities: [], questCompletions: [] });
+  assert.equal(migrated.version, 2);
+  assert.deepEqual(migrated.bodyMeasurements, []);
+  assert.deepEqual(migrated.profile, { goalWeightKg: null });
+  assert.deepEqual(normalizeState(null).programDays, []);
+
+  const corrupt = { ...state([]), questCompletions: 'not-an-array' };
+  assert.throws(() => parseBackup(serializeBackup(corrupt)), /sérült/);
+  const brokenActivity = { ...state([]), activities: [{ ...workout('a', today), duration: -1 }] };
+  assert.throws(() => parseBackup(serializeBackup(brokenActivity)), /sérült/);
+  const linked = { ...state([workout('a', today)]),
+    programDays: [{ programId: 'saitama30', runStart: today, day: 1, date: today, activityId: 'a' }] };
+  assert.deepEqual(parseBackup(serializeBackup(linked)).programDays, linked.programDays);
+}
+{
+  assert.deepEqual(parseMeasurement({ weightKg: '86,5', waistCm: '89,1' }), {
+    weightKg: 86.5, waistCm: 89.1, chestCm: null, hipsCm: null, armCm: null, thighCm: null
+  });
+  assert.throws(() => parseMeasurement({ weightKg: 'nem szám' }));
+  const measurements = [{ id: 'a', date: '2026-10-01T12:00:00Z', weightKg: 87 },
+    { id: 'b', date: '2026-10-09T12:00:00Z', weightKg: 86.5 }];
+  assert.equal(bodySummary(measurements).changeKg, -0.5);
+  assert.equal(bodySummary([]).latest, null);
+  assert.equal(setValue({ reps: 8, weightKg: 60 }), 8);
+  assert.equal(setWeightKg(10), 0);
+  assert.equal(formatSet({ reps: 8, weightKg: 60 }, 'reps'), '8 × 60 kg');
+  assert.equal(formatSet(10, 'reps'), '10 ism.');
+  const weighted = { ...workout('w', today),
+    exercises: [{ name: 'Fekvenyomás', unit: 'reps',
+      sets: [{ reps: 8, weightKg: 60 }, { reps: 6, weightKg: 70 }] }] };
+  const r = computeExerciseRecords(state([weighted]))['Fekvenyomás'];
+  assert.equal(r.bestSet, 8);
+  assert.equal(r.bestWeightKg, 70);
+  assert.equal(r.volumeKg, 900);
+  assert.deepEqual(parseBackup(serializeBackup({ ...state([weighted]), bodyMeasurements: measurements })).bodyMeasurements, measurements);
+}
+{
+  const entries = ['2026-10-19', '2026-10-20', '2026-10-21'].map((d, i) => workout(`w${i}`, d));
+  const st = state([...entries, { ...workout('study', today), type: 'study', duration: 60 }]);
+  const trials = trialsForWeek(st, '2026-10-19', weekKey, dayKey);
+  assert.deepEqual(trials.map((t) => t.completed), [true, false, true]);
+  const reward = earnedWeeklyTrials(st, weekKey, dayKey);
+  assert.equal(reward.xp, 100);
+  assert.equal(reward.completed, 2);
+  const statResult = computeStats(st, computeProgress(st, '2026-10-21'), '2026-10-21');
+  assert.equal(statResult.weeklyXP.at(-1).xp,
+    entries.reduce((n, a) => n + computeProgress(st, '2026-10-21').xpById[a.id], 0) +
+    computeProgress(st, '2026-10-21').xpById.study + reward.xp);
+  assert.equal(computeProgress(st, '2026-10-21').weeklyTrialXP, 100);
+  const removed = { ...st, activities: st.activities.filter((a) => a.id !== 'w2') };
+  assert.equal(computeProgress(removed, '2026-10-21').weeklyTrialXP, 40);
+  const achievements = computeAchievements(st, computeProgress(st, '2026-10-21'));
+  assert.equal(achievements.find((a) => a.id === 'trial_1').unlocked, true);
+  const withSets = { ...st, activities: [...st.activities, {
+    ...workout('weights', today),
+    exercises: [{ name: 'Fekvenyomás', unit: 'reps',
+      sets: [{ reps: 5, weightKg: 100 }, { reps: 5, weightKg: 100 }] }]
+  }] };
+  assert.equal(computeAchievements(withSets, computeProgress(withSets, today)).find((a) => a.id === 'volume_5000').current, 1000);
+}
 console.log('Minden játéklogika teszt átment.');

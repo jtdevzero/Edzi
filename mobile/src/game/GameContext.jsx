@@ -6,6 +6,8 @@ import { computeAchievements, newlyUnlocked } from './achievements';
 import { programRunStatus, getProgram } from './programs';
 import { computeExerciseRecords, newRecords } from './stats';
 import { sessionMinutes } from './session';
+import { parseMeasurement } from './body';
+import { trialsForWeek } from './weeklyTrials';
 
 const SESSION_KEY = 'animefitness:session';
 
@@ -47,6 +49,7 @@ export function GameProvider({ children }) {
     );
     const quests = questsForDay(today).map((q) => ({ ...q, completed: completedToday.has(q.id) }));
     const programStatus = programRunStatus(state, today);
+    const weeklyTrials = trialsForWeek(state, weekKey(today), weekKey, dayKey);
 
     function commit(nextState) {
       const after = computeProgress(nextState, today);
@@ -80,8 +83,9 @@ export function GameProvider({ children }) {
       return activity;
     }
 
-    function programDayEntry() {
+    function programDayEntry(activityId = null) {
       return {
+        ...(activityId ? { activityId } : {}),
         programId: state.program.id,
         runStart: state.program.startDate,
         day: programStatus.doneCount + 1,
@@ -95,6 +99,7 @@ export function GameProvider({ children }) {
       achievements,
       quests,
       programStatus,
+      weeklyTrials,
       createCharacter(name, classId) {
         setState((s) => ({ ...s, character: { name, classId, createdAt: new Date().toISOString() } }));
       },
@@ -131,7 +136,7 @@ export function GameProvider({ children }) {
         let nextState = { ...state, activities: [...state.activities, activity] };
         let finishedProgram = false;
         if (completesProgram) {
-          const entry = programDayEntry();
+          const entry = programDayEntry(activity.id);
           finishedProgram = entry.day >= programStatus.program.days.length;
           nextState = { ...nextState, programDays: [...state.programDays, entry], program: finishedProgram ? null : state.program };
         }
@@ -139,7 +144,12 @@ export function GameProvider({ children }) {
         return { ...commit(nextState), programDay: completesProgram, finishedProgram };
       },
       deleteActivity(id) {
-        setState((s) => ({ ...s, activities: s.activities.filter((a) => a.id !== id) }));
+        setState((s) => ({
+          ...s,
+          activities: s.activities.filter((a) => a.id !== id),
+          // XP for a program day linked to the deleted workout must also disappear.
+          programDays: s.programDays.filter((d) => d.activityId !== id)
+        }));
       },
       completeQuest(questId) {
         if (completedToday.has(questId)) return null;
@@ -163,6 +173,23 @@ export function GameProvider({ children }) {
         });
         return { ...result, finished };
       },
+      addBodyMeasurement(input) {
+        const measurement = parseMeasurement(input);
+        setState((s) => ({
+          ...s,
+          bodyMeasurements: [...s.bodyMeasurements, { ...measurement, id: newId(), date: new Date().toISOString() }]
+        }));
+      },
+      deleteBodyMeasurement(id) {
+        setState((s) => ({ ...s, bodyMeasurements: s.bodyMeasurements.filter((m) => m.id !== id) }));
+      },
+      setGoalWeight(raw) {
+        const weight = raw == null || String(raw).trim() === '' ? null : Number(String(raw).replace(',', '.'));
+        if (weight !== null && (!Number.isFinite(weight) || weight < 20 || weight > 600)) {
+          throw new Error('A céltestsúly 20 és 600 kg között lehet.');
+        }
+        setState((s) => ({ ...s, profile: { ...s.profile, goalWeightKg: weight } }));
+      },
       setWeeklyGoal(goal) {
         const from = weekKey(today);
         setState((s) => ({
@@ -177,6 +204,7 @@ export function GameProvider({ children }) {
         setState((s) => ({ ...s, lastBackupAt: new Date().toISOString() }));
       },
       importState(imported) {
+        setSession(null);
         setState({ ...imported, lastBackupAt: new Date().toISOString() });
       },
       resetAll() {

@@ -33,3 +33,18 @@ Push a `main` branchre → a GitHub Action buildel és kiteszi a `gh-pages` bran
 3. AI: Claude karakter fotóból, AI questek, sensei coach (a `backend/` mappa ehhez van előkészítve)
 4. Szinkron több eszköz között (Supabase)
 5. Natív iOS app (Expo EAS → TestFlight → App Store)
+
+## Hibrid fitnesz + RPG bővítés (fejlesztési ág)
+
+- **Stabilizálás:** helyi mentés/import szigorúbb ellenőrzése, v1→v2 állapotmigráció, edzéshez kötött programnap-jutalom visszavonása törléskor. A backend tokennel védett és ismert originre korlátozott, de még **nem többfelhasználós, éles API**.
+- **Fitnesz Pro:** testsúly és körfogatok rögzítése a Statisztika fülön, testsúlygrafikon, önkéntes céltestsúly, súlyzós gyakorlatok kg + ismétlés alapú sorozatai, rekordok és összes mozgatott tömeg. A régi, csak ismétlést tároló edzések változatlanul olvashatók.
+- **Anime RPG 2.0:** három heti hőspróba (edzésnapok, edzéspercek, szellemi fókusz), automatikusan újraszámolt XP, D–S karakterrang és új jelvények. Az XP megváltozik, ha törlöd a hozzá kapcsolódó naplózott aktivitást.
+- **Adatvédelem:** testsúly és testméretek jelenleg csak helyben tárolódnak, illetve a saját kézzel exportált mentésben. Ne tölts fel személyes mentésfájlt a nyilvános GitHub repóba.
+- **Tesztelés:** pull request esetén külön CI ellenőrzi a játéklogikai teszteket és a web buildet.
+
+### Bevezetési ellenőrzőlista
+1. Futtasd a `mobile/` mappából: `npm ci && npm test && npm run build:web`.
+2. Böngészőn mérés létrehozása, export, import, törlés; majd webapp újratöltése.
+3. Súlyzós edzés: két sorozat rögzítése, rekord megjelenítése, edzés törlése.
+4. Heti hőspróba teljesítése és XP-egyezőség ellenőrzése a Statisztika fülön.
+5. Csak sikeres PR-ellenőrzés után kerüljön a `main` ágba.

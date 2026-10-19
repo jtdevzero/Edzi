@@ -67,7 +67,7 @@ function ActiveProgram({ status, onComplete, onAbandon, onWorkout }) {
 }
 
 export default function QuestsScreen() {
-  const { state, quests, completeQuest, programStatus, startProgram, abandonProgram, completeProgramDay, startSession } = useGame();
+  const { state, quests, weeklyTrials, completeQuest, programStatus, startProgram, abandonProgram, completeProgramDay, startSession } = useGame();
   const allDone = quests.every((q) => q.completed);
 
   function complete(q) {
@@ -109,6 +109,24 @@ export default function QuestsScreen() {
       ) : (
         <ProgramPicker onStart={start} />
       )}
+
+      <View style={[card, styles.gap]}>
+        <Text style={styles.sectionTitle}>🌟 Heti hőspróbák</Text>
+        <Text style={styles.muted}>Valódi edzések és fókuszidő alapján teljesülnek. A jutalom automatikus, és visszavonódik, ha törlöd az alapjául szolgáló naplóbejegyzést.</Text>
+        {weeklyTrials.map((t) => (
+          <View key={t.id} style={styles.programOption}>
+            <View style={styles.badges}>
+              <Text style={styles.programName}>{t.emoji} {t.title}</Text>
+              <Text style={styles.xp}>{t.completed ? '✓ ' : ''}+{t.xp} XP</Text>
+            </View>
+            <Text style={styles.muted}>{t.detail}</Text>
+            <View style={styles.track}>
+              <View style={[styles.fill, { backgroundColor: t.completed ? colors.green : colors.primary, width: `${100 * t.current / t.target}%` }]} />
+            </View>
+            <Text style={styles.muted}>{t.current}/{t.target} {t.completed ? '· Teljesítve' : ''}</Text>
+          </View>
+        ))}
+      </View>
 
       <Text style={styles.heading}>Napi questek</Text>
       <Text style={styles.muted}>Minden nap 3 új quest. Éjfélkor frissülnek.</Text>
