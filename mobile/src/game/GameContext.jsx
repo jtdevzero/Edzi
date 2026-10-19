@@ -77,6 +77,12 @@ export function GameProvider({ children }) {
         setState(nextState);
         return { xpGained: after.totalXP - before.totalXP, leveledUp: after.level > before.level };
       },
+      markBackedUp() {
+        setState((s) => ({ ...s, lastBackupAt: new Date().toISOString() }));
+      },
+      importState(imported) {
+        setState({ ...imported, lastBackupAt: new Date().toISOString() });
+      },
       resetAll() {
         setState(INITIAL_STATE);
       }

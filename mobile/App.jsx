@@ -24,7 +24,7 @@ function Root() {
   }
   if (!game.state.character) return <OnboardingScreen />;
   return (
-    <NavigationContainer theme={navTheme} documentTitle={{ formatter: () => 'Anime Fitness' }}>
+    <NavigationContainer theme={navTheme} documentTitle={{ formatter: () => 'Edzi' }}>
       <TabNavigator />
     </NavigationContainer>
   );

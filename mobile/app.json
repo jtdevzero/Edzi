@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Anime Fitness",
+    "name": "Edzi",
     "slug": "anime-fitness",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -25,9 +25,9 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/icon.png",
-      "name": "Anime Fitness",
-      "shortName": "AnimeFit",
+      "favicon": "./assets/favicon.png",
+      "name": "Edzi",
+      "shortName": "Edzi",
       "themeColor": "#0a0a1a",
       "backgroundColor": "#0a0a1a"
     },

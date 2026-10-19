@@ -13,6 +13,11 @@ Telefonra optimalizált edzés-, tanulás- és napló-tracker anime RPG játéke
 - Előzmények törléssel. Minden érték a bejegyzésekből számolódik, így a törlés után is pontos marad
 - Az adat a böngészőben tárolódik (nincs fiók, nincs szerver)
 
+## 2. ütem
+- **A (kész):** adatmentés fájlba és visszatöltés, rendes app ikon, teljes képernyős mód a főképernyőről, Statisztika fül (12 hetes naptár, heti XP, rekordok), streak-védő (hetente 1 pihenőnap)
+- **B:** jelvények, heti cél, kihívás programok
+- **C:** edzésmód időzítővel és számlálóval, pomodoro, gyakorlat rekordok
+
 ## Fejlesztés
 ```bash
 cd mobile

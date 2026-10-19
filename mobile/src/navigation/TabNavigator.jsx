@@ -5,6 +5,7 @@ import DashboardScreen from '../screens/DashboardScreen';
 import LogScreen from '../screens/LogScreen';
 import QuestsScreen from '../screens/QuestsScreen';
 import CharacterScreen from '../screens/CharacterScreen';
+import StatsScreen from '../screens/StatsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,7 +25,7 @@ export default function TabNavigator() {
         },
         tabBarActiveTintColor: '#7c3aed',
         tabBarInactiveTintColor: '#4b5563',
-        tabBarLabelStyle: { fontSize: 11, marginTop: 2 }
+        tabBarLabelStyle: { fontSize: 10, marginTop: 2 }
       }}
     >
       <Tab.Screen
@@ -49,6 +50,14 @@ export default function TabNavigator() {
         options={{
           tabBarLabel: 'Questek',
           tabBarIcon: ({ focused }) => <TabIcon emoji="⭐" focused={focused} />
+        }}
+      />
+      <Tab.Screen
+        name="Stats"
+        component={StatsScreen}
+        options={{
+          tabBarLabel: 'Statisztika',
+          tabBarIcon: ({ focused }) => <TabIcon emoji="📊" focused={focused} />
         }}
       />
       <Tab.Screen

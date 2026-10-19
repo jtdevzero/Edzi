@@ -5,12 +5,38 @@ import CharacterCard from '../components/CharacterCard';
 import StatsRadar from '../components/StatsRadar';
 import { useGame } from '../game/GameContext';
 import { getClass, LEVELS_PER_EVOLUTION } from '../game/characters';
-import { confirm } from '../utils/notify';
+import { confirm, notify } from '../utils/notify';
+import { downloadBackup, pickBackupFile } from '../game/backup';
 import { colors, card } from '../theme';
 
 export default function CharacterScreen() {
-  const { state, progress, resetAll } = useGame();
+  const { state, progress, resetAll, markBackedUp, importState } = useGame();
   const cls = getClass(state.character.classId);
+
+  async function handleExport() {
+    try {
+      if (await downloadBackup(state)) markBackedUp();
+    } catch (err) {
+      notify('Nem sikerült a mentés', err.message);
+    }
+  }
+
+  async function handleImport() {
+    try {
+      const imported = await pickBackupFile();
+      if (!imported) return;
+      confirm(
+        'Visszatöltés',
+        `A mentésben ${imported.activities.length} bejegyzés van. A mostani adataid felülíródnak. Folytatod?`,
+        () => {
+          importState(imported);
+          notify('Kész', 'Az adatok visszatöltve.');
+        }
+      );
+    } catch (err) {
+      notify('Nem sikerült a visszatöltés', err.message);
+    }
+  }
 
   return (
     <Screen title="Karakter">
@@ -37,13 +63,28 @@ export default function CharacterScreen() {
         })}
       </View>
 
+      <View style={[card, styles.backup]}>
+        <Text style={styles.sectionTitle}>💾 Adatmentés</Text>
+        <Text style={styles.muted}>
+          Az adataid csak ebben a böngészőben vannak. Mentsd le őket fájlba (pl. iCloud Drive-ra), és ha új telefonod lesz vagy törlöd a Safari adatait, vissza tudod tölteni.
+        </Text>
+        <Text style={styles.muted}>
+          Utolsó mentés: {state.lastBackupAt ? new Date(state.lastBackupAt).toLocaleDateString('hu-HU') : 'még nem volt'}
+        </Text>
+        <Pressable onPress={handleExport} style={styles.primaryBtn}>
+          <Text style={styles.primaryText}>Mentés fájlba</Text>
+        </Pressable>
+        <Pressable onPress={handleImport} style={styles.secondaryBtn}>
+          <Text style={styles.secondaryText}>Visszatöltés fájlból</Text>
+        </Pressable>
+      </View>
+
       <Pressable
         onPress={() => confirm('Újrakezdés', 'Minden adat (karakter, XP, előzmények) törlődik erről az eszközről. Biztos?', resetAll)}
         style={styles.reset}
       >
         <Text style={styles.resetText}>Újrakezdés</Text>
       </Pressable>
-      <Text style={styles.footnote}>Az adataid csak ezen az eszközön, ebben a böngészőben tárolódnak.</Text>
     </Screen>
   );
 }
@@ -57,5 +98,9 @@ const styles = StyleSheet.create({
   evoLocked: { color: colors.textMuted },
   reset: { borderColor: colors.red, borderWidth: 1, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center' },
   resetText: { color: colors.red, fontWeight: '700' },
-  footnote: { color: colors.textMuted, fontSize: 12, textAlign: 'center' }
+  backup: { gap: 8 },
+  primaryBtn: { backgroundColor: colors.primary, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+  primaryText: { color: '#fff', fontWeight: '800', fontSize: 15 },
+  secondaryBtn: { borderColor: colors.primary, borderWidth: 1, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center' },
+  secondaryText: { color: colors.primarySoft, fontWeight: '700', fontSize: 15 }
 });

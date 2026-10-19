@@ -6,26 +6,50 @@ import { useGame } from '../game/GameContext';
 import { ACTIVITY_TYPES } from '../game/gamification';
 import { colors, card } from '../theme';
 
-function StreakBadge({ streak, activeToday }) {
+const BACKUP_REMINDER_DAYS = 7;
+
+function StreakBadge({ streak, atRisk, restAvailable }) {
   return (
-    <View style={[styles.streak, !activeToday && streak > 0 && styles.streakAtRisk]}>
-      <Text style={styles.streakText}>🔥 {streak}</Text>
+    <View style={[styles.streak, atRisk && styles.streakAtRisk]}>
+      <Text style={styles.streakText}>🔥 {streak}{restAvailable ? '  🛡️' : ''}</Text>
     </View>
   );
+}
+
+function needsBackup(state) {
+  if (state.activities.length < 3) return false;
+  if (!state.lastBackupAt) return true;
+  return Date.now() - new Date(state.lastBackupAt).getTime() > BACKUP_REMINDER_DAYS * 86400000;
 }
 
 export default function DashboardScreen({ navigation }) {
   const { state, progress, quests } = useGame();
   const doneQuests = quests.filter((q) => q.completed).length;
   const recent = [...state.activities].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+  const restAvailable = !progress.restUsedThisWeek;
 
   let streakHint;
-  if (progress.activeToday) streakHint = `Ma már aktív voltál. Streak bónusz: ×${progress.nextStreakMultiplier}`;
-  else if (progress.streak > 0) streakHint = `Naplózz ma valamit, különben elveszik a ${progress.streak} napos streak!`;
-  else streakHint = 'Kezdj egy új streaket egy mai bejegyzéssel.';
+  if (progress.activeToday) {
+    streakHint = `Ma már aktív voltál. Streak bónusz: ×${progress.nextStreakMultiplier}`;
+  } else if (progress.restPending) {
+    streakHint = `🛡️ A tegnap pihenőnap volt, a streak megmaradt. Ma viszont naplózz, különben elveszik!`;
+  } else if (progress.streak > 0) {
+    streakHint = restAvailable
+      ? `Ma még nem naplóztál. Ha kihagyod, a 🛡️ pihenőnap megvédi a ${progress.streak} napos streaket.`
+      : `Naplózz ma valamit, különben elveszik a ${progress.streak} napos streak! (A heti pihenőnapot már felhasználtad.)`;
+  } else {
+    streakHint = 'Kezdj egy új streaket egy mai bejegyzéssel.';
+  }
+  const atRisk = !progress.activeToday && progress.streak > 0 && (progress.restPending || !restAvailable);
 
   return (
-    <Screen title="Anime Fitness" right={<StreakBadge streak={progress.streak} activeToday={progress.activeToday} />}>
+    <Screen title="Edzi" right={<StreakBadge streak={progress.streak} atRisk={atRisk} restAvailable={restAvailable} />}>
+      {needsBackup(state) && (
+        <Pressable style={[card, styles.backupNag]} onPress={() => navigation.navigate('Character')}>
+          <Text style={styles.backupText}>💾 Rég mentettél. Az adataid csak ebben a böngészőben vannak. Koppints ide a mentéshez.</Text>
+        </Pressable>
+      )}
+
       <CharacterCard character={state.character} progress={progress} />
 
       <View style={styles.statsRow}>
@@ -43,7 +67,7 @@ export default function DashboardScreen({ navigation }) {
         </View>
       </View>
 
-      <Text style={[styles.hint, !progress.activeToday && progress.streak > 0 && { color: colors.gold }]}>{streakHint}</Text>
+      <Text style={[styles.hint, atRisk && { color: colors.gold }]}>{streakHint}</Text>
 
       <Pressable style={styles.button} onPress={() => navigation.navigate('Log')}>
         <Text style={styles.buttonText}>➕ Új bejegyzés</Text>
@@ -79,6 +103,8 @@ const styles = StyleSheet.create({
   streak: { backgroundColor: '#3b1d0a', borderColor: colors.gold, borderWidth: 1, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
   streakAtRisk: { borderStyle: 'dashed' },
   streakText: { color: colors.gold, fontWeight: '800', fontSize: 16 },
+  backupNag: { borderColor: colors.blue, paddingVertical: 12 },
+  backupText: { color: '#93c5fd', fontSize: 13, fontWeight: '600' },
   statsRow: { flexDirection: 'row', gap: 10 },
   stat: { flex: 1, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 6 },
   statValue: { color: colors.text, fontSize: 20, fontWeight: '800' },

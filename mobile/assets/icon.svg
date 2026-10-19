@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b1d8f"/>
+      <stop offset="0.55" stop-color="#1a1047"/>
+      <stop offset="1" stop-color="#0a0a1a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.48" r="0.42">
+      <stop offset="0" stop-color="#a78bfa" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="0.5" stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="492" r="430" fill="url(#glow)"/>
+  <g stroke="#a78bfa" stroke-opacity="0.18" stroke-width="10" fill="none">
+    <path d="M110 300 L330 250"/><path d="M90 520 L300 500"/><path d="M120 740 L320 690"/>
+    <path d="M914 300 L694 260"/><path d="M934 520 L724 520"/><path d="M904 740 L704 700"/>
+  </g>
+  <path d="M590 120 L300 560 L480 560 L410 904 L724 420 L540 420 L620 120 Z"
+        fill="url(#bolt)" stroke="#fff7d6" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M590 120 L300 560 L480 560 L470 610 L560 470 L420 470 Z" fill="#ffffff" fill-opacity="0.22"/>
+</svg>
