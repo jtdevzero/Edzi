@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { loadState, saveState, INITIAL_STATE } from './store';
+import { loadState, saveState, loadJSON, saveJSON, INITIAL_STATE } from './store';
 import { computeProgress, dayKey, weekKey } from './gamification';
 import { questsForDay } from './quests';
 import { computeAchievements, newlyUnlocked } from './achievements';
 import { programRunStatus, getProgram } from './programs';
+import { computeExerciseRecords, newRecords } from './stats';
+import { sessionMinutes } from './session';
+
+const SESSION_KEY = 'animefitness:session';
 
 const GameContext = createContext(null);
 
@@ -14,9 +18,11 @@ function newId() {
 export function GameProvider({ children }) {
   const [state, setState] = useState(null);
   const [today, setToday] = useState(dayKey());
+  const [session, setSession] = useState(undefined);
 
   useEffect(() => {
     loadState().then(setState);
+    loadJSON(SESSION_KEY).then(setSession);
   }, []);
 
   useEffect(() => {
@@ -24,12 +30,16 @@ export function GameProvider({ children }) {
   }, [state]);
 
   useEffect(() => {
+    if (session !== undefined) saveJSON(SESSION_KEY, session);
+  }, [session]);
+
+  useEffect(() => {
     const timer = setInterval(() => setToday(dayKey()), 60 * 1000);
     return () => clearInterval(timer);
   }, []);
 
   const value = useMemo(() => {
-    if (!state) return null;
+    if (!state || session === undefined) return null;
     const progress = computeProgress(state, today);
     const achievements = computeAchievements(state, progress);
     const completedToday = new Set(
@@ -46,7 +56,36 @@ export function GameProvider({ children }) {
         leveledUp: after.level > progress.level,
         evolved: after.evolutionStage > progress.evolutionStage,
         level: after.level,
-        achievements: newlyUnlocked(achievements, computeAchievements(nextState, after))
+        achievements: newlyUnlocked(achievements, computeAchievements(nextState, after)),
+        records: newRecords(
+          computeExerciseRecords(state),
+          computeExerciseRecords(nextState),
+          (nextState.activities.at(-1)?.exercises ?? []).map((e) => e.name)
+        )
+      };
+    }
+
+    function buildActivity({ type, title, duration, intensity, notes, templateId, exercises }) {
+      const activity = {
+        id: newId(),
+        type,
+        title,
+        duration,
+        intensity,
+        notes,
+        templateId: templateId ?? null,
+        date: new Date().toISOString()
+      };
+      if (exercises?.length) activity.exercises = exercises;
+      return activity;
+    }
+
+    function programDayEntry() {
+      return {
+        programId: state.program.id,
+        runStart: state.program.startDate,
+        day: programStatus.doneCount + 1,
+        date: today
       };
     }
 
@@ -59,18 +98,45 @@ export function GameProvider({ children }) {
       createCharacter(name, classId) {
         setState((s) => ({ ...s, character: { name, classId, createdAt: new Date().toISOString() } }));
       },
-      logActivity({ type, title, duration, intensity, notes, templateId }) {
-        const activity = {
-          id: newId(),
-          type,
-          title,
-          duration,
+      session,
+      logActivity(input) {
+        return commit({ ...state, activities: [...state.activities, buildActivity(input)] });
+      },
+      startSession(newSession) {
+        setSession(newSession);
+      },
+      updateSession(updater) {
+        setSession((s) => (s ? updater(s) : s));
+      },
+      discardSession() {
+        setSession(null);
+      },
+      finishSession(intensity) {
+        const exercises = session.exercises
+          .filter((e) => e.sets.length)
+          .map(({ name, unit, sets }) => ({ name, unit, sets }));
+        const activity = buildActivity({
+          type: 'workout',
+          title: session.title,
+          duration: sessionMinutes(session),
           intensity,
-          notes,
-          templateId: templateId ?? null,
-          date: new Date().toISOString()
-        };
-        return commit({ ...state, activities: [...state.activities, activity] });
+          notes: '',
+          templateId: session.templateId,
+          exercises
+        });
+        const completesProgram = Boolean(
+          session.program && programStatus && !programStatus.doneToday && !programStatus.finished &&
+          session.program.id === state.program?.id && session.program.startDate === state.program?.startDate
+        );
+        let nextState = { ...state, activities: [...state.activities, activity] };
+        let finishedProgram = false;
+        if (completesProgram) {
+          const entry = programDayEntry();
+          finishedProgram = entry.day >= programStatus.program.days.length;
+          nextState = { ...nextState, programDays: [...state.programDays, entry], program: finishedProgram ? null : state.program };
+        }
+        setSession(null);
+        return { ...commit(nextState), programDay: completesProgram, finishedProgram };
       },
       deleteActivity(id) {
         setState((s) => ({ ...s, activities: s.activities.filter((a) => a.id !== id) }));
@@ -88,12 +154,7 @@ export function GameProvider({ children }) {
       },
       completeProgramDay() {
         if (!programStatus || programStatus.doneToday || programStatus.finished) return null;
-        const entry = {
-          programId: state.program.id,
-          runStart: state.program.startDate,
-          day: programStatus.doneCount + 1,
-          date: today
-        };
+        const entry = programDayEntry();
         const finished = entry.day >= programStatus.program.days.length;
         const result = commit({
           ...state,
@@ -122,7 +183,7 @@ export function GameProvider({ children }) {
         setState(INITIAL_STATE);
       }
     };
-  }, [state, today]);
+  }, [state, today, session]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

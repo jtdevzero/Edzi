@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { computeProgress, baseXP, levelFromTotalXP, xpForLevel, dayKey } from '../src/game/gamification';
 import { questsForDay } from '../src/game/quests';
 import { INITIAL_STATE } from '../src/game/store';
-import { computeStats } from '../src/game/stats';
+import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
+import { intervalStatus, pomodoroStatus, sessionMinutes, createSession } from '../src/game/session';
 import { serializeBackup, parseBackup } from '../src/game/backup';
 import { computeAchievements, newlyUnlocked } from '../src/game/achievements';
 import { PROGRAMS, programRunStatus, programDayXP, finishedPrograms, PROGRAM_FINISH_BONUS } from '../src/game/programs';
@@ -150,6 +151,42 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.deepEqual(newlyUnlocked(before, after).map((a) => a.id).sort(), ['early', 'first_log']);
   const logs10 = after.find((a) => a.id === 'logs_10');
   assert.deepEqual([logs10.current, logs10.target], [1, 10]);
+}
+
+{
+  const withEx = (id, day, sets) => ({ ...workout(id, day), exercises: [{ name: 'Fekvőtámasz', unit: 'reps', sets }] });
+  const before = computeExerciseRecords(state([withEx('a', '2026-10-17', [10, 12])]));
+  const st = state([withEx('a', '2026-10-17', [10, 12]), withEx('b', today, [15, 8, 8])]);
+  const rec = computeExerciseRecords(st);
+  assert.deepEqual(
+    [rec['Fekvőtámasz'].bestSet, rec['Fekvőtámasz'].bestSession, rec['Fekvőtámasz'].total, rec['Fekvőtámasz'].sessions],
+    [15, 31, 53, 2]
+  );
+  assert.deepEqual(rec['Fekvőtámasz'].history.map((h) => h.value), [12, 15]);
+  assert.deepEqual(newRecords(before, rec, ['Fekvőtámasz']), ['Fekvőtámasz']);
+  assert.deepEqual(newRecords({}, rec, ['Fekvőtámasz']), [], 'first entry is not a record');
+  const ach = computeAchievements(st, computeProgress(st, today)).find((a) => a.id === 'pushups_100');
+  assert.equal(ach.current, 53);
+}
+
+{
+  const t0 = 1_000_000;
+  const preset = { work: 40, rest: 20, rounds: 2, startedAt: t0 };
+  assert.deepEqual(intervalStatus(preset, t0 + 10_000), { done: false, round: 1, phase: 'work', remaining: 30, workSeconds: 10 });
+  assert.equal(intervalStatus(preset, t0 + 45_000).phase, 'rest');
+  assert.equal(intervalStatus(preset, t0 + 65_000).round, 2);
+  assert.equal(intervalStatus(preset, t0 + 100_000).done, true, 'no trailing rest after the last round');
+  assert.equal(intervalStatus(preset, t0 + 100_000).workSeconds, 80);
+
+  const p0 = pomodoroStatus(t0, t0 + 10 * 60_000);
+  assert.deepEqual([p0.phase, p0.round, p0.focusMinutes, p0.completedRounds], ['focus', 1, 10, 0]);
+  const p1 = pomodoroStatus(t0, t0 + 27 * 60_000);
+  assert.deepEqual([p1.phase, p1.focusMinutes, p1.completedRounds], ['break', 25, 1]);
+  assert.equal(pomodoroStatus(t0, t0 + 70 * 60_000).focusMinutes, 60);
+
+  const s = createSession({ title: 'x', exercises: [{ name: 'Plank', unit: 'sec' }] }, t0);
+  assert.equal(sessionMinutes(s, t0 + 10_000), 1, 'at least one minute');
+  assert.equal(sessionMinutes(s, t0 + 31 * 60_000), 31);
 }
 
 console.log('Minden játéklogika teszt átment.');

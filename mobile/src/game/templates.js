@@ -11,10 +11,10 @@ export const WORKOUT_TEMPLATES = [
     duration: 90,
     intensity: 9,
     exercises: [
-      { name: 'Fekvőtámasz', amount: '100 ism.', search: 'push up proper form' },
-      { name: 'Felülés', amount: '100 ism.', search: 'sit up proper form' },
-      { name: 'Guggolás', amount: '100 ism.', search: 'bodyweight squat proper form' },
-      { name: 'Futás', amount: '10 km', search: 'running form beginners' }
+      { name: 'Fekvőtámasz', amount: '100 ism.', unit: 'reps', search: 'push up proper form' },
+      { name: 'Felülés', amount: '100 ism.', unit: 'reps', search: 'sit up proper form' },
+      { name: 'Guggolás', amount: '100 ism.', unit: 'reps', search: 'bodyweight squat proper form' },
+      { name: 'Futás', amount: '10 km', unit: 'none', search: 'running form beginners' }
     ]
   },
   {
@@ -25,10 +25,10 @@ export const WORKOUT_TEMPLATES = [
     duration: 45,
     intensity: 8,
     exercises: [
-      { name: 'Húzódzkodás', amount: '5×6 ism.', search: 'pull up proper form' },
-      { name: 'Tolódzkodás', amount: '5×10 ism.', search: 'dips proper form' },
-      { name: 'Burpee', amount: '3×10 ism.', search: 'burpee proper form' },
-      { name: 'Sprint intervallum', amount: '10 × 20 mp', search: 'sprint interval training' }
+      { name: 'Húzódzkodás', amount: '5×6 ism.', unit: 'reps', search: 'pull up proper form' },
+      { name: 'Tolódzkodás', amount: '5×10 ism.', unit: 'reps', search: 'dips proper form' },
+      { name: 'Burpee', amount: '3×10 ism.', unit: 'reps', search: 'burpee proper form' },
+      { name: 'Sprint intervallum', amount: '10 × 20 mp', unit: 'sec', search: 'sprint interval training' }
     ]
   },
   {
@@ -39,8 +39,8 @@ export const WORKOUT_TEMPLATES = [
     duration: 15,
     intensity: 4,
     exercises: [
-      { name: 'Húzódzkodás', amount: 'max. fele', search: 'grease the groove pull ups' },
-      { name: 'Fekvőtámasz', amount: 'max. fele', search: 'grease the groove push ups' }
+      { name: 'Húzódzkodás', amount: 'max. fele', unit: 'reps', search: 'grease the groove pull ups' },
+      { name: 'Fekvőtámasz', amount: 'max. fele', unit: 'reps', search: 'grease the groove push ups' }
     ]
   },
   {
@@ -51,9 +51,9 @@ export const WORKOUT_TEMPLATES = [
     duration: 30,
     intensity: 8,
     exercises: [
-      { name: 'HIIT kör', amount: '20 perc', search: '20 minute hiit no equipment' },
-      { name: 'Ugrásos guggolás', amount: '3×15 ism.', search: 'jump squat proper form' },
-      { name: 'Hegymászó', amount: '3×30 mp', search: 'mountain climbers proper form' }
+      { name: 'HIIT kör', amount: '20 perc', unit: 'sec', search: '20 minute hiit no equipment' },
+      { name: 'Ugrásos guggolás', amount: '3×15 ism.', unit: 'reps', search: 'jump squat proper form' },
+      { name: 'Hegymászó', amount: '3×30 mp', unit: 'sec', search: 'mountain climbers proper form' }
     ]
   },
   {
@@ -64,9 +64,30 @@ export const WORKOUT_TEMPLATES = [
     duration: 20,
     intensity: 3,
     exercises: [
-      { name: 'Box légzés', amount: '5 perc', search: 'box breathing guided' },
-      { name: 'Napüdvözlet', amount: '5 kör', search: 'sun salutation beginners' },
-      { name: 'Nyújtás', amount: '10 perc', search: 'full body stretch 10 minutes' }
+      { name: 'Box légzés', amount: '5 perc', unit: 'sec', search: 'box breathing guided' },
+      { name: 'Napüdvözlet', amount: '5 kör', unit: 'reps', search: 'sun salutation beginners' },
+      { name: 'Nyújtás', amount: '10 perc', unit: 'sec', search: 'full body stretch 10 minutes' }
     ]
   }
 ];
+
+export const EXERCISE_LIBRARY = [
+  { name: 'Fekvőtámasz', unit: 'reps', search: 'push up proper form' },
+  { name: 'Húzódzkodás', unit: 'reps', search: 'pull up proper form' },
+  { name: 'Guggolás', unit: 'reps', search: 'bodyweight squat proper form' },
+  { name: 'Felülés', unit: 'reps', search: 'sit up proper form' },
+  { name: 'Tolódzkodás', unit: 'reps', search: 'dips proper form' },
+  { name: 'Kitörés', unit: 'reps', search: 'lunge proper form' },
+  { name: 'Burpee', unit: 'reps', search: 'burpee proper form' },
+  { name: 'Ugrásos guggolás', unit: 'reps', search: 'jump squat proper form' },
+  { name: 'Plank', unit: 'sec', search: 'plank proper form' },
+  { name: 'Hegymászó', unit: 'sec', search: 'mountain climbers proper form' },
+  { name: 'HIIT kör', unit: 'sec', search: '20 minute hiit no equipment' },
+  { name: 'Nyújtás', unit: 'sec', search: 'full body stretch 10 minutes' }
+];
+
+export function sessionExercisesFromTemplate(template) {
+  return template.exercises
+    .filter((e) => e.unit !== 'none')
+    .map((e) => ({ name: e.name, unit: e.unit, search: e.search, sets: [] }));
+}

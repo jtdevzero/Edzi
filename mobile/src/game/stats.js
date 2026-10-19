@@ -67,3 +67,30 @@ export function computeStats(state, progress, today = dayKey()) {
     }
   };
 }
+
+export function computeExerciseRecords(state) {
+  const records = {};
+  const sorted = [...state.activities].sort((a, b) => a.date.localeCompare(b.date));
+  for (const a of sorted) {
+    for (const ex of a.exercises ?? []) {
+      if (!ex.sets?.length) continue;
+      const r = (records[ex.name] ??= { name: ex.name, unit: ex.unit, bestSet: 0, bestSession: 0, total: 0, sessions: 0, history: [] });
+      const best = Math.max(...ex.sets);
+      const sum = ex.sets.reduce((x, y) => x + y, 0);
+      r.bestSet = Math.max(r.bestSet, best);
+      r.bestSession = Math.max(r.bestSession, sum);
+      r.total += sum;
+      r.sessions += 1;
+      const day = dayKey(a.date);
+      const last = r.history[r.history.length - 1];
+      if (last?.day === day) last.value = Math.max(last.value, best);
+      else r.history.push({ day, value: best });
+    }
+  }
+  return records;
+}
+
+// A first-ever entry is not announced as a record, only beating an existing best.
+export function newRecords(before, after, names) {
+  return names.filter((n) => before[n] && after[n] && after[n].bestSet > before[n].bestSet);
+}

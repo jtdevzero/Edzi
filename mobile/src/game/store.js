@@ -31,6 +31,24 @@ export async function loadState() {
   }
 }
 
+export async function loadJSON(key) {
+  try {
+    const raw = await AsyncStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveJSON(key, value) {
+  try {
+    if (value == null) await AsyncStorage.removeItem(key);
+    else await AsyncStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage can be unavailable (private mode); the in-memory value still works.
+  }
+}
+
 export async function saveState(state) {
   try {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));

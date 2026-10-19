@@ -6,6 +6,8 @@ import { CATEGORY_LABELS } from '../game/quests';
 import { PROGRAMS, programDayXP } from '../game/programs';
 import { confirm } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
+import { unlockAudio } from '../utils/device';
+import { createSession } from '../game/session';
 import { colors, card } from '../theme';
 
 const CATEGORY_COLORS = { physical: colors.red, mental: colors.blue, recovery: colors.green };
@@ -35,7 +37,7 @@ function ProgramPicker({ onStart }) {
   );
 }
 
-function ActiveProgram({ status, onComplete, onAbandon }) {
+function ActiveProgram({ status, onComplete, onAbandon, onWorkout }) {
   const { program, doneCount, doneToday, currentDay, today } = status;
   const pct = doneCount / program.days.length;
   return (
@@ -48,6 +50,11 @@ function ActiveProgram({ status, onComplete, onAbandon }) {
       {today.tasks.map((t) => <Text key={t} style={styles.task}>• {t}</Text>)}
       <View style={styles.track}><View style={[styles.fill, { width: `${pct * 100}%` }]} /></View>
       <Text style={styles.muted}>{doneCount}/{program.days.length} nap kész</Text>
+      {!doneToday && today.exercises && (
+        <Pressable onPress={onWorkout} style={styles.workoutBtn}>
+          <Text style={styles.workoutText}>▶ Edzésmódban (számlálóval)</Text>
+        </Pressable>
+      )}
       <Pressable disabled={doneToday} onPress={onComplete} style={[styles.button, doneToday && styles.buttonDone]}>
         <Text style={styles.buttonText}>{doneToday ? '✅ A mai programnap kész' : 'Megcsináltam'}</Text>
       </Pressable>
@@ -60,7 +67,7 @@ function ActiveProgram({ status, onComplete, onAbandon }) {
 }
 
 export default function QuestsScreen() {
-  const { quests, completeQuest, programStatus, startProgram, abandonProgram, completeProgramDay } = useGame();
+  const { state, quests, completeQuest, programStatus, startProgram, abandonProgram, completeProgramDay, startSession } = useGame();
   const allDone = quests.every((q) => q.completed);
 
   function complete(q) {
@@ -89,6 +96,14 @@ export default function QuestsScreen() {
         <ActiveProgram
           status={programStatus}
           onComplete={completeDay}
+          onWorkout={() => {
+            unlockAudio();
+            startSession(createSession({
+              title: `${programStatus.program.name} · ${programStatus.currentDay}. nap`,
+              program: state.program,
+              exercises: programStatus.today.exercises
+            }));
+          }}
           onAbandon={() => confirm('Program feladása', 'Az eddigi napok XP-je megmarad, de újrakezdésnél az 1. naptól indul. Biztos?', abandonProgram)}
         />
       ) : (
@@ -138,6 +153,8 @@ const styles = StyleSheet.create({
   task: { color: colors.text, fontSize: 15 },
   track: { height: 8, backgroundColor: '#1e1b4b', borderRadius: 4, overflow: 'hidden', marginTop: 4 },
   fill: { height: '100%', backgroundColor: colors.gold },
+  workoutBtn: { backgroundColor: colors.green, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+  workoutText: { color: '#052e16', fontWeight: '800', fontSize: 15 },
   abandon: { color: colors.textMuted, fontSize: 12, textAlign: 'center', textDecorationLine: 'underline', paddingVertical: 6 },
   celebrate: { borderColor: colors.gold, alignItems: 'center' },
   celebrateText: { color: colors.gold, fontWeight: '700', fontSize: 15, textAlign: 'center' },

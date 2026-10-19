@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Rect, Text as SvgText } from 'react-native-svg';
+import React, { useMemo, useState } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import Svg, { Rect, Polyline, Circle, Text as SvgText } from 'react-native-svg';
 import Screen from '../components/Screen';
 import { useGame } from '../game/GameContext';
-import { computeStats } from '../game/stats';
+import { computeStats, computeExerciseRecords } from '../game/stats';
+import { formatClock } from '../game/session';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
 import { colors, card } from '../theme';
 
@@ -80,6 +81,71 @@ function WeeklyChart({ weeks }) {
   );
 }
 
+function ProgressChart({ history, unit }) {
+  const points = history.slice(-20);
+  const width = 300;
+  const height = 140;
+  const pad = 20;
+  const max = Math.max(...points.map((p) => p.value));
+  const min = Math.min(...points.map((p) => p.value));
+  const span = Math.max(1, max - min);
+  const xy = points.map((p, i) => ({
+    x: pad + (i * (width - 2 * pad)) / (points.length - 1),
+    y: pad + (1 - (p.value - min) / span) * (height - 2 * pad - 10)
+  }));
+  const fmt = (v) => (unit === 'sec' ? formatClock(v) : String(v));
+  return (
+    <View style={styles.center}>
+      <Svg width={width} height={height}>
+        <Polyline points={xy.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke={colors.gold} strokeWidth="2.5" />
+        {xy.map((p, i) => <Circle key={i} cx={p.x} cy={p.y} r="3.5" fill={colors.gold} />)}
+        <SvgText x={xy.at(-1).x} y={xy.at(-1).y - 8} fill={colors.text} fontSize="11" fontWeight="bold" fontFamily={FONT} textAnchor="middle">{fmt(points.at(-1).value)}</SvgText>
+        <SvgText x={pad} y={height - 2} fill={colors.textMuted} fontSize="9" fontFamily={FONT}>{shortDate(points[0].day)}</SvgText>
+        <SvgText x={width - pad} y={height - 2} fill={colors.textMuted} fontSize="9" fontFamily={FONT} textAnchor="end">{shortDate(points.at(-1).day)}</SvgText>
+      </Svg>
+    </View>
+  );
+}
+
+function ExerciseRecords({ records }) {
+  const list = Object.values(records).sort((a, b) => b.sessions - a.sessions);
+  const [selected, setSelected] = useState(null);
+  const current = records[selected] ?? list[0];
+  if (!list.length) {
+    return (
+      <View style={card}>
+        <Text style={styles.sectionTitle}>🏆 Gyakorlat rekordok</Text>
+        <Text style={styles.muted}>Használd az Edzésmódot (Naplózás → Edzés), és itt látod majd a rekordjaidat és a fejlődésedet gyakorlatonként.</Text>
+      </View>
+    );
+  }
+  const fmt = (v) => (current.unit === 'sec' ? formatClock(v) : `${v}`);
+  return (
+    <View style={[card, styles.recGap]}>
+      <Text style={styles.sectionTitle}>🏆 Gyakorlat rekordok</Text>
+      <View style={styles.exChips}>
+        {list.map((r) => (
+          <Pressable key={r.name} onPress={() => setSelected(r.name)} style={[styles.exChip, r.name === current.name && styles.exChipOn]}>
+            <Text style={[styles.exChipText, r.name === current.name && styles.exChipTextOn]}>{r.name}</Text>
+          </Pressable>
+        ))}
+      </View>
+      <View style={styles.recordGrid}>
+        <Record value={fmt(current.bestSet)} label={current.unit === 'sec' ? 'Leghosszabb' : 'Max egy sorozatban'} />
+        <Record value={fmt(current.bestSession)} label="Max egy edzésen" />
+        <Record value={fmt(current.total)} label="Összesen" />
+        <Record value={current.sessions} label="Edzés" />
+      </View>
+      <Text style={styles.muted}>Fejlődés (napi legjobb sorozat)</Text>
+      {current.history.length >= 2 ? (
+        <ProgressChart history={current.history} unit={current.unit} />
+      ) : (
+        <Text style={styles.muted}>A grafikonhoz legalább 2 különböző nap kell ebből a gyakorlatból.</Text>
+      )}
+    </View>
+  );
+}
+
 function Record({ value, label }) {
   return (
     <View style={[card, styles.record]}>
@@ -92,6 +158,7 @@ function Record({ value, label }) {
 export default function StatsScreen() {
   const { state, progress } = useGame();
   const stats = useMemo(() => computeStats(state, progress), [state, progress]);
+  const exerciseRecords = useMemo(() => computeExerciseRecords(state), [state]);
   const { records, minutesByType } = stats;
   const totalTypeMinutes = records.totalMinutes || 1;
 
@@ -103,6 +170,8 @@ export default function StatsScreen() {
         <Record value={formatMinutes(records.bestWeekMinutes)} label="Legjobb hét" />
         <Record value={formatMinutes(records.totalMinutes)} label="Összesen" />
       </View>
+
+      <ExerciseRecords records={exerciseRecords} />
 
       <View style={card}>
         <Text style={styles.sectionTitle}>Az utolsó 12 hét</Text>
@@ -142,6 +211,12 @@ const CELL = 18;
 
 const styles = StyleSheet.create({
   center: { alignItems: 'center', marginTop: 8 },
+  recGap: { gap: 10 },
+  exChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  exChip: { paddingHorizontal: 12, height: 36, borderRadius: 18, backgroundColor: colors.input, justifyContent: 'center' },
+  exChipOn: { backgroundColor: colors.gold },
+  exChipText: { color: colors.textMuted, fontWeight: '600', fontSize: 13 },
+  exChipTextOn: { color: '#1c1206' },
   sectionTitle: { color: colors.text, fontSize: 16, fontWeight: '700', marginBottom: 4 },
   muted: { color: colors.textMuted, fontSize: 12 },
   recordGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },

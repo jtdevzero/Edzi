@@ -15,9 +15,17 @@ function buildContext(state, progress) {
     questsByDay[c.date] = (questsByDay[c.date] ?? 0) + 1;
   }
   const hours = state.activities.map((a) => new Date(a.date).getHours());
+  const exerciseTotal = (name) =>
+    state.activities.reduce(
+      (sum, a) => sum + (a.exercises ?? []).filter((e) => e.name === name).reduce((s, e) => s + e.sets.reduce((x, y) => x + y, 0), 0),
+      0
+    );
   return {
     state,
     progress,
+    pushups: exerciseTotal('Fekvőtámasz'),
+    pullups: exerciseTotal('Húzódzkodás'),
+    plankSec: exerciseTotal('Plank'),
     logs: state.activities.length,
     study: countBy(state.activities, (a) => a.type === 'study'),
     journal: countBy(state.activities, (a) => a.type === 'journal'),
@@ -53,6 +61,10 @@ export const ACHIEVEMENTS = [
   { id: 'goal_1', emoji: '🎯', title: 'Célba ért', description: 'Teljesítsd a heti célt.', check: (c) => at(c.progress.weeksGoalMet, 1) },
   { id: 'goal_4', emoji: '🗓️', title: 'Egy hónap fegyelem', description: '4 héten teljesített heti cél.', check: (c) => at(c.progress.weeksGoalMet, 4) },
   { id: 'program_1', emoji: '🥋', title: 'Kihívás teljesítve', description: 'Fejezz be egy kihívás programot.', check: (c) => at(c.programsDone, 1) },
+  { id: 'pushups_100', emoji: '🙌', title: 'Száz fekvő', description: '100 fekvőtámasz összesen edzésmódban.', check: (c) => at(c.pushups, 100) },
+  { id: 'pushups_1000', emoji: '🦾', title: 'Ezer fekvő', description: '1000 fekvőtámasz összesen.', check: (c) => at(c.pushups, 1000) },
+  { id: 'pullups_50', emoji: '🧗', title: 'Felhúzó', description: '50 húzódzkodás összesen.', check: (c) => at(c.pullups, 50) },
+  { id: 'plank_300', emoji: '🪨', title: 'Kőszikla', description: '5 perc plank összesen.', check: (c) => at(c.plankSec, 300) },
   { id: 'early', emoji: '🌅', title: 'Hajnali harcos', description: 'Naplózz reggel 7 előtt.', check: (c) => at(c.early, 1) },
   { id: 'late', emoji: '🌙', title: 'Éjjeli bagoly', description: 'Naplózz este 10 után.', check: (c) => at(c.late, 1) }
 ];

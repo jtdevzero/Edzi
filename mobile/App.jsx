@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import TabNavigator from './src/navigation/TabNavigator';
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import WorkoutSessionScreen from './src/screens/WorkoutSessionScreen';
 import { GameProvider, useGame } from './src/game/GameContext';
 import { colors } from './src/theme';
 
@@ -23,6 +24,7 @@ function Root() {
     );
   }
   if (!game.state.character) return <OnboardingScreen />;
+  if (game.session) return <WorkoutSessionScreen />;
   return (
     <NavigationContainer theme={navTheme} documentTitle={{ formatter: () => 'Edzi' }}>
       <TabNavigator />

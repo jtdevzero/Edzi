@@ -3,7 +3,10 @@ import { View, Text, TextInput, Pressable, StyleSheet, Linking } from 'react-nat
 import Screen from '../components/Screen';
 import { useGame } from '../game/GameContext';
 import { ACTIVITY_TYPES, baseXP } from '../game/gamification';
-import { WORKOUT_TEMPLATES, youtubeSearchUrl } from '../game/templates';
+import { WORKOUT_TEMPLATES, youtubeSearchUrl, sessionExercisesFromTemplate } from '../game/templates';
+import { createSession } from '../game/session';
+import { unlockAudio } from '../utils/device';
+import Pomodoro from '../components/Pomodoro';
 import { confirm } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
@@ -17,7 +20,7 @@ function formatDate(iso) {
 }
 
 export default function LogScreen({ navigation }) {
-  const { state, progress, logActivity, deleteActivity } = useGame();
+  const { state, progress, logActivity, deleteActivity, startSession } = useGame();
   const [type, setType] = useState('workout');
   const [form, setForm] = useState(EMPTY_FORM);
   const [openTemplate, setOpenTemplate] = useState(null);
@@ -31,6 +34,13 @@ export default function LogScreen({ navigation }) {
 
   function applyTemplate(t) {
     update({ title: t.name, duration: String(t.duration), intensity: t.intensity, templateId: t.id });
+  }
+
+  function startWorkout(template) {
+    unlockAudio();
+    startSession(createSession(template
+      ? { title: template.name, templateId: template.id, exercises: sessionExercisesFromTemplate(template) }
+      : { title: 'Saját edzés', exercises: [] }));
   }
 
   function submit() {
@@ -62,6 +72,18 @@ export default function LogScreen({ navigation }) {
       </View>
 
       {type === 'workout' && (
+        <View style={[card, styles.gap, styles.sessionCard]}>
+          <Text style={styles.sectionTitle}>⏱ Edzésmód</Text>
+          <Text style={styles.muted}>Sorozatszámláló, pihenő időzítő, stopper és intervallum. A végén automatikusan naplóz, és rekordokat is számol.</Text>
+          <Pressable onPress={() => startWorkout(null)} style={styles.sessionBtn}>
+            <Text style={styles.sessionText}>▶ Üres edzés indítása</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {type === 'study' && <Pomodoro onLogged={() => navigation.navigate('Dashboard')} />}
+
+      {type === 'workout' && (
         <View style={[card, styles.gap]}>
           <Text style={styles.sectionTitle}>Anime edzéssablonok</Text>
           {WORKOUT_TEMPLATES.map((t) => {
@@ -86,8 +108,11 @@ export default function LogScreen({ navigation }) {
                         </Pressable>
                       </View>
                     ))}
+                    <Pressable onPress={() => startWorkout(t)} style={styles.sessionBtn}>
+                      <Text style={styles.sessionText}>▶ Edzésmódban</Text>
+                    </Pressable>
                     <Pressable onPress={() => applyTemplate(t)} style={styles.useBtn}>
-                      <Text style={styles.useText}>Ezt csináltam → kitöltés</Text>
+                      <Text style={styles.useText}>Már megcsináltam → kitöltés</Text>
                     </Pressable>
                   </View>
                 )}
@@ -187,6 +212,9 @@ const styles = StyleSheet.create({
   exerciseText: { color: colors.text, fontSize: 14, flex: 1 },
   videoBtn: { backgroundColor: '#3f0d12', borderRadius: 8, paddingHorizontal: 10, height: 36, justifyContent: 'center' },
   videoText: { color: '#fca5a5', fontSize: 12, fontWeight: '700' },
+  sessionCard: { borderColor: colors.green },
+  sessionBtn: { backgroundColor: colors.green, borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center' },
+  sessionText: { color: '#052e16', fontWeight: '800', fontSize: 15 },
   useBtn: { borderColor: colors.primary, borderWidth: 1, borderRadius: 10, height: 44, alignItems: 'center', justifyContent: 'center' },
   useText: { color: colors.primarySoft, fontWeight: '700' },
   label: { color: colors.textSoft, fontSize: 13, fontWeight: '600' },

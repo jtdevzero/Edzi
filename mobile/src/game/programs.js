@@ -14,7 +14,12 @@ function saitamaDays() {
     const km = Math.min(10, 1 + Math.floor(i / 3));
     return {
       title: `${reps} ismétlés`,
-      tasks: [`${reps} fekvőtámasz`, `${reps} felülés`, `${reps} guggolás`, `${km} km futás`]
+      tasks: [`${reps} fekvőtámasz`, `${reps} felülés`, `${reps} guggolás`, `${km} km futás`],
+      exercises: [
+        { name: 'Fekvőtámasz', unit: 'reps', target: reps, search: 'push up proper form' },
+        { name: 'Felülés', unit: 'reps', target: reps, search: 'sit up proper form' },
+        { name: 'Guggolás', unit: 'reps', target: reps, search: 'bodyweight squat proper form' }
+      ]
     };
   });
 }
