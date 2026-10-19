@@ -64,7 +64,7 @@ function WeeklyChart({ weeks }) {
   const max = Math.max(50, ...weeks.map((w) => w.xp));
   return (
     <View style={styles.center}>
-      <Svg width={width} height={height}>
+      <Svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
         {weeks.map((w, i) => {
           const h = (w.xp / max) * chartH;
           const x = i * (width / weeks.length) + 5;
@@ -99,7 +99,7 @@ function ProgressChart({ history, unit }) {
   const fmt = (v) => (unit === 'sec' ? formatClock(v) : String(v));
   return (
     <View style={styles.center}>
-      <Svg width={width} height={height}>
+      <Svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
         <Polyline points={xy.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke={colors.gold} strokeWidth="2.5" />
         {xy.map((p, i) => <Circle key={i} cx={p.x} cy={p.y} r="3.5" fill={colors.gold} />)}
         <SvgText x={xy.at(-1).x} y={xy.at(-1).y - 8} fill={colors.text} fontSize="11" fontWeight="bold" fontFamily={FONT} textAnchor="middle">{fmt(points.at(-1).value)}</SvgText>

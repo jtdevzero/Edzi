@@ -58,6 +58,13 @@ const assert = require('node:assert/strict');
     await page.getByText('Teszt Harcos').first().waitFor({ timeout: 15000 });
     console.log('SMOKE: offline reload preserved character and app shell');
     await context.setOffline(false);
+    // Narrow viewport regression: charts and primary navigation may not cause horizontal overflow.
+    await page.setViewportSize({width:320,height:700});
+    await page.getByText('Statisztika', {exact:true}).last().click();
+    await page.getByText('Testösszetétel és mérések', {exact:false}).waitFor();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
+    assert.equal(overflow, false, '320px layout must not overflow horizontally');
+    console.log('SMOKE: 320px narrow mobile layout');
     assert.deepEqual(errors, []);
     console.log('MOBILE-SIZE BROWSER SMOKE SUCCESS');
   } finally {

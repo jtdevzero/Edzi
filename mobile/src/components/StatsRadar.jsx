@@ -26,7 +26,7 @@ export default function StatsRadar({ attributes, color = colors.primary }) {
 
   return (
     <View style={styles.container}>
-      <Svg width={WIDTH} height={HEIGHT}>
+      <Svg width="100%" height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMidYMid meet">
         {[0.25, 0.5, 0.75, 1].map((s) => (
           <Polygon key={s} points={toPoints(angles.map((a) => point(a, RADIUS * s)))} fill="none" stroke={colors.cardBorder} strokeWidth="1" />
         ))}

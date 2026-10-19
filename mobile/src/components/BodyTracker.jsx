@@ -19,7 +19,7 @@ function WeightChart({ history }) {
   }));
   return (
     <View style={styles.center}>
-      <Svg width={W} height={H}>
+      <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
         <Polyline points={coords.map((v) => `${v.x},${v.y}`).join(' ')} stroke={colors.green} strokeWidth={2.5} fill="none" />
         {coords.map((v, i) => <Circle key={points[i].id} cx={v.x} cy={v.y} r={3.5} fill={colors.green} />)}
         <SvgText x={p} y={H - 2} fontSize={10} fill={colors.textMuted}>{min.toFixed(1)} kg</SvgText>
