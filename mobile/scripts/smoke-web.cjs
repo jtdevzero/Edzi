@@ -37,6 +37,7 @@ const assert = require('node:assert/strict');
     console.log('SMOKE: measurement persisted after reload');
     await page.getByText('Naplózás', { exact: true }).last().click();
     await page.getByText('Üres edzés indítása', { exact: false }).click();
+    await page.getByText('＋ Gyakorlat', { exact: true }).click();
     await page.getByText('Gyakorlat hozzáadása', { exact: false }).waitFor();
     await page.getByText('Fekvenyomás', { exact: true }).click();
     await page.getByPlaceholder('pl. 60').fill('60');
