@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Svg, { Rect, Polyline, Circle, Text as SvgText } from 'react-native-svg';
 import Screen from '../components/Screen';
+import SectionHeading from '../components/SectionHeading';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '../game/GameContext';
 import { computeStats, computeExerciseRecords } from '../game/stats';
 import { formatClock } from '../game/session';
@@ -9,7 +11,7 @@ import BodyTracker from '../components/BodyTracker';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
 import { colors, card } from '../theme';
 
-const HEAT_COLORS = ['#1a1a35', '#3b2a7a', '#5b3cc4', '#7c3aed', '#a78bfa'];
+const HEAT_COLORS = ['#192641', '#263E61', '#375E8C', '#4071AF', '#44DFD0'];
 const WEEKDAYS = ['H', 'K', 'Sz', 'Cs', 'P', 'Sz', 'V'];
 const TYPE_COLORS = { workout: colors.red, study: colors.blue, journal: colors.green };
 const FONT = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
@@ -166,7 +168,14 @@ export default function StatsScreen() {
   const totalTypeMinutes = records.totalMinutes || 1;
 
   return (
-    <Screen title="Statisztika">
+    <Screen title="Statisztika" eyebrow="ANALYTICS / PERFORMANCE" subtitle="A fejlődés láthatóvá válik.">
+      <LinearGradient colors={['#26295C','#111C37']} style={styles.statsHero}>
+        <Text style={styles.heroEyebrow}>◈  PERFORMANCE RECORD</Text>
+        <Text style={styles.heroNumber}>{formatMinutes(records.totalMinutes)}</Text>
+        <Text style={styles.heroCaption}>ÖSSZES RÖGZÍTETT AKTIVITÁS</Text>
+        <Text style={styles.heroNote}>{records.activeDays} aktív nap · {records.longestStreak} napos rekord sorozat</Text>
+      </LinearGradient>
+      <SectionHeading eyebrow="YOUR NUMBERS" title="Áttekintés"/>
       <View style={styles.recordGrid}>
         <Record value={`🔥 ${records.longestStreak}`} label="Leghosszabb streak (nap)" />
         <Record value={records.activeDays} label="Aktív napok" />
@@ -174,9 +183,12 @@ export default function StatsScreen() {
         <Record value={formatMinutes(records.totalMinutes)} label="Összesen" />
       </View>
 
+      <SectionHeading eyebrow="BODY COMPOSITION" title="Testméretek és trendek"/>
       <BodyTracker />
+      <SectionHeading eyebrow="PERSONAL RECORDS" title="Gyakorlatok"/>
       <ExerciseRecords records={exerciseRecords} />
 
+      <SectionHeading eyebrow="CONSISTENCY" title="Aktivitási térkép"/>
       <View style={card}>
         <Text style={styles.sectionTitle}>Az utolsó 12 hét</Text>
         <Text style={styles.muted}>Minél sötétebb, annál több perc. 🛡 = pihenőnap, ami megvédte a streaket.</Text>
@@ -214,18 +226,23 @@ export default function StatsScreen() {
 const CELL = 18;
 
 const styles = StyleSheet.create({
+  statsHero: { padding: 23, borderRadius: 26, borderColor: '#4B559D', borderWidth: 1, gap: 7 },
+  heroEyebrow: { fontSize: 10, fontWeight: '900', color: colors.cyan, letterSpacing: 1.8 },
+  heroNumber: { fontSize: 32, fontWeight: '900', color: colors.text, letterSpacing: -1 },
+  heroCaption: { color: colors.textSoft, fontWeight: '900', fontSize: 10, letterSpacing: 1.4 },
+  heroNote: { fontSize: 12, color: colors.textMuted, marginTop: 4 },
   center: { alignItems: 'center', marginTop: 8 },
   recGap: { gap: 10 },
   exChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   exChip: { paddingHorizontal: 12, height: 36, borderRadius: 18, backgroundColor: colors.input, justifyContent: 'center' },
-  exChipOn: { backgroundColor: colors.gold },
+  exChipOn: { backgroundColor: colors.primarySoft },
   exChipText: { color: colors.textMuted, fontWeight: '600', fontSize: 13 },
   exChipTextOn: { color: '#1c1206' },
-  sectionTitle: { color: colors.text, fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  sectionTitle: { color: colors.text, fontSize: 16, fontWeight: '900', marginBottom: 8 },
   muted: { color: colors.textMuted, fontSize: 12 },
   recordGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   record: { flexBasis: '47%', flexGrow: 1, alignItems: 'center', paddingVertical: 14 },
-  recordValue: { color: colors.text, fontSize: 20, fontWeight: '800' },
+  recordValue: { color: colors.text, fontSize: 22, fontWeight: '900' },
   recordLabel: { color: colors.textMuted, fontSize: 11, marginTop: 2, textAlign: 'center' },
   heatWrap: { flexDirection: 'row', marginTop: 12, justifyContent: 'center' },
   heatLabels: { marginRight: 6, gap: 4 },

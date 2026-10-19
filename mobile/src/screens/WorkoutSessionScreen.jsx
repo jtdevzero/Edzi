@@ -32,6 +32,7 @@ export default function WorkoutSessionScreen() {
   const now = useTicker(true);
   const [counter, setCounter] = useState(0);
   const [weightInput, setWeightInput] = useState('');
+  const [exerciseSearch, setExerciseSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [intensity, setIntensity] = useState(7);
@@ -73,6 +74,7 @@ export default function WorkoutSessionScreen() {
   }, [interval?.phase, interval?.done]);
 
   const totalSets = session.exercises.reduce((n, e) => n + e.sets.length, 0);
+  const filteredLibrary = EXERCISE_LIBRARY.filter(item => item.name.toLocaleLowerCase('hu-HU').includes(exerciseSearch.trim().toLocaleLowerCase('hu-HU'))).slice(0, 40);
 
   function select(index) {
     updateSession((s) => ({ ...s, current: index }));
@@ -123,6 +125,7 @@ export default function WorkoutSessionScreen() {
       current: s.exercises.length
     }));
     setShowAdd(false);
+    setExerciseSearch('');
   }
 
   function finish() {
@@ -168,8 +171,10 @@ export default function WorkoutSessionScreen() {
         {showAdd && (
           <View style={[card, styles.gap]}>
             <Text style={styles.sectionTitle}>Gyakorlat hozzáadása</Text>
+            <TextInput style={styles.weightInput} value={exerciseSearch} onChangeText={setExerciseSearch}
+              placeholder="Gyakorlat keresése…" placeholderTextColor={colors.textMuted} accessibilityLabel="Gyakorlat keresése"/>
             <View style={styles.libGrid}>
-              {EXERCISE_LIBRARY.map((item) => (
+              {filteredLibrary.map((item) => (
                 <Pressable key={item.name} onPress={() => addExercise(item)} style={styles.libItem}>
                   <Text style={styles.libText}>{item.name}</Text>
                   <Text style={styles.muted}>{item.unit === 'sec' ? 'időre' : item.weighted ? 'súlyzós' : 'ismétlés'}</Text>
@@ -221,6 +226,9 @@ export default function WorkoutSessionScreen() {
                 {ex.weighted && (
                   <View style={styles.weightRow}>
                     <Text style={styles.muted}>Súly (kg)</Text>
+                    <Pressable accessibilityLabel="Súly csökkentése 2,5 kilogrammal" onPress={() =>
+                      setWeightInput(String(Math.max(0, (Number(weightInput.replace(',', '.'))||0)-2.5)))}
+                      style={styles.weightStep}><Text style={styles.weightStepText}>−</Text></Pressable>
                     <TextInput
                       style={styles.weightInput}
                       value={weightInput}
@@ -230,6 +238,9 @@ export default function WorkoutSessionScreen() {
                       placeholderTextColor={colors.textMuted}
                       maxLength={6}
                     />
+                    <Pressable accessibilityLabel="Súly növelése 2,5 kilogrammal" onPress={() =>
+                      setWeightInput(String(Math.min(1500, (Number(weightInput.replace(',', '.'))||0)+2.5)))}
+                      style={styles.weightStep}><Text style={styles.weightStepText}>＋</Text></Pressable>
                   </View>
                 )}
                 <Pressable disabled={counter <= 0 || (ex.weighted && (weightInput.trim() === '' || !Number.isFinite(Number(weightInput.replace(',', '.')))))} onPress={completeRepSet} style={[styles.primary, counter <= 0 && styles.disabled]}>
@@ -336,14 +347,14 @@ const styles = StyleSheet.create({
   gap: { gap: 10 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
-  headerTitle: { color: colors.text, fontSize: 22, fontWeight: '800' },
+  headerTitle: { color: colors.text, fontSize: 23, fontWeight: '900' },
   headerSub: { color: colors.primarySoft, fontSize: 13, fontWeight: '600', marginTop: 2 },
   closeBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   closeText: { color: colors.textMuted, fontSize: 22 },
   chipsScroll: { flexGrow: 0, marginTop: 12 },
   chips: { paddingHorizontal: 16, gap: 8 },
-  chip: { height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder, justifyContent: 'center' },
-  chipOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chip: { height: 43, paddingHorizontal: 14, borderRadius: 13, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder, justifyContent: 'center' },
+  chipOn: { backgroundColor: '#353268', borderColor: colors.primarySoft },
   chipAdd: { borderStyle: 'dashed' },
   chipText: { color: colors.textMuted, fontWeight: '600', fontSize: 14 },
   chipTextOn: { color: '#fff' },
@@ -360,13 +371,16 @@ const styles = StyleSheet.create({
   sets: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   setChip: { backgroundColor: '#14532d', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
   setText: { color: '#bbf7d0', fontWeight: '700', fontSize: 13 },
-  weightRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  weightRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  weightStep: { width: 45, height: 47, backgroundColor: colors.input, borderWidth: 1, borderColor: colors.cardBorder,
+    borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  weightStepText: { color: colors.cyan, fontSize: 20, fontWeight: '900' },
   weightInput: { flex: 1, borderRadius: 12, backgroundColor: colors.input, color: colors.text, height: 48, paddingHorizontal: 14, fontSize: 18 },
   counterRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   counter: { flex: 1, color: colors.text, fontSize: 48, fontWeight: '800', textAlign: 'center' },
   counterBtn: { width: 56, height: 56, borderRadius: 14, backgroundColor: colors.input, alignItems: 'center', justifyContent: 'center' },
   counterBtnText: { color: colors.text, fontSize: 18, fontWeight: '800' },
-  primary: { backgroundColor: colors.primary, borderRadius: 14, height: 54, alignItems: 'center', justifyContent: 'center' },
+  primary: { backgroundColor: colors.primary, borderRadius: 16, height: 56, alignItems: 'center', justifyContent: 'center' },
   primaryText: { color: '#fff', fontSize: 17, fontWeight: '800' },
   stopBtn: { backgroundColor: colors.red },
   disabled: { opacity: 0.4 },

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import SectionHeading from '../components/SectionHeading';
 import { View, Text, TextInput, Pressable, StyleSheet, Linking } from 'react-native';
 import Screen from '../components/Screen';
 import { useGame } from '../game/GameContext';
@@ -62,7 +64,7 @@ export default function LogScreen({ navigation }) {
   }
 
   return (
-    <Screen title="Naplózás" subtitle="Minden perc számít.">
+    <Screen title="Naplózás" subtitle="Egy mozdulattal indul a következő menet." eyebrow="THE TRAINING GROUND">
       <View style={styles.tabs}>
         {Object.entries(ACTIVITY_TYPES).map(([key, t]) => (
           <Pressable key={key} onPress={() => { setType(key); setForm(EMPTY_FORM); }} style={[styles.tab, type === key && styles.tabActive]}>
@@ -72,19 +74,29 @@ export default function LogScreen({ navigation }) {
       </View>
 
       {type === 'workout' && (
-        <View style={[card, styles.gap, styles.sessionCard]}>
-          <Text style={styles.sectionTitle}>⏱ Edzésmód</Text>
-          <Text style={styles.muted}>Sorozatszámláló, pihenő időzítő, stopper és intervallum. A végén automatikusan naplóz, és rekordokat is számol.</Text>
+        <LinearGradient colors={['#29265D','#151D3B']} style={styles.trainingHero}>
+          <Text style={styles.trainingLabel}>TRAINING MODE  /  READY</Text>
+          <Text style={styles.trainingTitle}>IDEJE ERŐSEBBÉ VÁLNI.</Text>
+          <Text style={styles.trainingCopy}>Indíts edzést, vezess minden sorozatot, és gyűjts valódi XP-t.</Text>
           <Pressable onPress={() => startWorkout(null)} style={styles.sessionBtn}>
             <Text style={styles.sessionText}>▶ Üres edzés indítása</Text>
           </Pressable>
-        </View>
+          <View style={styles.quickTemplates}>
+            {WORKOUT_TEMPLATES.slice(0, 2).map(t => (
+              <Pressable key={t.id} style={styles.quickItem} onPress={()=>startWorkout(t)}>
+                <Text style={styles.quickName} numberOfLines={1}>{t.name}</Text>
+                <Text style={styles.quickMeta}>{t.duration} perc  ↗</Text>
+              </Pressable>
+            ))}
+          </View>
+        </LinearGradient>
       )}
 
       {type === 'study' && <Pomodoro onLogged={() => navigation.navigate('Dashboard')} />}
 
       {type === 'workout' && (
         <View style={[card, styles.gap]}>
+          <Text style={styles.miniEyebrow}>CHOOSE YOUR PATH</Text>
           <Text style={styles.sectionTitle}>Anime edzéssablonok</Text>
           {WORKOUT_TEMPLATES.map((t) => {
             const open = openTemplate === t.id;
@@ -123,6 +135,8 @@ export default function LogScreen({ navigation }) {
       )}
 
       <View style={[card, styles.gap]}>
+        <Text style={styles.miniEyebrow}>QUICK LOG</Text>
+        <Text style={styles.sectionTitle}>Gyors bejegyzés</Text>
         <Text style={styles.label}>Mit csináltál?</Text>
         <TextInput
           style={styles.input}
@@ -170,8 +184,8 @@ export default function LogScreen({ navigation }) {
       </View>
 
       {history.length > 0 && (
-        <View style={card}>
-          <Text style={styles.sectionTitle}>Előzmények</Text>
+        <View style={[card, styles.gap]}>
+          <SectionHeading eyebrow="RECENT ACTIVITY" title="Előzmények" />
           {history.map((a) => (
             <View key={a.id} style={styles.historyRow}>
               <View style={styles.flex}>
@@ -194,14 +208,24 @@ export default function LogScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  miniEyebrow: { color: colors.cyan, fontSize: 10, fontWeight: '900', letterSpacing: 1.9 },
+  trainingHero: { borderRadius: 25, padding: 20, borderColor: '#5756AE', borderWidth: 1, gap: 12 },
+  trainingLabel: { color: colors.cyan, fontWeight: '900', fontSize: 10, letterSpacing: 2.2 },
+  trainingTitle: { fontSize: 23, fontWeight: '900', color: colors.text, letterSpacing: -.6 },
+  trainingCopy: { fontSize: 12, color: colors.textSoft, lineHeight: 19 },
+  quickTemplates: { flexDirection: 'row', gap: 9 },
+  quickItem: { flex: 1, backgroundColor: '#1E2747', borderColor: '#465686', borderWidth: 1,
+    borderRadius: 13, minHeight: 64, padding: 9, gap: 4 },
+  quickName: { color: colors.text, fontSize: 12, fontWeight: '900' },
+  quickMeta: { color: colors.cyan, fontWeight: '800', fontSize: 10 },
   flex: { flex: 1 },
   gap: { gap: 10 },
-  tabs: { flexDirection: 'row', backgroundColor: colors.card, borderRadius: 14, padding: 4, gap: 4 },
+  tabs: { flexDirection: 'row', backgroundColor: colors.cardElevated, borderRadius: 16, padding: 5, gap: 5, borderColor: colors.cardBorder, borderWidth: 1 },
   tab: { flex: 1, height: 44, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  tabActive: { backgroundColor: colors.primary },
+  tabActive: { backgroundColor: '#313367', borderColor: colors.primarySoft, borderWidth: 1 },
   tabText: { color: colors.textMuted, fontWeight: '600', fontSize: 14 },
   tabTextActive: { color: '#fff' },
-  sectionTitle: { color: colors.text, fontSize: 16, fontWeight: '700' },
+  sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '900', letterSpacing: -.2 },
   template: { backgroundColor: colors.input, borderRadius: 12, padding: 12, gap: 10, borderWidth: 1, borderColor: 'transparent' },
   templateSelected: { borderColor: colors.primary },
   templateHead: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
