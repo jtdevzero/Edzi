@@ -47,6 +47,17 @@ const assert = require('node:assert/strict');
     await page.getByText('Mentés és XP').click();
     await page.getByText('Teszt Harcos').waitFor();
     console.log('SMOKE: weighted workout logged');
+    // Offline regression: once SW controls the tab, content and locally stored progress survive.
+    await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) throw new Error('Service worker not supported');
+      await navigator.serviceWorker.ready;
+    });
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), null, { timeout: 15000 });
+    await context.setOffline(true);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.getByText('Teszt Harcos').first().waitFor({ timeout: 15000 });
+    console.log('SMOKE: offline reload preserved character and app shell');
+    await context.setOffline(false);
     assert.deepEqual(errors, []);
     console.log('MOBILE-SIZE BROWSER SMOKE SUCCESS');
   } finally {
