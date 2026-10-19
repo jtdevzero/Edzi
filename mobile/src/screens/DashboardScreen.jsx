@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
 import CharacterCard from '../components/CharacterCard';
 import { useGame } from '../game/GameContext';
-import { ACTIVITY_TYPES } from '../game/gamification';
+import { ACTIVITY_TYPES, WEEKLY_GOAL_BONUS } from '../game/gamification';
 import { colors, card } from '../theme';
 
 const BACKUP_REMINDER_DAYS = 7;
@@ -23,7 +23,7 @@ function needsBackup(state) {
 }
 
 export default function DashboardScreen({ navigation }) {
-  const { state, progress, quests } = useGame();
+  const { state, progress, quests, programStatus } = useGame();
   const doneQuests = quests.filter((q) => q.completed).length;
   const recent = [...state.activities].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   const restAvailable = !progress.restUsedThisWeek;
@@ -69,6 +69,32 @@ export default function DashboardScreen({ navigation }) {
 
       <Text style={[styles.hint, atRisk && { color: colors.gold }]}>{streakHint}</Text>
 
+      <View style={[card, styles.goal]}>
+        <View style={styles.goalHead}>
+          <Text style={styles.sectionTitle}>🎯 Heti cél</Text>
+          <Text style={styles.goalCount}>{Math.min(progress.thisWeekActiveDays, progress.weeklyGoal)}/{progress.weeklyGoal} aktív nap</Text>
+        </View>
+        <View style={styles.goalDots}>
+          {Array.from({ length: progress.weeklyGoal }, (_, i) => (
+            <View key={i} style={[styles.goalDot, i < progress.thisWeekActiveDays && styles.goalDotOn]} />
+          ))}
+        </View>
+        <Text style={styles.goalHint}>
+          {progress.thisWeekActiveDays >= progress.weeklyGoal
+            ? `✅ Heti cél teljesítve, +${WEEKLY_GOAL_BONUS} XP bónusz!`
+            : `Még ${progress.weeklyGoal - progress.thisWeekActiveDays} aktív nap a +${WEEKLY_GOAL_BONUS} XP bónuszig.`}
+        </Text>
+      </View>
+
+      {programStatus && (
+        <Pressable style={[card, styles.programLink]} onPress={() => navigation.navigate('Quests')}>
+          <Text style={styles.programText}>
+            {programStatus.program.emoji} {programStatus.program.name} · {programStatus.currentDay}. nap
+            {programStatus.doneToday ? '  ✅' : `: ${programStatus.today.title}`}
+          </Text>
+        </Pressable>
+      )}
+
       <Pressable style={styles.button} onPress={() => navigation.navigate('Log')}>
         <Text style={styles.buttonText}>➕ Új bejegyzés</Text>
       </Pressable>
@@ -104,6 +130,15 @@ const styles = StyleSheet.create({
   streakAtRisk: { borderStyle: 'dashed' },
   streakText: { color: colors.gold, fontWeight: '800', fontSize: 16 },
   backupNag: { borderColor: colors.blue, paddingVertical: 12 },
+  goal: { gap: 10 },
+  goalHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  goalCount: { color: colors.primarySoft, fontWeight: '700', fontSize: 13 },
+  goalDots: { flexDirection: 'row', gap: 6 },
+  goalDot: { flex: 1, height: 10, borderRadius: 5, backgroundColor: '#1e1b4b' },
+  goalDotOn: { backgroundColor: colors.green },
+  goalHint: { color: colors.textMuted, fontSize: 12 },
+  programLink: { borderColor: colors.gold, paddingVertical: 12 },
+  programText: { color: colors.gold, fontWeight: '700', fontSize: 14 },
   backupText: { color: '#93c5fd', fontSize: 13, fontWeight: '600' },
   statsRow: { flexDirection: 'row', gap: 10 },
   stat: { flex: 1, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 6 },

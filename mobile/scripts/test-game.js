@@ -4,6 +4,8 @@ import { questsForDay } from '../src/game/quests';
 import { INITIAL_STATE } from '../src/game/store';
 import { computeStats } from '../src/game/stats';
 import { serializeBackup, parseBackup } from '../src/game/backup';
+import { computeAchievements, newlyUnlocked } from '../src/game/achievements';
+import { PROGRAMS, programRunStatus, programDayXP, finishedPrograms, PROGRAM_FINISH_BONUS } from '../src/game/programs';
 
 const character = { name: 'Teszt', classId: 'hero' };
 const at = (day, hour = 12) => new Date(`${day}T${String(hour).padStart(2, '0')}:00:00`).toISOString();
@@ -93,10 +95,61 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
 {
   const st = state([workout('a', today)], [{ questId: 'water', date: today }]);
   assert.deepEqual(parseBackup(serializeBackup(st)).activities, st.activities);
-  assert.equal(parseBackup(serializeBackup({ ...st, settings: undefined })).settings.weeklyGoal, 4, 'old saves get defaults');
+  assert.deepEqual(parseBackup(serializeBackup({ ...st, settings: undefined })).settings.weeklyGoals, [], 'old saves get defaults');
   assert.throws(() => parseBackup('nem json'), /hibás formátum/);
   assert.throws(() => parseBackup(JSON.stringify({ app: 'mas', state: {} })), /nem egy Edzi/);
   assert.throws(() => parseBackup(JSON.stringify({ app: 'edzi', state: { activities: [{ id: 1 }], questCompletions: [] } })), /nem egy Edzi/);
+}
+
+{
+  const week = ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15'].map((d, i) => workout(`w${i}`, d));
+  const three = computeProgress(state(week.slice(0, 3)), '2026-10-15');
+  const four = computeProgress(state(week), '2026-10-15');
+  assert.equal(three.weeksGoalMet, 0);
+  assert.equal(four.weeksGoalMet, 1);
+  assert.equal(four.totalXP - three.totalXP, four.xpById.w3 + 50, 'goal bonus is +50');
+  assert.equal(four.thisWeekActiveDays, 4);
+
+  const loweredLater = { ...state(week.slice(0, 2)), settings: { weeklyGoals: [{ from: '2026-10-19', goal: 1 }] } };
+  assert.equal(computeProgress(loweredLater, today).weeksGoalMet, 0, 'lowering the goal does not pay out past weeks');
+  assert.equal(computeProgress(loweredLater, today).weeklyGoal, 1);
+  const loweredBefore = { ...state(week.slice(0, 2)), settings: { weeklyGoals: [{ from: '2026-10-12', goal: 2 }] } };
+  assert.equal(computeProgress(loweredBefore, today).weeksGoalMet, 1);
+}
+
+{
+  assert.deepEqual(PROGRAMS.map((p) => p.days.length), [30, 28, 14]);
+  assert.match(PROGRAMS[0].days[0].tasks[0], /^10 fekvőtámasz/);
+  assert.match(PROGRAMS[0].days[29].tasks[0], /^100 fekvőtámasz/);
+  assert.equal(PROGRAMS[0].days[6].rest, true);
+  assert.equal(programDayXP('saitama30', 30), 40 + PROGRAM_FINISH_BONUS);
+
+  const run = { id: 'breathing14', startDate: '2026-10-18' };
+  let st = { ...state([]), program: run, programDays: [{ programId: 'breathing14', runStart: '2026-10-18', day: 1, date: '2026-10-18' }] };
+  let s1 = programRunStatus(st, today);
+  assert.equal(s1.doneToday, false);
+  assert.equal(s1.currentDay, 2);
+  st = { ...st, programDays: [...st.programDays, { programId: 'breathing14', runStart: '2026-10-18', day: 2, date: today }] };
+  s1 = programRunStatus(st, today);
+  assert.equal(s1.doneToday, true);
+  assert.equal(s1.currentDay, 2);
+  assert.equal(computeProgress(st, today).totalXP, programDayXP('breathing14', 1) + programDayXP('breathing14', 2));
+
+  const done = Array.from({ length: 14 }, (_, i) => ({ programId: 'breathing14', runStart: 'x', day: i + 1, date: `d${i}` }));
+  assert.equal(finishedPrograms({ programDays: done }), 1);
+  assert.equal(finishedPrograms({ programDays: done.slice(0, 13) }), 0);
+}
+
+{
+  const empty = state([]);
+  const before = computeAchievements(empty, computeProgress(empty, today));
+  assert.ok(before.length >= 20);
+  assert.equal(before.filter((a) => a.unlocked).length, 0);
+  const one = state([{ ...workout('a', today), date: at(today, 6) }]);
+  const after = computeAchievements(one, computeProgress(one, today));
+  assert.deepEqual(newlyUnlocked(before, after).map((a) => a.id).sort(), ['early', 'first_log']);
+  const logs10 = after.find((a) => a.id === 'logs_10');
+  assert.deepEqual([logs10.current, logs10.target], [1, 10]);
 }
 
 console.log('Minden játéklogika teszt átment.');

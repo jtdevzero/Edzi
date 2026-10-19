@@ -4,7 +4,8 @@ import Screen from '../components/Screen';
 import { useGame } from '../game/GameContext';
 import { ACTIVITY_TYPES, baseXP } from '../game/gamification';
 import { WORKOUT_TEMPLATES, youtubeSearchUrl } from '../game/templates';
-import { notify, confirm } from '../utils/notify';
+import { confirm } from '../utils/notify';
+import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
 
 const EMPTY_FORM = { title: '', duration: '', intensity: 5, notes: '', templateId: null };
@@ -43,13 +44,10 @@ export default function LogScreen({ navigation }) {
       templateId: form.templateId
     });
     setForm(EMPTY_FORM);
-    if (result.evolved) {
-      notify('✨ EVOLÚCIÓ!', `+${result.xpGained} XP. Elérted a ${result.level}. szintet, és új címet kaptál!`);
-    } else if (result.leveledUp) {
-      notify('⬆️ SZINTLÉPÉS!', `+${result.xpGained} XP. Mostantól ${result.level}. szintű vagy!`);
-    } else {
-      notify(`+${result.xpGained} XP`, 'Szép munka, harcos!');
-    }
+    announceReward(result, {
+      title: 'Szép munka, harcos!',
+      message: result.evolved ? 'Új címet kaptál!' : `Bejegyzés mentve: ${form.title.trim()}`
+    });
     navigation.navigate('Dashboard');
   }
 

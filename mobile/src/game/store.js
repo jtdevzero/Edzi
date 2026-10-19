@@ -7,7 +7,9 @@ export const INITIAL_STATE = {
   character: null,
   activities: [],
   questCompletions: [],
-  settings: { weeklyGoal: 4 },
+  settings: { weeklyGoals: [] },
+  program: null,
+  programDays: [],
   lastBackupAt: null
 };
 

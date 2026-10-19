@@ -10,8 +10,12 @@ import { downloadBackup, pickBackupFile } from '../game/backup';
 import { colors, card } from '../theme';
 
 export default function CharacterScreen() {
-  const { state, progress, resetAll, markBackedUp, importState } = useGame();
+  const { state, progress, achievements, resetAll, markBackedUp, importState, setWeeklyGoal } = useGame();
   const cls = getClass(state.character.classId);
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const sortedAchievements = [...achievements].sort(
+    (a, b) => Number(b.unlocked) - Number(a.unlocked) || b.current / b.target - a.current / a.target
+  );
 
   async function handleExport() {
     try {
@@ -46,6 +50,49 @@ export default function CharacterScreen() {
         <Text style={styles.sectionTitle}>Statok</Text>
         <Text style={styles.muted}>Edzés → erő, állóképesség (7+ intenzitásnál gyorsaság is) · Tanulás → intelligencia · Napló → akaraterő</Text>
         <StatsRadar attributes={progress.attributes} color={cls.color} />
+      </View>
+
+      <View style={card}>
+        <View style={styles.rowBetween}>
+          <Text style={styles.sectionTitle}>🏅 Jelvények</Text>
+          <Text style={styles.muted}>{unlockedCount}/{achievements.length}</Text>
+        </View>
+        <View style={styles.badgeGrid}>
+          {sortedAchievements.map((a) => (
+            <View key={a.id} style={[styles.badgeCell, a.unlocked && styles.badgeUnlocked]}>
+              <Text style={[styles.badgeEmoji, !a.unlocked && styles.badgeLockedEmoji]}>{a.emoji}</Text>
+              <Text style={[styles.badgeTitle, !a.unlocked && styles.evoLocked]} numberOfLines={2}>{a.title}</Text>
+              {a.unlocked ? (
+                <Text style={styles.badgeDesc} numberOfLines={2}>{a.description}</Text>
+              ) : (
+                <>
+                  <Text style={styles.badgeDesc} numberOfLines={2}>{a.description}</Text>
+                  {a.target > 1 && (
+                    <View style={styles.badgeTrack}>
+                      <View style={[styles.badgeFill, { width: `${(a.current / a.target) * 100}%` }]} />
+                    </View>
+                  )}
+                </>
+              )}
+            </View>
+          ))}
+        </View>
+      </View>
+
+      <View style={card}>
+        <Text style={styles.sectionTitle}>🎯 Heti cél</Text>
+        <Text style={styles.muted}>Hány napon akarsz aktív lenni hetente? A változás ettől a héttől érvényes.</Text>
+        <View style={styles.goalRow}>
+          {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+            <Pressable
+              key={n}
+              onPress={() => setWeeklyGoal(n)}
+              style={[styles.goalBtn, n === progress.weeklyGoal && styles.goalBtnOn]}
+            >
+              <Text style={styles.goalBtnText}>{n}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
 
       <View style={card}>
@@ -99,6 +146,23 @@ const styles = StyleSheet.create({
   reset: { borderColor: colors.red, borderWidth: 1, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center' },
   resetText: { color: colors.red, fontWeight: '700' },
   backup: { gap: 8 },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  badgeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  badgeCell: {
+    width: '31%', flexGrow: 1, backgroundColor: colors.input, borderRadius: 12, padding: 10,
+    alignItems: 'center', gap: 4, borderWidth: 1, borderColor: 'transparent'
+  },
+  badgeUnlocked: { borderColor: colors.gold, backgroundColor: '#2a1f0a' },
+  badgeEmoji: { fontSize: 26 },
+  badgeLockedEmoji: { opacity: 0.25 },
+  badgeTitle: { color: colors.text, fontSize: 12, fontWeight: '700', textAlign: 'center' },
+  badgeDesc: { color: colors.textMuted, fontSize: 10, textAlign: 'center' },
+  badgeTrack: { alignSelf: 'stretch', height: 4, backgroundColor: '#1e1b4b', borderRadius: 2, overflow: 'hidden', marginTop: 2 },
+  badgeFill: { height: '100%', backgroundColor: colors.primarySoft },
+  goalRow: { flexDirection: 'row', gap: 6, marginTop: 10 },
+  goalBtn: { flex: 1, height: 44, borderRadius: 10, backgroundColor: colors.input, alignItems: 'center', justifyContent: 'center' },
+  goalBtnOn: { backgroundColor: colors.green },
+  goalBtnText: { color: colors.text, fontWeight: '700' },
   primaryBtn: { backgroundColor: colors.primary, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   primaryText: { color: '#fff', fontWeight: '800', fontSize: 15 },
   secondaryBtn: { borderColor: colors.primary, borderWidth: 1, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center' },

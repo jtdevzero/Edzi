@@ -15,7 +15,7 @@ Telefonra optimalizált edzés-, tanulás- és napló-tracker anime RPG játéke
 
 ## 2. ütem
 - **A (kész):** adatmentés fájlba és visszatöltés, rendes app ikon, teljes képernyős mód a főképernyőről, Statisztika fül (12 hetes naptár, heti XP, rekordok), streak-védő (hetente 1 pihenőnap)
-- **B:** jelvények, heti cél, kihívás programok
+- **B (kész):** 22 jelvény, heti cél (+50 XP bónusz), kihívás programok (Saitama 30 nap, GtG húzódzkodás 4 hét, Démonvadász légzés 14 nap)
 - **C:** edzésmód időzítővel és számlálóval, pomodoro, gyakorlat rekordok
 
 ## Fejlesztés

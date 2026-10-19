@@ -1,5 +1,6 @@
 import { getClass, evolutionStage } from './characters';
 import { QUEST_POOL } from './quests';
+import { programDayXP } from './programs';
 
 export const ACTIVITY_TYPES = {
   workout: { label: 'Edzés', emoji: '💪', xpMultiplier: 1.5 },
@@ -8,6 +9,17 @@ export const ACTIVITY_TYPES = {
 };
 
 const XP_BASE = 2;
+export const DEFAULT_WEEKLY_GOAL = 4;
+export const WEEKLY_GOAL_BONUS = 50;
+
+// Goal changes apply from the week they were made, so lowering it never pays out past weeks.
+export function weeklyGoalFor(settings, week) {
+  let goal = DEFAULT_WEEKLY_GOAL;
+  for (const entry of settings?.weeklyGoals ?? []) {
+    if (entry.from <= week) goal = entry.goal;
+  }
+  return goal;
+}
 
 export function dayKey(date = new Date()) {
   const d = new Date(date);
@@ -127,6 +139,26 @@ export function computeProgress(state, today = dayKey()) {
     totalXP += QUEST_XP[completion.questId] ?? 0;
   }
 
+  for (const d of state.programDays ?? []) {
+    totalXP += programDayXP(d.programId, d.day);
+  }
+
+  const activeDaysByWeek = {};
+  for (const activity of activities) {
+    const day = dayKey(activity.date);
+    (activeDaysByWeek[weekKey(day)] ??= new Set()).add(day);
+  }
+  let weeksGoalMet = 0;
+  for (const [week, days] of Object.entries(activeDaysByWeek)) {
+    if (days.size >= weeklyGoalFor(state.settings, week)) {
+      weeksGoalMet += 1;
+      totalXP += WEEKLY_GOAL_BONUS;
+    }
+  }
+  const thisWeek = weekKey(today);
+  const weeklyGoal = weeklyGoalFor(state.settings, thisWeek);
+  const thisWeekActiveDays = activeDaysByWeek[thisWeek]?.size ?? 0;
+
   const yesterday = previousDayKey(today);
   let streakAlive = lastDay === today || lastDay === yesterday;
   let restPending = false;
@@ -149,6 +181,9 @@ export function computeProgress(state, today = dayKey()) {
     nextStreakMultiplier: streakMultiplier(lastDay === today ? streak : currentStreak + 1),
     attributes,
     evolutionStage: evolutionStage(levelInfo.level),
+    weeklyGoal,
+    thisWeekActiveDays,
+    weeksGoalMet,
     xpById
   };
 }
