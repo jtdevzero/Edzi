@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
     await page.getByText('Ébredj fel, harcos').waitFor({ timeout: 15000 });
     console.log('SMOKE: first-use onboarding rendered');
     await page.getByPlaceholder('pl. Jozsi').fill('Teszt Harcos');
-    await page.getByText('Hős', { exact: true }).first().click();
+    await page.getByText('Egyszerű, kemény, napi edzés. Az erő a kitartásból jön.').click();
     await page.getByText('Kaland indítása').click();
     await page.getByText('Teszt Harcos').waitFor();
     console.log('SMOKE: character created');
