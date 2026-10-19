@@ -7,7 +7,7 @@ const fs = require('fs');
 const app = express();
 const PORT = Number(process.env.PORT || 3002);
 const AUTH_TOKEN = process.env.BACKEND_ACCESS_TOKEN;
-if (!AUTH_TOKEN || AUTH_TOKEN.length < 24) {
+if (!AUTH_TOKEN || AUTH_TOKEN.length < 24 || AUTH_TOKEN.startsWith('replace-with')) {
   throw new Error('Set a random BACKEND_ACCESS_TOKEN of at least 24 characters before starting the backend.');
 }
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean);
