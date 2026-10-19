@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: anime-fitness-pages
+  group: pages
   cancel-in-progress: true
 
 jobs:
