@@ -238,6 +238,10 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   const reward = earnedWeeklyTrials(st, weekKey, dayKey);
   assert.equal(reward.xp, 100);
   assert.equal(reward.completed, 2);
+  const statResult = computeStats(st, computeProgress(st, '2026-10-21'), '2026-10-21');
+  assert.equal(statResult.weeklyXP.at(-1).xp,
+    entries.reduce((n, a) => n + computeProgress(st, '2026-10-21').xpById[a.id], 0) +
+    computeProgress(st, '2026-10-21').xpById.study + reward.xp);
   assert.equal(computeProgress(st, '2026-10-21').weeklyTrialXP, 100);
   const removed = { ...st, activities: st.activities.filter((a) => a.id !== 'w2') };
   assert.equal(computeProgress(removed, '2026-10-21').weeklyTrialXP, 40);

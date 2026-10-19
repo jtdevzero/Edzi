@@ -29,12 +29,16 @@ function fromGroup(group) {
 export function trialsForWeek(state, week, weekKey, dayKey) {
   return fromGroup(weekGroups(state, weekKey, dayKey)[week]);
 }
+export function weeklyRewardsByWeek(state, weekKey, dayKey) {
+  return Object.fromEntries(Object.entries(weekGroups(state, weekKey, dayKey)).map(([week, group]) => [
+    week, fromGroup(group).filter((t) => t.completed).reduce((xp, t) => xp + t.xp, 0)
+  ]));
+}
 export function earnedWeeklyTrials(state, weekKey, dayKey) {
-  let xp = 0, completed = 0;
-  for (const group of Object.values(weekGroups(state, weekKey, dayKey))) {
-    for (const trial of fromGroup(group)) {
-      if (trial.completed) { xp += trial.xp; completed++; }
-    }
-  }
-  return { xp, completed };
+  const rewards = weeklyRewardsByWeek(state, weekKey, dayKey);
+  return {
+    xp: Object.values(rewards).reduce((n, xp) => n + xp, 0),
+    completed: Object.values(weekGroups(state, weekKey, dayKey))
+      .reduce((n, group) => n + fromGroup(group).filter((t) => t.completed).length, 0)
+  };
 }

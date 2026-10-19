@@ -1,4 +1,6 @@
-import { dayKey, addDays, weekKey, QUEST_XP } from './gamification';
+import { dayKey, addDays, weekKey, QUEST_XP, weeklyGoalFor, WEEKLY_GOAL_BONUS } from './gamification';
+import { programDayXP } from './programs';
+import { weeklyRewardsByWeek } from './weeklyTrials';
 
 export const HEATMAP_WEEKS = 12;
 export const CHART_WEEKS = 8;
@@ -26,6 +28,9 @@ export function computeStats(state, progress, today = dayKey()) {
   for (const c of state.questCompletions) {
     dayOf(c.date).xp += QUEST_XP[c.questId] ?? 0;
   }
+  for (const p of state.programDays || []) {
+    dayOf(p.date).xp += programDayXP(p.programId, p.day);
+  }
 
   const weeks = {};
   for (const [key, d] of Object.entries(days)) {
@@ -34,6 +39,20 @@ export function computeStats(state, progress, today = dayKey()) {
     w.minutes += d.minutes;
   }
 
+  // Include computed weekly goal and trial bonuses so weekly bars reconcile to overall XP.
+  const activeByWeek = {};
+  for (const a of state.activities) {
+    const week = weekKey(dayKey(a.date));
+    (activeByWeek[week] ??= new Set()).add(dayKey(a.date));
+  }
+  for (const [week, days] of Object.entries(activeByWeek)) {
+    if (days.size >= weeklyGoalFor(state.settings, week)) {
+      (weeks[week] ??= { xp: 0, minutes: 0 }).xp += WEEKLY_GOAL_BONUS;
+    }
+  }
+  for (const [week, xp] of Object.entries(weeklyRewardsByWeek(state, weekKey, dayKey))) {
+    (weeks[week] ??= { xp: 0, minutes: 0 }).xp += xp;
+  }
   const thisWeek = weekKey(today);
   const heatmapStart = addDays(thisWeek, -7 * (HEATMAP_WEEKS - 1));
   const heatmap = Array.from({ length: HEATMAP_WEEKS }, (_, w) =>

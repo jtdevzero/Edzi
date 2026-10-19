@@ -23,7 +23,7 @@ function buildContext(state, progress) {
     );
   const resistanceSets = state.activities.reduce((n, a) =>
     n + (a.exercises || []).reduce((total, e) =>
-      total + (e.unit === 'reps' ? e.sets.length : 0), 0), 0);
+      total + (e.unit === 'reps' ? (e.sets?.length || 0) : 0), 0), 0);
   const volumeKg = state.activities.reduce((n, a) =>
     n + (a.exercises || []).reduce((total, e) =>
       total + (e.unit === 'reps' ? e.sets.reduce((v, s) =>

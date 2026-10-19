@@ -97,7 +97,7 @@ export default function BodyTracker() {
       </View>
       {summary.history.slice(-5).reverse().map((m) => (
         <View key={m.id} style={styles.history}>
-          <Text style={styles.muted}>{new Date(summary.latest.id === m.id ? summary.latest.date : state.bodyMeasurements.find((x) => x.id === m.id).date).toLocaleDateString('hu-HU')}</Text>
+          <Text style={styles.muted}>{new Date(state.bodyMeasurements.find((x) => x.id === m.id).date).toLocaleDateString('hu-HU')}</Text>
           <Text style={styles.entryValue}>{m.value} kg</Text>
           <Pressable onPress={() => confirm('Mérés törlése', 'Biztosan törlöd ezt a mérést?', () => deleteBodyMeasurement(m.id))}>
             <Text style={styles.delete}>Törlés</Text>
