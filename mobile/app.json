@@ -6,11 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0a0a1a"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.animefitness.app"
@@ -35,6 +30,15 @@
       "baseUrl": "/Edzi"
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#0a0a1a"
+        }
+      ],
       "expo-asset"
     ]
   }

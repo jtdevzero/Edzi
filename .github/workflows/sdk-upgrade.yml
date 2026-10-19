@@ -28,19 +28,23 @@ jobs:
         run: |
           set -euo pipefail
           npm ci
+          current="$(node -p "require('./package.json').dependencies.expo.match(/[0-9]+/)[0]")"
           for sdk in 53 54 55 56 57 58; do
+            if (( sdk <= current )); then continue; fi
             echo "::group::Upgrade Expo SDK ${sdk}"
             npm install "expo@^${sdk}.0.0" --no-audit --no-fund
             npx expo install --fix --npm
             echo "::endgroup::"
           done
+          npx expo install expo-splash-screen --npm
+          npx expo install --fix --npm
       - name: Verify clean install and test
         working-directory: mobile
         run: |
           npm ci
           npm test
           npm run build:web
-          npx expo-doctor@latest || true
+          npx expo-doctor@latest
           npm audit --json > /tmp/edzi-audit-after.json || true
           node -e "const a=require('/tmp/edzi-audit-after.json');console.log('AUDIT_TOTALS_AFTER',JSON.stringify(a.metadata?.vulnerabilities||{}));"
       - name: Commit upgraded Expo dependencies and lockfile
