@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
+import SectionHeading from '../components/SectionHeading';
 import CharacterCard from '../components/CharacterCard';
 import StatsRadar from '../components/StatsRadar';
 import { useGame } from '../game/GameContext';
@@ -43,15 +44,18 @@ export default function CharacterScreen() {
   }
 
   return (
-    <Screen title="Karakter">
+    <Screen title="Karakter" subtitle="Egyetlen edzés sem vész el a történetedből." eyebrow="HUNTER PROFILE / ASCENSION">
       <CharacterCard character={state.character} progress={progress} />
 
+      <SectionHeading eyebrow="HUNTER ATTRIBUTES" title="Tulajdonságok" />
       <View style={card}>
         <Text style={styles.sectionTitle}>Statok</Text>
         <Text style={styles.muted}>Edzés → erő, állóképesség (7+ intenzitásnál gyorsaság is) · Tanulás → intelligencia · Napló → akaraterő</Text>
         <StatsRadar attributes={progress.attributes} color={cls.color} />
       </View>
 
+      <SectionHeading eyebrow="TROPHY ROOM" title="Megszerzett jelvények"
+        right={<Text style={styles.badgeCount}>{unlockedCount}/{achievements.length}</Text>} />
       <View style={card}>
         <View style={styles.rowBetween}>
           <Text style={styles.sectionTitle}>🏅 Jelvények</Text>
@@ -95,6 +99,7 @@ export default function CharacterScreen() {
         </View>
       </View>
 
+      <SectionHeading eyebrow="YOUR DESTINY" title="Evolúciós útvonal"/>
       <View style={card}>
         <Text style={styles.sectionTitle}>Evolúció</Text>
         <Text style={styles.muted}>Minden {LEVELS_PER_EVOLUTION}. szinten új címet kapsz.</Text>
@@ -137,7 +142,8 @@ export default function CharacterScreen() {
 }
 
 const styles = StyleSheet.create({
-  sectionTitle: { color: colors.text, fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  badgeCount: { color: colors.cyan, fontWeight: '900', fontSize: 12 },
+  sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '900', marginBottom: 7 },
   muted: { color: colors.textMuted, fontSize: 12 },
   evoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8 },
   evoDot: { fontSize: 14 },
@@ -149,10 +155,10 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   badgeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   badgeCell: {
-    width: '31%', flexGrow: 1, backgroundColor: colors.input, borderRadius: 12, padding: 10,
-    alignItems: 'center', gap: 4, borderWidth: 1, borderColor: 'transparent'
+    width: '31%', flexGrow: 1, backgroundColor: colors.input, borderRadius: 16, padding: 12,
+    alignItems: 'center', gap: 6, borderWidth: 1, borderColor: colors.cardBorder
   },
-  badgeUnlocked: { borderColor: colors.gold, backgroundColor: '#2a1f0a' },
+  badgeUnlocked: { borderColor: colors.gold, backgroundColor: '#382F28' },
   badgeEmoji: { fontSize: 26 },
   badgeLockedEmoji: { opacity: 0.25 },
   badgeTitle: { color: colors.text, fontSize: 12, fontWeight: '700', textAlign: 'center' },

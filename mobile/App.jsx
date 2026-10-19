@@ -8,6 +8,7 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 import WorkoutSessionScreen from './src/screens/WorkoutSessionScreen';
 import { GameProvider, useGame } from './src/game/GameContext';
 import { colors } from './src/theme';
+import RewardOverlay from './src/components/RewardOverlay';
 
 const navTheme = {
   ...DarkTheme,
@@ -40,6 +41,7 @@ export default function App() {
         <View style={styles.inner}>
           <GameProvider>
             <Root />
+            <RewardOverlay />
           </GameProvider>
         </View>
       </View>
