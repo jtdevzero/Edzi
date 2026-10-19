@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Anime Fitness",
+    "slug": "anime-fitness",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0a1a"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.animefitness.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0a0a1a"
+      },
+      "package": "com.animefitness.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/icon.png",
+      "name": "Anime Fitness",
+      "shortName": "AnimeFit",
+      "themeColor": "#0a0a1a",
+      "backgroundColor": "#0a0a1a"
+    },
+    "experiments": {
+      "baseUrl": "/Edzi"
+    },
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}
