@@ -112,7 +112,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   const four = computeProgress(state(week), '2026-10-15');
   assert.equal(three.weeksGoalMet, 0);
   assert.equal(four.weeksGoalMet, 1);
-  assert.equal(four.totalXP - three.totalXP, four.xpById.w3 + 50, 'goal bonus is +50');
+  assert.equal(four.totalXP - three.totalXP, four.xpById.w3 + 50 + 50, 'goal bonus +50 and 120-minute weekly trial +50');
   assert.equal(four.thisWeekActiveDays, 4);
 
   const loweredLater = { ...state(week.slice(0, 2)), settings: { weeklyGoals: [{ from: '2026-10-19', goal: 1 }] } };
