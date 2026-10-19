@@ -55,4 +55,5 @@ jobs:
               via:(v.via||[]).map(x=>typeof x==='string'?x:{name:x.name,title:x.title,url:x.url}).slice(0,3)
             }));
           for (const item of vulns) console.log('AUDIT_ITEM', JSON.stringify(item));
+          if ((report.metadata?.vulnerabilities?.critical || 0) > 0) process.exitCode = 1;
           NODE
