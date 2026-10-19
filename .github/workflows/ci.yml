@@ -24,12 +24,26 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build:web
+      - name: Install browser test tools
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Browser-based mobile-size smoke test
+        run: |
+          mkdir -p web-preview/Edzi
+          cp -a dist/. web-preview/Edzi/
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory web-preview > /tmp/edzi-http.log 2>&1 &
+          echo $! > /tmp/edzi-http.pid
+          node scripts/smoke-web.cjs
       - name: Security audit details (non-blocking until triaged)
         run: |
           npm audit --json > audit.json || true
+          npm audit --omit=dev --json > audit-prod.json || true
           node - <<'NODE'
           const fs = require('fs');
           const report = JSON.parse(fs.readFileSync('audit.json','utf8'));
+          const prodReport = JSON.parse(fs.readFileSync('audit-prod.json','utf8'));
+          console.log('PROD_VULNERABILITY_TOTALS', JSON.stringify(prodReport.metadata?.vulnerabilities || {}));
           console.log('VULNERABILITY_TOTALS', JSON.stringify(report.metadata?.vulnerabilities || {}));
           const vulns = Object.entries(report.vulnerabilities || {})
             .filter(([_, v]) => ['critical','high'].includes(v.severity))
