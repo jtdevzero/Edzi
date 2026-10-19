@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
+import PwaInstall from '../components/PwaInstall';
 import CharacterCard from '../components/CharacterCard';
 import StatsRadar from '../components/StatsRadar';
 import { useGame } from '../game/GameContext';
@@ -115,6 +116,7 @@ export default function CharacterScreen() {
         })}
       </View>
 
+      <PwaInstall />
       <View style={[card, styles.backup]}>
         <Text style={styles.sectionTitle}>💾 Adatmentés</Text>
         <Text style={styles.muted}>

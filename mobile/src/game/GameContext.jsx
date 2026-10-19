@@ -21,6 +21,7 @@ export function GameProvider({ children }) {
   const [state, setState] = useState(null);
   const [today, setToday] = useState(dayKey());
   const [session, setSession] = useState(undefined);
+  const [storageWarning, setStorageWarning] = useState(false);
 
   useEffect(() => {
     loadState().then(setState);
@@ -28,7 +29,7 @@ export function GameProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (state) saveState(state);
+    if (state) saveState(state).then(ok=>{if(!ok)setStorageWarning(true);});
   }, [state]);
 
   useEffect(() => {
@@ -95,6 +96,7 @@ export function GameProvider({ children }) {
 
     return {
       state,
+      storageWarning,
       progress,
       achievements,
       quests,
@@ -211,7 +213,7 @@ export function GameProvider({ children }) {
         setState(INITIAL_STATE);
       }
     };
-  }, [state, today, session]);
+  }, [state, today, session, storageWarning]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

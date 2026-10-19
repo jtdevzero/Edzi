@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -9,6 +9,8 @@ import WorkoutSessionScreen from './src/screens/WorkoutSessionScreen';
 import { GameProvider, useGame } from './src/game/GameContext';
 import { colors } from './src/theme';
 import RewardOverlay from './src/components/RewardOverlay';
+import OfflineStatus from './src/components/OfflineStatus';
+import {registerOfflineSupport} from './src/utils/offline';
 
 const navTheme = {
   ...DarkTheme,
@@ -34,6 +36,7 @@ function Root() {
 }
 
 export default function App() {
+  useEffect(()=>{registerOfflineSupport();},[]);
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
@@ -42,6 +45,7 @@ export default function App() {
           <GameProvider>
             <Root />
             <RewardOverlay />
+            <OfflineStatus />
           </GameProvider>
         </View>
       </View>

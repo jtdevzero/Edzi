@@ -31,7 +31,7 @@ function Metric({value,label,color}) {
   </View>;
 }
 export default function DashboardScreen({navigation}) {
-  const {state,progress,quests,programStatus,weeklyTrials}=useGame();
+  const {state,progress,quests,programStatus,weeklyTrials,storageWarning}=useGame();
   const done=quests.filter(q=>q.completed).length;
   const goal=progress.weeklyGoal||3, active=Math.min(goal,progress.thisWeekActiveDays);
   const recent=[...state.activities].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
@@ -39,6 +39,10 @@ export default function DashboardScreen({navigation}) {
   const trial=weeklyTrials.find(t=>!t.completed);
   return <Screen title="Edzi" subtitle="A fejlődésed minden nap számít." eyebrow="ASCENSION  /  YOUR JOURNEY"
     right={<View style={s.streak}><Text style={s.streakBig}>🔥 {progress.streak}</Text><Text style={s.streakLabel}>NAP</Text></View>}>
+    {storageWarning&&<View style={[card,s.backup]}>
+      <Text style={s.backupTitle}>⚠  A MENTÉS NEM ELÉRHETŐ</Text>
+      <Text style={s.backupCopy}>Az eszközön nem sikerült a mentés. Próbáld normál böngészőablakban, majd készíts exportot.</Text>
+    </View>}
     {backupDue&&<Pressable style={[card,s.backup]} onPress={()=>navigation.navigate('Character')}>
       <Text style={s.backupTitle}>◇  MENTSÜK A FEJLŐDÉSEDET</Text>
       <Text style={s.backupCopy}>Az adataid helyben vannak. Koppints a biztonsági mentéshez →</Text>
