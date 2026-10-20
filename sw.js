@@ -1,5 +1,5 @@
 /* Edzi offline shell. No personal fitness records or API responses are cached. */
-const CACHE = 'edzi-mythic-ui-v6';
+const CACHE = 'edzi-cinematic-v7';
 const ROOT = '/Edzi/';
 const SHELL = [ROOT, ROOT + 'manifest.json'];
 self.addEventListener('install', event => {
@@ -21,7 +21,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k=>k.startsWith('edzi-ascension-shell-')&&k!==CACHE).map(k=>caches.delete(k)));
+    await Promise.all(keys.filter(k=>k!==CACHE && (k.startsWith('edzi-')||k.startsWith('edzi-ascension-shell-'))).map(k=>caches.delete(k)));
     await self.clients.claim();
   })());
 });
