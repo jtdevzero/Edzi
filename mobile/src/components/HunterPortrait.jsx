@@ -6,7 +6,7 @@ import { colors } from '../theme';
  * Procedural anime-inspired guardian artwork.
  * Entirely vector, offline-capable, no external art licences or network loading.
  */
-export default function HunterPortrait({ classId = 'hero', accent = colors.primarySoft, size = 260 }) {
+export default function HunterPortrait({ classId = 'hero', accent = colors.primarySoft, armorAccent = colors.primarySoft, helmetStyle = 'vanguard', size = 260 }) {
   const sigil = classId === 'shadow' ? 'shadow' : classId === 'monk' ? 'monk' : 'blade';
   return <Svg width={size} height={size * 1.26} viewBox="0 0 280 354" accessibilityLabel="Stilizált vadász karakterportré">
     <Defs>
@@ -39,6 +39,8 @@ export default function HunterPortrait({ classId = 'hero', accent = colors.prima
       <Line x1="45" y1="59" x2="78" y2="92"/><Line x1="218" y1="63" x2="195" y2="87"/>
       <Line x1="70" y1="237" x2="100" y2="217"/><Line x1="228" y1="229" x2="202" y2="209"/>
     </G>
+    {helmetStyle==='royal'&&<Path d="M107 93 L113 45 L139 67 L151 38 L173 69 L193 43 L199 91 Z" fill="#2B334D" stroke={armorAccent} strokeWidth="1.5"/>}
+    {helmetStyle==='shadow'&&<Path d="M82 117 Q146 37 216 118 L195 139 L180 91 L119 92 L104 141 Z" fill="#0A1020" stroke={armorAccent} strokeWidth="1.5"/>}
     {sigil === 'blade' && <Path d="M219 41 L234 64 L153 238 L145 246 Z" fill="#9BADD5" opacity=".53"/>}
     {sigil === 'shadow' && <Path d="M226 49 L244 78 L192 207 L185 214 Z" fill={accent} opacity=".42"/>}
     {sigil === 'monk' && <Circle cx="150" cy="145" r="120" fill="none" stroke={colors.gold} strokeWidth="1" strokeOpacity=".17"/>}
@@ -46,8 +48,8 @@ export default function HunterPortrait({ classId = 'hero', accent = colors.prima
     <Path d="M109 204 Q72 219 48 257 L5 353 L275 353 L241 251 Q220 223 189 204 Z" fill="url(#cloak)" stroke="#43516D" strokeWidth="1.4"/>
     <Path d="M104 207 L67 243 L37 353 L112 353 L145 239 Z" fill="#10192E"/>
     <Path d="M189 207 L227 244 L262 353 L187 353 L154 239 Z" fill="#111C32"/>
-    <Polygon points="91,224 143,259 111,353 54,353" fill="url(#armor)" stroke="#51607C" strokeWidth="1"/>
-    <Polygon points="202,223 151,259 184,353 243,353" fill="url(#armor)" stroke="#51607C" strokeWidth="1"/>
+    <Polygon points="91,224 143,259 111,353 54,353" fill="url(#armor)" stroke={armorAccent} strokeWidth="1"/>
+    <Polygon points="202,223 151,259 184,353 243,353" fill="url(#armor)" stroke={armorAccent} strokeWidth="1"/>
     <Path d="M143 240 L169 262 L152 330 L129 266 Z" fill="#202C44" stroke={accent} strokeOpacity=".35"/>
     <Path d="M151 232 L141 275 L153 315 L165 272 Z" fill="#161D36" stroke={accent} strokeWidth=".6"/>
     <Path d="M109 212 L143 242 L127 261 L93 230 Z M193 212 L156 242 L174 262 L211 229 Z" fill="#283959" stroke="#66779B" strokeWidth="1.3"/>
@@ -60,7 +62,7 @@ export default function HunterPortrait({ classId = 'hero', accent = colors.prima
     <Path d="M115 139 L140 147 L146 151 L133 155 L115 148 Z M185 139 L160 147 L154 151 L169 155 L185 148 Z" fill="url(#visor)" opacity=".9"/>
     <Path d="M134 175 L151 181 L167 175 L154 193 L145 193 Z" fill="#1E2C48"/>
     <Path d="M108 149 L125 183 L144 200 M190 148 L174 182 L156 201" fill="none" stroke="#50607D" strokeOpacity=".65" strokeWidth=".9"/>
-    <Path d="M102 228 L108 249 L137 267 M196 228 L189 251 L164 267" fill="none" stroke={accent} strokeWidth="1.6" opacity=".74"/>
+    <Path d="M102 228 L108 249 L137 267 M196 228 L189 251 L164 267" fill="none" stroke={armorAccent} strokeWidth="1.6" opacity=".74"/>
     <Path d="M130 279 L152 303 L173 279" fill="none" stroke={accent} strokeWidth="1.2" opacity=".52"/>
     <Rect x="134" y="321" width="36" height="2" rx="1" fill={accent} opacity=".35"/>
   </Svg>;

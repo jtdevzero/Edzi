@@ -22,3 +22,26 @@ without a privacy/legal review, removal path and verified backup/restore test.
 This release is **not** automatic multi-device synchronization.
 
 Users may explicitly delete their remote snapshot from the Cloud Vault screen; local data stays intact. Full account deletion must additionally be handled in the Supabase Auth administration/privacy process.
+
+## Optional AI Sensei edge function
+Install `edzi_ai_usage.sql` and deploy `functions/hunter-coach/index.ts` as a Supabase Edge Function with JWT verification enabled. Set server-only secrets: ANTHROPIC_API_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL, SUPABASE_ANON_KEY, EDZI_ALLOWED_ORIGIN=https://jtdevzero.github.io. Never put secrets in EXPO_PUBLIC_* values. The browser uploads minimal counts only after explicit consent for each request. Five generations per user per UTC day are enforced by a privileged SQL RPC. Requires a live two-user authorization test, rate-limit check, provider privacy disclosure and administrator deployment.
+
+## Optional guild multiplayer (authenticated, manual scores)
+Install `edzi_guilds.sql` in the Supabase SQL Editor, then test with **two distinct authenticated accounts**:
+- One user creates a guild and shares the randomly generated invite code.
+- Another joins with the invite code, and both see only their own guild.
+- Other unrelated users **must not** see guild names, members or weekly aggregates.
+- Members choose a public nickname. Each user can belong to **one** guild.
+- The weekly activity totals are self-reported/locally calculated and **only transmitted on manual button press**. Do not treat them as verified competition results. No body composition or personal training logs are uploaded through this feature.
+- Leaving a guild deletes own membership and cascade-deletes shared weekly entries. Empty abandoned guilds may require a retention policy and admin cleanup.
+- Run abuse/rate-limit checks for guild creation and invitation guessing before enabling in a public production app.
+`EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` are client-public, but do **not** configure them before running and verifying SQL RLS policies.
+
+## Launch gates: independent AI and online guild opt-in
+
+Even after Cloud Vault is configured, optional online services stay off by default.
+
+- `EXPO_PUBLIC_EDZI_AI_ENABLED=true`: enables online AI mentor only after deployment of `hunter-coach`, JWT verification, API model key kept server-side, and the five-requests-per-day SQL guard.
+- `EXPO_PUBLIC_EDZI_ONLINE_GUILDS_ENABLED=true`: enables guild multiplayer only after installing the guild SQL schema and verifying RLS/isolation and invite codes with two independent real accounts.
+
+Neither setting is required for local Hunter World, offline mentor, smart training, or local guilds. Never put model API secrets or Supabase service-role secrets in `EXPO_PUBLIC_*` variables. These flags control availability, not security: server authentication and row-level access policies remain mandatory.

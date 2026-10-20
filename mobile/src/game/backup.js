@@ -1,5 +1,7 @@
 import { normalizeState } from './store';
 import { dayKey } from './gamification';
+import {safeCreatorChoice} from './characterCreator';
+import {WORLD_GEAR} from './hunterWorld';
 
 const BACKUP_APP = 'edzi';
 const hasDOM = () => typeof document !== 'undefined';
@@ -56,6 +58,18 @@ export function parseBackup(text) {
       s.trainingPlan.days.length<=7 && s.trainingPlan.days.every(d=>d && Number.isInteger(d.weekday) &&
         d.weekday>=0 && d.weekday<=6 && typeof d.title==='string' && Array.isArray(d.exercises) &&
         d.exercises.length<=10 && d.exercises.every(e=>typeof e==='string')))) &&
+    (s.guild===undefined || s.guild===null || (s.guild && typeof s.guild==='object' &&
+      !Array.isArray(s.guild) && typeof s.guild.name==='string' && s.guild.name.length<=35 &&
+      Array.isArray(s.guild.members) && s.guild.members.length<=6 &&
+      s.guild.members.every(m=>typeof m==='string'&&m.length<=24))) &&
+    (s.supersets===undefined || (Array.isArray(s.supersets) && s.supersets.length<=12 &&
+      s.supersets.every(p=>p&&typeof p.id==='string'&&Array.isArray(p.names)&&p.names.length===2&&
+        p.names.every(n=>typeof n==='string'&&n.length<=100)))) &&
+    (s.character?.appearance===undefined || s.character?.appearance===null || (
+      typeof s.character.appearance==='object' && !Array.isArray(s.character.appearance) &&
+      (s.character.appearance.visorId===undefined || safeCreatorChoice('visor',s.character.appearance.visorId)) &&
+      (s.character.appearance.helmetId===undefined || safeCreatorChoice('helmet',s.character.appearance.helmetId)) &&
+      (s.character.appearance.gearId===undefined || WORLD_GEAR.some(g=>g.id===s.character.appearance.gearId)))) &&
     (s.preferences===undefined || (s.preferences && typeof s.preferences==='object' &&
       ['hunter','performance'].includes(s.preferences.appMode||'hunter'))) &&
     (s.settings === undefined || (s.settings && typeof s.settings === 'object' &&

@@ -4,11 +4,13 @@ import {useGame} from '../game/GameContext';
 import {cloudEnabled,requestEmailCode,verifyEmailCode,uploadCloudSnapshot,readCloudSnapshot,deleteCloudSnapshot} from '../cloud/supabase';
 import {confirm,notify} from '../utils/notify';
 import {colors,card} from '../theme';
+import {useCloudSession} from '../cloud/session';
 
 export default function CloudBackup(){
   const {state,importState,markBackedUp}=useGame();
   const [email,setEmail]=useState(''),[code,setCode]=useState(''),[submitted,setSubmitted]=useState('');
-  const [session,setSession]=useState(null),[busy,setBusy]=useState(false);
+  const {session,setSession,signOut}=useCloudSession();
+  const [busy,setBusy]=useState(false);
   const [status,setStatus]=useState('');
   if(!cloudEnabled) return <View style={[card,styles.root]}>
     <Text style={styles.eyebrow}>CLOUD / NOT CONFIGURED</Text>
@@ -55,7 +57,7 @@ export default function CloudBackup(){
         'A távoli mentés végleg törlődik. A HELYI adataid megmaradnak. Előbb készíts JSON-exportot. Biztos?',
         ()=>act(async()=>{await deleteCloudSnapshot(session);setStatus('A felhőmentést töröltük. A helyi adatok változatlanok.');}))}
         style={styles.delete}><Text style={styles.deleteText}>Távoli adataim törlése</Text></Pressable>
-      <Pressable onPress={()=>{setSession(null);setStatus('Kijelentkezve.');}}><Text style={styles.logout}>Kijelentkezés</Text></Pressable>
+      <Pressable onPress={()=>{signOut();setStatus('Kijelentkezve.');}}><Text style={styles.logout}>Kijelentkezés</Text></Pressable>
     </>}
     {status?<Text style={styles.status}>{status}</Text>:null}
     <Text style={styles.note}>A kapcsolat HTTPS-t használ, hozzáférést a Supabase RLS korlátozza. Nincs automatikus háttérszinkron, a belépés csak ebben a munkamenetben él.</Text>

@@ -11,6 +11,7 @@ import { colors } from './src/theme';
 import RewardOverlay from './src/components/RewardOverlay';
 import OfflineStatus from './src/components/OfflineStatus';
 import RecoveryScreen from './src/screens/RecoveryScreen';
+import {CloudSessionProvider} from './src/cloud/session';
 import {registerOfflineSupport} from './src/utils/offline';
 
 const navTheme = {
@@ -45,9 +46,11 @@ export default function App() {
       <View style={styles.outer}>
         <View style={styles.inner}>
           <GameProvider>
-            <Root />
-            <RewardOverlay />
-            <OfflineStatus />
+            <CloudSessionProvider>
+              <Root />
+              <RewardOverlay />
+              <OfflineStatus />
+            </CloudSessionProvider>
           </GameProvider>
         </View>
       </View>

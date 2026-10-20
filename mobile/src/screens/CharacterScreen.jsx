@@ -4,6 +4,7 @@ import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
 import PwaInstall from '../components/PwaInstall';
 import HunterEvolution from '../components/HunterEvolution';
+import HunterCreator from '../components/HunterCreator';
 import CloudBackup from '../components/CloudBackup';
 import AppModeSwitcher from '../components/AppModeSwitcher';
 import CharacterCard from '../components/CharacterCard';
@@ -54,6 +55,8 @@ export default function CharacterScreen() {
       <CharacterCard character={state.character} progress={progress} />
       <SectionHeading eyebrow="UNLOCKED STYLES" title="Hunter Evolution" />
       <HunterEvolution />
+      <SectionHeading eyebrow="CUSTOM LOADOUT" title="Karakteralkotó" />
+      <HunterCreator />
 
       <SectionHeading eyebrow="HUNTER ATTRIBUTES" title="Tulajdonságok" />
       <View style={[card, styles.radarPanel]}>

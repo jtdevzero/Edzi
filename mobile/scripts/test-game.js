@@ -9,6 +9,13 @@ import { hunterEvolution, validAppearanceChoice } from '../src/game/evolution';
 import { DEFAULT_TRAINING_PLAN,cleanTrainingPlan,trainingToday,validateDetailedSet,estimatedOneRepMax,exerciseInsights,nextLoadSuggestion } from '../src/game/fitnessPro';
 import { bossCampaigns,earnedBossRewards } from '../src/game/bosses';
 import {performanceOverview,validateRecovery} from '../src/game/performance';
+import {worldProgress,worldUnlockedGear,selectWorldGear} from '../src/game/hunterWorld';
+import {smartLoadAdvice,groupSuperset,workoutWeekSummary} from '../src/game/smartTraining';
+import {mentorBrief} from '../src/game/mentor';
+import {sanitizeGuild,localGuildChallenges,guildRaidProgress} from '../src/game/guild';
+import {safeCreatorChoice,portraitOptions} from '../src/game/characterCreator';
+import {minimalAIPayload,aiReady} from '../src/cloud/ai';
+import {minimalGuildStats,onlineGuildReady} from '../src/cloud/guild';
 import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
 import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
@@ -18,6 +25,8 @@ import { computeAchievements, newlyUnlocked } from '../src/game/achievements';
 import { PROGRAMS, programRunStatus, programDayXP, finishedPrograms, PROGRAM_FINISH_BONUS } from '../src/game/programs';
 
 const character = { name: 'Teszt', classId: 'hero' };
+assert.equal(aiReady, false, 'AI stays off without an explicit launch flag');
+assert.equal(onlineGuildReady, false, 'Online guilds stay off without an explicit launch flag');
 const at = (day, hour = 12) => new Date(`${day}T${String(hour).padStart(2, '0')}:00:00`).toISOString();
 const workout = (id, day) => ({ id, type: 'workout', title: 'x', duration: 30, intensity: 7, date: at(day) });
 const state = (activities, questCompletions = []) => ({ ...INITIAL_STATE, character, activities, questCompletions });
@@ -200,7 +209,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
 
 {
   const migrated = normalizeState({ version: 1, activities: [], questCompletions: [] });
-  assert.equal(migrated.version, 3);
+  assert.equal(migrated.version, 4);
   assert.deepEqual(migrated.bodyMeasurements, []);
   assert.deepEqual(migrated.profile, { goalWeightKg: null });
   assert.deepEqual(normalizeState(null).programDays, []);
@@ -314,5 +323,59 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.throws(()=>parseBackup(serializeBackup({...v3,recoveryEntries:[{date:'x',readiness:9}]})),/sérült/);
   const badRPE={...v3,activities:[{...w,exercises:[{name:'Fekvenyomás',unit:'reps',sets:[{reps:8,weightKg:50,rpe:99}]}]}]};
   assert.throws(()=>parseBackup(serializeBackup(badRPE)),/sérült/);
+}
+{
+  const log = state([workout('mon','2026-10-19'),workout('tue','2026-10-20'),
+    workout('wed','2026-10-21')]);
+  const levels={level:25,bossWins:5};
+  const regions=worldProgress(log,levels,'2026-10-21');
+  assert.deepEqual(regions.slice(0,3).map(x=>x.complete),[true,true,false]);
+  assert.equal(worldUnlockedGear(regions).filter(x=>x.unlocked).length,2);
+  assert.equal(selectWorldGear(character,regions).id,'forest');
+  const after={...log,activities:log.activities.slice(0,1)};
+  assert.equal(worldUnlockedGear(worldProgress(after,levels,'2026-10-21')).filter(x=>x.unlocked).length,1);
+  assert.equal(safeCreatorChoice('visor','aurora'),true);
+  assert.equal(safeCreatorChoice('helmet','unknown'),false);
+  assert.equal(portraitOptions({appearance:{visorId:'ember'}},{accent:'#123456'}).visorColor,'#F7B46B');
+
+  const bench=(id,day,effort)=>({...workout(id,day),exercises:[{name:'Fekvenyomás',
+    unit:'reps',weighted:true,sets:[{reps:8,weightKg:60,rpe:effort,rir:3}]}]});
+  const training=state([bench('a','2026-10-19',7),bench('b','2026-10-20',7)]);
+  assert.equal(smartLoadAdvice(training,'Fekvenyomás','2026-10-20').weightKg,62.5);
+  assert.equal(smartLoadAdvice({...training,recoveryEntries:[{id:'r',date:at('2026-10-20'),readiness:1}]},
+    'Fekvenyomás','2026-10-20').kind,'recovery');
+  assert.equal(smartLoadAdvice(state([bench('c','2026-10-20',10)]),'Fekvenyomás','2026-10-20').kind,'hold');
+  assert.equal(workoutWeekSummary(training,'2026-10-20').sessions,2);
+  assert.deepEqual(groupSuperset(['A','B'],'A','B').names,['A','B']);
+  assert.throws(()=>groupSuperset(['A','B'],'A','A'),/két|Két/);
+
+  const insight=mentorBrief(training,{level:3},'2026-10-20');
+  assert.equal(insight.isGenerativeAI,false);
+  assert.equal(insight.source,'on-device');
+  assert.equal(insight.explanation.length,3);
+  assert.equal(sanitizeGuild({name:'  Hunters  ',members:['Anna','Béla']} ).name,'Hunters');
+  assert.equal(sanitizeGuild({name:' '}),null);
+  assert.deepEqual(guildRaidProgress([{days:4,minutes:300,focus:100},
+    {days:5,minutes:250,focus:90}]).map(x=>x.complete),[true,true,true]);
+  assert.equal(localGuildChallenges(log,'2026-10-21')[0].complete,true);
+  const shared=minimalGuildStats(log,'2026-10-21');
+  assert.deepEqual(shared,{week:'2026-10-19',days:3,minutes:90,focus:0});
+  const anon=minimalAIPayload(log,{level:7,streak:2},'2026-10-21');
+  assert.deepEqual(Object.keys(anon).sort(),['currentStreak','hunterLevel','readiness','recentMinutes','recentWorkoutCount'].sort());
+  assert.equal(anon.recentWorkoutCount,3);
+  assert.ok(!JSON.stringify(anon).includes('Teszt'));
+  assert.ok(!JSON.stringify(shared).includes('Teszt'));
+
+  const v4={...training,guild:{name:'Ezüst osztag',members:['Anna']},
+    supersets:[{id:'A::B',names:['A','B']}],
+    character:{...character,appearance:{visorId:'ember',helmetId:'shadow',gearId:'origin'}}};
+  const backup=parseBackup(serializeBackup(v4));
+  assert.equal(backup.version,4);
+  assert.equal(backup.guild.name,'Ezüst osztag');
+  assert.equal(backup.supersets[0].names[1],'B');
+  assert.equal(backup.character.appearance.visorId,'ember');
+  assert.throws(()=>parseBackup(serializeBackup({...v4,guild:{name:'a',members:[22]}})),/sérült/);
+  assert.throws(()=>parseBackup(serializeBackup({...v4,character:{...character,
+    appearance:{visorId:'unknown'}}})),/sérült/);
 }
 console.log('Minden játéklogika teszt átment.');

@@ -26,6 +26,12 @@ jobs:
       - run: npm run build:web
       - name: Validate Expo configuration
         run: npx expo-doctor@latest
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Typecheck optional secure AI Edge Function
+        working-directory: .
+        run: deno check supabase/functions/hunter-coach/index.ts
       - name: Install browser test tools
         run: |
           npm install --no-save --package-lock=false playwright@1.56.1

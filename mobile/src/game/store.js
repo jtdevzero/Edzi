@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const STORAGE_KEY = 'animefitness:state';
 
 export const INITIAL_STATE = {
-  version: 3,
+  version: 4,
   character: null,
   activities: [],
   questCompletions: [],
@@ -13,6 +13,8 @@ export const INITIAL_STATE = {
   bodyMeasurements: [],
   recoveryEntries: [],
   trainingPlan: null,
+  guild: null,
+  supersets: [],
   preferences: { appMode: 'hunter' },
   profile: { goalWeightKg: null },
   lastBackupAt: null
@@ -26,12 +28,14 @@ export function normalizeState(raw) {
   return {
     ...INITIAL_STATE,
     ...data,
-    version: 3,
+    version: 4,
     activities: array('activities'),
     questCompletions: array('questCompletions'),
     programDays: array('programDays'),
     bodyMeasurements: array('bodyMeasurements'),
     recoveryEntries: array('recoveryEntries'),
+    supersets: array('supersets'),
+    guild: data.guild && typeof data.guild==='object' && !Array.isArray(data.guild) ? data.guild : null,
     trainingPlan: data.trainingPlan && typeof data.trainingPlan === 'object' ? data.trainingPlan : null,
     preferences: { ...INITIAL_STATE.preferences, ...(data.preferences && typeof data.preferences === 'object' ? data.preferences : {}) },
     settings: { ...INITIAL_STATE.settings, ...settings,

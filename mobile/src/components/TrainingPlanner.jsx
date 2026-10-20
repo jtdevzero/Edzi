@@ -5,10 +5,12 @@ import {DEFAULT_TRAINING_PLAN,cleanTrainingPlan,trainingToday,nextLoadSuggestion
 import {createSession} from '../game/session';
 import {EXERCISE_LIBRARY} from '../game/templates';
 import {colors,card} from '../theme';
+import {smartLoadAdvice} from '../game/smartTraining';
 const WEEKDAYS=['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
 export default function TrainingPlanner(){
   const {state,setTrainingPlan,startSession}=useGame();
   const plan=cleanTrainingPlan(state.trainingPlan||DEFAULT_TRAINING_PLAN);
+  const pairs=state.supersets||[];
   const [editing,setEditing]=useState(false);
   const [newDay,setNewDay]=useState(1);
   const [title,setTitle]=useState('');
@@ -37,7 +39,9 @@ export default function TrainingPlanner(){
     {plan.days.map(day=><View key={day.weekday} style={styles.day}>
       <View style={{flex:1}}><Text style={styles.dayName}>{WEEKDAYS[day.weekday]} · {day.title}</Text>
         <Text style={styles.muted}>{day.exercises.length?day.exercises.join(' · '):'Válassz gyakorlatokat a szerkesztőben'}</Text>
-        {day.exercises.length>0&&(()=>{const rec=nextLoadSuggestion(state.activities,day.exercises[0]);return rec?<Text style={styles.hint}>{day.exercises[0]}: {rec.weightKg} kg · {rec.rationale}</Text>:null;})()}</View>
+        {day.exercises.length>0&&(()=>{const rec=smartLoadAdvice(state,day.exercises[0]);return rec?<Text style={styles.hint}>{day.exercises[0]}: {rec.weightKg!=null?rec.weightKg+' kg · ':''}{rec.reason}</Text>:null;})()}
+        {pairs.filter(pair=>pair.names.every(n=>day.exercises.includes(n))).map(pair=><Text key={pair.id} style={styles.hint}>Szuperszett: {pair.names.join(' + ')}</Text>)}
+      </View>
       <Pressable onPress={()=>start(day)} style={styles.start}><Text style={styles.action}>▶</Text></Pressable>
     </View>)}
     {editing&&<View style={styles.editor}>

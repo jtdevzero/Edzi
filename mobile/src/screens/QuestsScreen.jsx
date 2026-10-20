@@ -3,6 +3,8 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
 import BossBoard from '../components/BossBoard';
+import HunterWorldMap from '../components/HunterWorldMap';
+import HunterGuild from '../components/HunterGuild';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '../game/GameContext';
 import { CATEGORY_LABELS } from '../game/quests';
@@ -101,6 +103,8 @@ export default function QuestsScreen() {
         <Text style={styles.missionHeroUnit}>MAI KÜLDETÉS TELJESÍTVE</Text>
         <Text style={styles.missionHeroCaption}>Minden teljesített feladat hozzáad a történetedhez.</Text>
       </LinearGradient>
+      <SectionHeading eyebrow="CHAPTER IV / THE EXPEDITION" title="Hunter World" />
+      <HunterWorldMap />
       <SectionHeading eyebrow="MAIN CAMPAIGN" title="Aktív történetszál"/>
       {programStatus ? (
         <ActiveProgram
@@ -122,6 +126,8 @@ export default function QuestsScreen() {
 
       <SectionHeading eyebrow="WEEKLY RAID" title="Boss-aréna" />
       <BossBoard />
+      <SectionHeading eyebrow="GUILD HALL" title="Céhes kihívások" />
+      <HunterGuild />
       <SectionHeading eyebrow="ELITE OPERATIONS" title="Heti hőspróbák"/>
       <Text style={styles.muted}>A hőspróbák valós naplózott aktivitással teljesülnek. Törléskor a kapcsolódó XP is levonódik.</Text>
       <View style={styles.gap}>

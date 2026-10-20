@@ -10,6 +10,8 @@ import {ACTIVITY_TYPES,WEEKLY_GOAL_BONUS} from '../game/gamification';
 import {colors,card} from '../theme';
 import AppModeSwitcher from '../components/AppModeSwitcher';
 import PerformanceCenter from '../components/PerformanceCenter';
+import HunterMentor from '../components/HunterMentor';
+import {worldProgress} from '../game/hunterWorld';
 
 function Ring({value,total}){
   const radius=32,c=2*Math.PI*radius;
@@ -33,6 +35,8 @@ function Stat({value,label,emphasis}){
 export default function DashboardScreen({navigation}){
   const {state,progress,quests,programStatus,weeklyTrials,storageWarning}=useGame();
   const completed=quests.filter(q=>q.completed).length;
+  const regions=worldProgress(state,progress);
+  const explored=regions.filter(r=>r.complete).length;
   const weeklyGoal=progress.weeklyGoal||3;
   const days=Math.min(progress.thisWeekActiveDays,weeklyGoal);
   const nextTrial=weeklyTrials.find(t=>!t.completed);
@@ -52,6 +56,12 @@ export default function DashboardScreen({navigation}){
     </Pressable>}
     <AppModeSwitcher />
     {state.preferences?.appMode==='performance' ? <PerformanceCenter /> : <CharacterCard character={state.character} progress={progress}/>}
+    <Pressable style={[card,styles.worldEntry]} onPress={()=>navigation.navigate('Quests')}>
+      <Text style={styles.worldTag}>✦ HUNTER WORLD  /  {explored} / 5 RÉGIÓ</Text>
+      <Text style={styles.worldTitle}>A világod rád vár ↗</Text>
+      <Text style={styles.worldCopy}>Új területek, feloldható páncélok és céhes kihívások.</Text>
+    </Pressable>
+    <HunterMentor />
     <View style={styles.report}>
       <Text style={styles.reportEyebrow}>FIELD REPORT <Text style={{color:colors.textMuted}}> /  LIFETIME</Text></Text>
       <View style={styles.statRow}>
@@ -145,6 +155,10 @@ export default function DashboardScreen({navigation}){
   </Screen>;
 }
 const styles=StyleSheet.create({
+  worldEntry:{backgroundColor:'#1D223A',borderColor:'#68618C',gap:7,padding:20},
+  worldTag:{color:colors.gold,fontSize:10,fontWeight:'900',letterSpacing:1.5},
+  worldTitle:{color:colors.text,fontSize:20,fontWeight:'900'},
+  worldCopy:{color:colors.textMuted,fontSize:12,lineHeight:19},
   streak:{backgroundColor:'#242322',borderRadius:13,borderColor:'#6E5D43',borderWidth:1,paddingVertical:8,paddingHorizontal:12,alignItems:'center',minWidth:78},
   streakFire:{fontSize:18,color:colors.gold,fontWeight:'900'},streakTiny:{color:colors.textMuted,fontSize:8,letterSpacing:1.1,fontWeight:'900',marginTop:2},
   warning:{backgroundColor:'#293041',borderColor:colors.gold,gap:6},

@@ -4,6 +4,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { getClass, characterTitle } from '../game/characters';
 import HunterPortrait from './HunterPortrait';
 import XPBar from './XPBar';
+import {worldProgress,selectWorldGear} from '../game/hunterWorld';
+import {portraitOptions} from '../game/characterCreator';
+import {useGame} from '../game/GameContext';
 import { colors } from '../theme';
 
 export function hunterRank(level) {
@@ -11,6 +14,9 @@ export function hunterRank(level) {
 }
 export default function CharacterCard({character,progress}) {
   const cls=getClass(character.classId);
+  const {state}=useGame();
+  const equipment=selectWorldGear(character,worldProgress(state,progress));
+  const portrait=portraitOptions(character,equipment);
   const rank=hunterRank(progress.level);
   const enter=useRef(new Animated.Value(0)).current;
   useEffect(()=>{
@@ -26,7 +32,7 @@ export default function CharacterCard({character,progress}) {
       <LinearGradient colors={['#1E2545','#101627','#080D19']} start={{x:0,y:0}} end={{x:.8,y:1}} style={StyleSheet.absoluteFill}/>
       <View style={styles.halo}/>
       <View style={styles.portrait} pointerEvents="none">
-        <HunterPortrait classId={cls.id} accent={cls.color||colors.primarySoft} size={254}/>
+        <HunterPortrait classId={cls.id} accent={portrait.visorColor} armorAccent={portrait.armorAccent} helmetStyle={portrait.helmetStyle} size={254}/>
       </View>
       <LinearGradient colors={['rgba(7,11,22,0)','#080D19']} locations={[0,1]} style={styles.bottomShade} pointerEvents="none"/>
       <View style={styles.top}>

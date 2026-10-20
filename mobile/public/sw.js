@@ -1,5 +1,5 @@
 /* Edzi offline shell. No personal fitness records or API responses are cached. */
-const CACHE = 'edzi-ascension-shell-v1';
+const CACHE = 'edzi-ascension-shell-v4-hunter-world';
 const ROOT = '/Edzi/';
 const SHELL = [ROOT, ROOT + 'manifest.json'];
 self.addEventListener('install', event => {
