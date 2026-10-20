@@ -114,3 +114,13 @@ A PR automatikus CI-je futtatja a logikai teszteket, Expo Doctort, web exportot,
 
 ### Hunter World – online közösség (külön konfigurációhoz kötve)
 Az Edzi 4.0 tartalmaz opcionális, Supabase RLS-sel védett valódi céhes bejelentkezést, meghívókódos csatlakozást és kézzel megosztható heti összesítőket. A szolgáltatás **csak Supabase-projekt konfigurálásával**, a `supabase/edzi_guilds.sql` telepítésével és két fiókos jogosultságteszttel válik használhatóvá. A helyi Guild Hall offline is működik. Nincs alapértelmezett automatikus közösségi adatmegosztás.
+
+## Edzi NIGHTFALL — arculati újratervezés (2026-10-20)
+- Az Edzi 4.0 funkciói **változatlanul** megmaradtak; ez külön **teljes UI-irányváltás**, nem adatmodellcsere.
+- Új obsidian/signal-amber/aurora-mint grafikai rendszer (`mobile/src/theme.js`), kontrasztos tipográfia és HUD-szerű felületek.
+- Új felhasználói főoldal: nagy, több rétegű SVG-gyűrűs **Hunter Dossier** karakterpanel, XP, világfelfedező teaser és jól kiemelt edzés CTA.
+- Lebegő ötféles alsó menü középen kiemelt naplózás gombbal; hálózati státusz helyett **PRIVATE / OFFLINE** jelzés.
+- Edzésmód, questek, karakteralkotó, statisztika és beléptetés összehangolt Nightfall stílusban.
+- Nincs külső képbetöltés vagy licencfüggő vizuális elem; az illusztrációk helyben renderelt vektorok.
+- Frissített PWA-cache név; a régi tartalom helyett új buildre kényszerítő service worker aktiválás.
+- Vizuális ellenőrzés: GitHub CI Chromium 390px + 320px képernyőméretek, screenshot artefakt `nightfall-dashboard.png`. A fizikai iOS Safari teszt külön szükséges.
