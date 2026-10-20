@@ -92,3 +92,15 @@ A korábbi helyi, offline adatbázis v2→v3 migrációval bővül. Megmaradnak 
 - Korábban azonosított npm audit figyelmeztetések részletes triage (#2).
 
 CI: `cd mobile && npm ci && npm test && npm run build:web && npx expo-doctor@latest` + Chromium mobil smoke, offline reload és 320px viewport.
+
+## Edzi 4.0 — Hunter World (2026-10)
+- Öt fejezetes, interaktív **helyben működő** Hunter World világtérkép, automatikusan feloldható régiók és páncélok. A világtérkép a régi edzésnaplókból is kiszámolható; nincs duplán járó XP.
+- Karakteralkotó: sisakformák, sisakfény, feloldható páncélszínek — offline vektoros megjelenés.
+- Smart Training: előző sorozatok és friss közérzet alapján magyarázható terhelési támpontok, heti szuperszett párosítások. A szuperszett csak tervben létezik, nem rögzít automatikusan edzést.
+- Mentor: magyarázható, offline **szabályalapú** edző. Nem generatív AI, nem küld személyes adatot külső API-nak. Valódi felhőalapú AI coachhoz szerveroldali modellhívás és önkéntes adattovábbítás kell.
+- Guild Hall: **helyi céh-tervező** a megadott nevekkel és a saját naplód alapján számolt célokkal. Valódi online multiplayer, valós idejű baráti adatok és szinkron nincs bekapcsolva; ehhez hitelesített szerver és részletes hozzáférési teszt szükséges.
+- Helyi séma: v4; v3 edzések/karakterek/questek megmaradnak. JSON-export/import tartalmazza a céhet és a szuperszett-terveket.
+- A megmaradt npm audit figyelmeztetések (#2), a Supabase Vault integráció (#7), valódi Safari/Android készülékpróba változatlanul külön kiadási teendők.
+
+### Ellenőrzés
+A PR automatikus CI-je futtatja a logikai teszteket, Expo Doctort, web exportot, telefonméretű Playwright tesztet, offline újratöltést és keskeny nézetet. A GitHub Pages csak zöld teszt után frissülhet.

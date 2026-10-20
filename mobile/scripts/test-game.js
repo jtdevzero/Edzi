@@ -9,6 +9,11 @@ import { hunterEvolution, validAppearanceChoice } from '../src/game/evolution';
 import { DEFAULT_TRAINING_PLAN,cleanTrainingPlan,trainingToday,validateDetailedSet,estimatedOneRepMax,exerciseInsights,nextLoadSuggestion } from '../src/game/fitnessPro';
 import { bossCampaigns,earnedBossRewards } from '../src/game/bosses';
 import {performanceOverview,validateRecovery} from '../src/game/performance';
+import {worldProgress,worldUnlockedGear,selectWorldGear} from '../src/game/hunterWorld';
+import {smartLoadAdvice,groupSuperset,workoutWeekSummary} from '../src/game/smartTraining';
+import {mentorBrief} from '../src/game/mentor';
+import {sanitizeGuild,localGuildChallenges} from '../src/game/guild';
+import {safeCreatorChoice,portraitOptions} from '../src/game/characterCreator';
 import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
 import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
@@ -200,7 +205,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
 
 {
   const migrated = normalizeState({ version: 1, activities: [], questCompletions: [] });
-  assert.equal(migrated.version, 3);
+  assert.equal(migrated.version, 4);
   assert.deepEqual(migrated.bodyMeasurements, []);
   assert.deepEqual(migrated.profile, { goalWeightKg: null });
   assert.deepEqual(normalizeState(null).programDays, []);
@@ -314,5 +319,49 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.throws(()=>parseBackup(serializeBackup({...v3,recoveryEntries:[{date:'x',readiness:9}]})),/sérült/);
   const badRPE={...v3,activities:[{...w,exercises:[{name:'Fekvenyomás',unit:'reps',sets:[{reps:8,weightKg:50,rpe:99}]}]}]};
   assert.throws(()=>parseBackup(serializeBackup(badRPE)),/sérült/);
+}
+{
+  const log = state([workout('mon','2026-10-19'),workout('tue','2026-10-20'),
+    workout('wed','2026-10-21')]);
+  const levels={level:25,bossWins:5};
+  const regions=worldProgress(log,levels);
+  assert.deepEqual(regions.slice(0,3).map(x=>x.complete),[true,true,false]);
+  assert.equal(worldUnlockedGear(regions).filter(x=>x.unlocked).length,2);
+  assert.equal(selectWorldGear(character,regions).id,'forest');
+  const after={...log,activities:log.activities.slice(0,1)};
+  assert.equal(worldUnlockedGear(worldProgress(after,levels)).filter(x=>x.unlocked).length,1);
+  assert.equal(safeCreatorChoice('visor','aurora'),true);
+  assert.equal(safeCreatorChoice('helmet','unknown'),false);
+  assert.equal(portraitOptions({appearance:{visorId:'ember'}},{accent:'#123456'}).visorColor,'#F7B46B');
+
+  const bench=(id,day,effort)=>({...workout(id,day),exercises:[{name:'Fekvenyomás',
+    unit:'reps',weighted:true,sets:[{reps:8,weightKg:60,rpe:effort,rir:3}]}]});
+  const training=state([bench('a','2026-10-19',7),bench('b','2026-10-20',7)]);
+  assert.equal(smartLoadAdvice(training,'Fekvenyomás','2026-10-20').weightKg,62.5);
+  assert.equal(smartLoadAdvice({...training,recoveryEntries:[{id:'r',date:at('2026-10-20'),readiness:1}]},
+    'Fekvenyomás','2026-10-20').kind,'recovery');
+  assert.equal(smartLoadAdvice(state([bench('c','2026-10-20',10)]),'Fekvenyomás','2026-10-20').kind,'hold');
+  assert.equal(workoutWeekSummary(training,'2026-10-20').sessions,2);
+  assert.deepEqual(groupSuperset(['A','B'],'A','B').names,['A','B']);
+  assert.throws(()=>groupSuperset(['A','B'],'A','A'),/két|Két/);
+
+  const insight=mentorBrief(training,{level:3},'2026-10-20');
+  assert.equal(insight.isGenerativeAI,false);
+  assert.equal(insight.source,'on-device');
+  assert.equal(insight.explanation.length,3);
+  assert.equal(sanitizeGuild({name:'  Hunters  ',members:['Anna','Béla']} ).name,'Hunters');
+  assert.equal(sanitizeGuild({name:' '}),null);
+  assert.equal(localGuildChallenges(log,'2026-10-21')[0].complete,true);
+  const v4={...training,guild:{name:'Ezüst osztag',members:['Anna']},
+    supersets:[{id:'A::B',names:['A','B']}],
+    character:{...character,appearance:{visorId:'ember',helmetId:'shadow',gearId:'origin'}}};
+  const backup=parseBackup(serializeBackup(v4));
+  assert.equal(backup.version,4);
+  assert.equal(backup.guild.name,'Ezüst osztag');
+  assert.equal(backup.supersets[0].names[1],'B');
+  assert.equal(backup.character.appearance.visorId,'ember');
+  assert.throws(()=>parseBackup(serializeBackup({...v4,guild:{name:'a',members:[22]}})),/sérült/);
+  assert.throws(()=>parseBackup(serializeBackup({...v4,character:{...character,
+    appearance:{visorId:'unknown'}}})),/sérült/);
 }
 console.log('Minden játéklogika teszt átment.');
