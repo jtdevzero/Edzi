@@ -37,7 +37,7 @@ export default function CinematicArt({scene='hero',height=220,style}){
       <Stop offset="1" stopColor="#03070D"/>
     </LinearGradient>
    </Defs>
-   <Rect x="0" y="0" width="400" height="250" fill={'url(#'+uid+'sky)'} fillOpacity={showGeneratedImage||scene==='world'?.62:1}/>
+   <Rect x="0" y="0" width="400" height="250" fill={'url(#'+uid+'sky)'} fillOpacity={(showGeneratedImage||scene==='world') ? 0.62 : 1}/>
    <Rect width="400" height="250" fill={'url(#'+uid+'shine)'} fillOpacity={showGeneratedImage?.56:1}/>
    <G stroke={gold} fill="none" opacity=".28">
      <Circle cx="299" cy="119" r="99" strokeWidth="1.2"/>
