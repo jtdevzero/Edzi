@@ -9,6 +9,7 @@ import {worldProgress,selectWorldGear} from '../game/hunterWorld';
 import {portraitOptions} from '../game/characterCreator';
 import {useGame} from '../game/GameContext';
 import {colors} from '../theme';
+import {MythicIcon,Sigil,rankRarity,RARITY} from './MythicIcon';
 
 export function hunterRank(level){return level>=21?'S':level>=16?'A':level>=11?'B':level>=6?'C':'D';}
 export default function CharacterCard({character,progress}){
@@ -17,6 +18,8 @@ export default function CharacterCard({character,progress}){
   const equipment=selectWorldGear(character,worldProgress(state,progress));
   const avatar=portraitOptions(character,equipment);
   const rank=hunterRank(progress.level);
+  const rarity=rankRarity(progress.level);
+  const rarityColor=RARITY[rarity].color;
   const enter=useRef(new Animated.Value(.96)).current;
   useEffect(()=>{
     let active=true;
@@ -53,31 +56,31 @@ export default function CharacterCard({character,progress}){
       <Text style={styles.rankGhost}>{rank}</Text>
       <View style={styles.portrait} pointerEvents="none">
         <HunterPortrait classId={cls.id} accent={avatar.visorColor}
-          armorAccent={avatar.armorAccent} helmetStyle={avatar.helmetStyle} size={291}/>
+          armorAccent={avatar.armorAccent} helmetStyle={avatar.helmetStyle} level={progress.level} size={291}/>
       </View>
       <LinearGradient colors={['rgba(5,8,13,0)','rgba(5,8,13,.05)','#05080D','#05080D']}
         locations={[0,.27,.67,1]} style={styles.shade} pointerEvents="none"/>
       <View style={styles.head}>
         <View style={styles.identity}>
-          <Text style={styles.kicker}>◈  HUNTER DOSSIER / Nº 004</Text>
+          <View style={{flexDirection:'row',alignItems:'center',gap:7}}><MythicIcon name="shield" size={18} color={rarityColor}/><Text style={styles.kicker}>HUNTER DOSSIER / Nº 004</Text></View>
           <Text style={styles.classTiny}>AWAKENED • {cls.name.toLocaleUpperCase('hu-HU')}</Text>
         </View>
-        <View style={styles.rankBadge}><Text style={styles.rankText}>RANK {rank}</Text></View>
+        <View style={[styles.rankBadge,{backgroundColor:rarityColor}]}><Text style={styles.rankText}>RANK {rank}</Text></View>
       </View>
       <View style={styles.leftMarker}>
-        <Text style={styles.markerCap}>ASCENSION</Text>
+        <View style={{flexDirection:'row',alignItems:'center',gap:7}}><MythicIcon name="energy" size={15} color={rarityColor}/><Text style={styles.markerCap}>ASCENSION</Text></View>
         <Text style={styles.markerNum}>{String(progress.level).padStart(2,'0')}</Text>
         <Text style={styles.markerLabel}>CURRENT LVL</Text>
       </View>
       <View style={styles.bottom}>
-        <View style={styles.bottomTag}><View style={styles.dot}/><Text style={styles.tagText}>THE HUNTER HAS AWAKENED</Text></View>
+        <View style={styles.bottomTag}><Sigil name={progress.level>=21?'crown':progress.level>=11?'armor':'quest'} size={36} rarity={rarity}/><View style={{flex:1,gap:4}}><Text style={styles.tagText}>{RARITY[rarity].label} HUNTER</Text><Text style={styles.subtitle}>THE HUNTER HAS AWAKENED</Text></View></View>
         <Text style={styles.name} adjustsFontSizeToFit numberOfLines={2}>{character.name}</Text>
         <Text style={styles.subtitle}>{characterTitle(character.classId,progress.level)}</Text>
         <View style={styles.hairline}/>
         <XPBar xp={progress.xp} xpToNextLevel={progress.xpToNextLevel} level={progress.level}/>
         <View style={styles.meta}>
-          <Text style={styles.metaLabel}>◈ {progress.bossWins} BOSS DEFEATED</Text>
-          <Text style={styles.metaLabel}>◈ {progress.streak} DAY STREAK</Text>
+          <View style={{flexDirection:'row',alignItems:'center',gap:5}}><MythicIcon name="boss" size={17} color={colors.gold}/><Text style={styles.metaLabel}>{progress.bossWins} BOSS DEFEATED</Text></View>
+          <View style={{flexDirection:'row',alignItems:'center',gap:5}}><MythicIcon name="streak" size={17} color={colors.gold}/><Text style={styles.metaLabel}>{progress.streak} DAY STREAK</Text></View>
         </View>
       </View>
       <View style={styles.edgeTop}/><View style={styles.edgeBottom}/>

@@ -10,6 +10,7 @@ import { beep, keepScreenAwake, unlockAudio } from '../utils/device';
 import { confirm, notify } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
+import {MythicIcon} from '../components/MythicIcon';
 import { validateDetailedSet } from '../game/fitnessPro';
 
 function useTicker(active) {
@@ -142,8 +143,8 @@ export default function WorkoutSessionScreen() {
   function finish() {
     const result = finishSession(intensity);
     const extra = [];
-    if (result.records.length) extra.push(`🏆 Új rekord: ${result.records.join(', ')}`);
-    if (result.programDay) extra.push(result.finishedProgram ? '🎉 A teljes programot teljesítetted!' : '🥋 A mai programnap is kész.');
+    if (result.records.length) extra.push(`Új rekord: ${result.records.join(', ')}`);
+    if (result.programDay) extra.push(result.finishedProgram ? 'A teljes programot teljesítetted!' : 'A mai programnap is kész.');
     announceReward(result, { title: 'Edzés kész', message: [session.title, ...extra].join('\n') });
   }
 
@@ -356,7 +357,7 @@ export default function WorkoutSessionScreen() {
           </View>
         ) : (
           <Pressable disabled={totalSets === 0} onPress={() => setFinishing(true)} style={[styles.finish, totalSets === 0 && styles.disabled]}>
-            <Text style={styles.primaryText}>🏁 Edzés befejezése</Text>
+            <View style={{flexDirection:'row',alignItems:'center',gap:9}}><MythicIcon name="complete" size={23} color="#FFFFFF"/><Text style={styles.primaryText}>Edzés befejezése</Text></View>
           </Pressable>
         )}
         <View style={{ height: insets.bottom + 16 }} />

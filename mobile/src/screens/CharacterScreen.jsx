@@ -14,6 +14,7 @@ import { getClass, LEVELS_PER_EVOLUTION } from '../game/characters';
 import { confirm, notify } from '../utils/notify';
 import { downloadBackup, pickBackupFile } from '../game/backup';
 import { colors, card } from '../theme';
+import {Sigil,MythicIcon,rankRarity} from '../components/MythicIcon';
 
 export default function CharacterScreen() {
   const { state, progress, achievements, resetAll, markBackedUp, importState, setWeeklyGoal } = useGame();
@@ -77,7 +78,7 @@ export default function CharacterScreen() {
         <View style={styles.badgeGrid}>
           {(showAllBadges ? sortedAchievements : sortedAchievements.slice(0,6)).map((a) => (
             <View key={a.id} style={[styles.badgeCell, a.unlocked && styles.badgeUnlocked]}>
-              <Text style={[styles.badgeEmoji, !a.unlocked && styles.badgeLockedEmoji]}>{a.emoji}</Text>
+              <Sigil name={a.unlocked?'trophy':'locked'} size={55} rarity={a.unlocked?rankRarity(progress.level):'common'} locked={!a.unlocked}/>
               <Text style={[styles.badgeTitle, !a.unlocked && styles.evoLocked]} numberOfLines={2}>{a.title}</Text>
               {a.unlocked ? (
                 <Text style={styles.badgeDesc} numberOfLines={2}>{a.description}</Text>
@@ -101,7 +102,7 @@ export default function CharacterScreen() {
       </View>
 
       <View style={card}>
-        <Text style={styles.sectionTitle}>🎯 Heti cél</Text>
+        <View style={{flexDirection:'row',gap:9,alignItems:'center'}}><MythicIcon name="quest" size={23}/><Text style={styles.sectionTitle}>Heti cél</Text></View>
         <Text style={styles.muted}>Hány napon akarsz aktív lenni hetente? A változás ettől a héttől érvényes.</Text>
         <View style={styles.goalRow}>
           {[1, 2, 3, 4, 5, 6, 7].map((n) => (
@@ -125,7 +126,7 @@ export default function CharacterScreen() {
           const reached = i <= progress.evolutionStage;
           return (
             <View key={title} style={styles.evoRow}>
-              <View style={[styles.evoEmblem,reached&&styles.evoEmblemOn]}><Text style={{color:reached?colors.gold:colors.textMuted}}>{reached?'◆':'◇'}</Text></View>
+              <View style={[styles.evoEmblem,reached&&styles.evoEmblemOn]}><MythicIcon name={reached?'unlock':'locked'} size={22} color={reached?colors.gold:colors.textMuted}/></View>
               <View style={{flex:1,gap:4}}><Text style={[styles.evoTitle,!reached&&styles.evoLocked]}>{title}</Text>
                 <Text style={styles.evoLevel}>LEVEL {String(i * LEVELS_PER_EVOLUTION + 1).padStart(2,'0')}</Text></View>
               <Text style={styles.evoState}>{reached?'FELOLDVA':'ZÁROLVA'}</Text>
@@ -138,7 +139,7 @@ export default function CharacterScreen() {
       <SectionHeading eyebrow="OPTIONAL / PRIVATE VAULT" title="Felhőmentés" />
       <CloudBackup />
       <View style={[card, styles.backup]}>
-        <Text style={styles.sectionTitle}>💾 Adatmentés</Text>
+        <View style={{flexDirection:'row',gap:9,alignItems:'center'}}><MythicIcon name="shield" size={23}/><Text style={styles.sectionTitle}>Adatmentés</Text></View>
         <Text style={styles.muted}>
           Az adataid csak ebben a böngészőben vannak. Mentsd le őket fájlba (pl. iCloud Drive-ra), és ha új telefonod lesz vagy törlöd a Safari adatait, vissza tudod tölteni.
         </Text>

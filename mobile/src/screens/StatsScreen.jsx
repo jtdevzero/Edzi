@@ -11,6 +11,7 @@ import BodyTracker from '../components/BodyTracker';
 import PerformanceCenter from '../components/PerformanceCenter';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
 import { colors, card } from '../theme';
+import {MythicIcon} from '../components/MythicIcon';
 
 const HEAT_COLORS = ['#193033', '#24544E', '#3F7771', '#5CA6A0', '#6EE3D8'];
 const WEEKDAYS = ['H', 'K', 'Sz', 'Cs', 'P', 'Sz', 'V'];
@@ -47,7 +48,7 @@ function Heatmap({ weeks }) {
                   day.rest && styles.heatRest
                 ]}
               >
-                {day.rest ? <Text style={styles.restIcon}>🛡</Text> : null}
+                {day.rest ? <MythicIcon name="shield" size={12} color={colors.gold}/> : null}
               </View>
             ))}
           </View>
@@ -118,7 +119,7 @@ function ExerciseRecords({ records }) {
   if (!list.length) {
     return (
       <View style={card}>
-        <Text style={styles.sectionTitle}>🏆 Gyakorlat rekordok</Text>
+        <View style={{flexDirection:'row',alignItems:'center',gap:9}}><MythicIcon name="trophy" size={21}/><Text style={styles.sectionTitle}>Gyakorlat rekordok</Text></View>
         <Text style={styles.muted}>Használd az Edzésmódot (Naplózás → Edzés), és itt látod majd a rekordjaidat és a fejlődésedet gyakorlatonként.</Text>
       </View>
     );
@@ -126,7 +127,7 @@ function ExerciseRecords({ records }) {
   const fmt = (v) => (current.unit === 'sec' ? formatClock(v) : `${v}`);
   return (
     <View style={[card, styles.recGap]}>
-      <Text style={styles.sectionTitle}>🏆 Gyakorlat rekordok</Text>
+      <View style={{flexDirection:'row',alignItems:'center',gap:9}}><MythicIcon name="trophy" size={21}/><Text style={styles.sectionTitle}>Gyakorlat rekordok</Text></View>
       <View style={styles.exChips}>
         {list.map((r) => (
           <Pressable key={r.name} onPress={() => setSelected(r.name)} style={[styles.exChip, r.name === current.name && styles.exChipOn]}>
@@ -171,14 +172,14 @@ export default function StatsScreen() {
   return (
     <Screen title="Statisztika" eyebrow="ANALYTICS / PERFORMANCE" subtitle="A fejlődés láthatóvá válik.">
       <LinearGradient colors={['#223B3C','#0F2328','#0B181D']} style={styles.statsHero}>
-        <Text style={styles.heroEyebrow}>◈  PERFORMANCE RECORD</Text>
+        <View style={{flexDirection:'row',alignItems:'center',gap:8}}><MythicIcon name="stats" size={24}/><Text style={styles.heroEyebrow}>PERFORMANCE RECORD</Text></View>
         <Text style={styles.heroNumber}>{formatMinutes(records.totalMinutes)}</Text>
         <Text style={styles.heroCaption}>ÖSSZES RÖGZÍTETT AKTIVITÁS</Text>
         <Text style={styles.heroNote}>{records.activeDays} aktív nap · {records.longestStreak} napos rekord sorozat</Text>
       </LinearGradient>
       <SectionHeading eyebrow="YOUR NUMBERS" title="Áttekintés"/>
       <View style={styles.recordGrid}>
-        <Record value={`🔥 ${records.longestStreak}`} label="Leghosszabb streak (nap)" />
+        <Record value={records.longestStreak} label="Leghosszabb streak (nap)" />
         <Record value={records.activeDays} label="Aktív napok" />
         <Record value={formatMinutes(records.bestWeekMinutes)} label="Legjobb hét" />
         <Record value={formatMinutes(records.totalMinutes)} label="Összesen" />
@@ -194,7 +195,7 @@ export default function StatsScreen() {
       <SectionHeading eyebrow="CONSISTENCY" title="Aktivitási térkép"/>
       <View style={card}>
         <Text style={styles.sectionTitle}>Az utolsó 12 hét</Text>
-        <Text style={styles.muted}>Minél sötétebb, annál több perc. 🛡 = pihenőnap, ami megvédte a streaket.</Text>
+        <Text style={styles.muted}>Minél világosabb a jelölés, annál több perc. A pajzs a streaket védő pihenőnapot jelöli.</Text>
         <Heatmap weeks={stats.heatmap} />
       </View>
 

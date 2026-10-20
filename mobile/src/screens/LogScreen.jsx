@@ -14,6 +14,7 @@ import SmartTrainingPanel from '../components/SmartTrainingPanel';
 import { confirm } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
+import {MythicIcon,activityIcon} from '../components/MythicIcon';
 
 const EMPTY_FORM = { title: '', duration: '', intensity: 5, notes: '', templateId: null };
 
@@ -70,14 +71,14 @@ export default function LogScreen({ navigation }) {
       <View style={styles.tabs}>
         {Object.entries(ACTIVITY_TYPES).map(([key, t]) => (
           <Pressable key={key} onPress={() => { setType(key); setForm(EMPTY_FORM); }} style={[styles.tab, type === key && styles.tabActive]}>
-            <Text style={[styles.tabText, type === key && styles.tabTextActive]}>{t.emoji} {t.label}</Text>
+            <MythicIcon name={activityIcon(key)} size={19} color={type===key?colors.gold:colors.textMuted}/><Text style={[styles.tabText, type === key && styles.tabTextActive]}>{t.label}</Text>
           </Pressable>
         ))}
       </View>
 
       {type === 'workout' && (
         <LinearGradient colors={['#35534E','#182D33','#0D1921']} style={styles.trainingHero}>
-          <Text style={styles.trainingLabel}>◈  TRAINING SYSTEM / READY FOR DEPLOYMENT</Text>
+          <View style={{flexDirection:'row',alignItems:'center',gap:8}}><MythicIcon name="energy" size={19}/><Text style={styles.trainingLabel}>TRAINING SYSTEM / READY</Text></View>
           <Text style={styles.trainingTitle}>A VALÓDI ERŐT\nTE ÉPÍTED.</Text>
           <Text style={styles.trainingCopy}>Indíts edzést, vezess minden sorozatot, és gyűjts valódi XP-t.</Text>
           <Pressable onPress={() => startWorkout(null)} style={styles.sessionBtn}>
@@ -201,7 +202,7 @@ export default function LogScreen({ navigation }) {
                 onPress={() => confirm('Törlés', `Biztosan törlöd: „${a.title}”? Az XP is levonódik.`, () => deleteActivity(a.id))}
                 style={styles.deleteBtn}
               >
-                <Text style={styles.deleteText}>🗑</Text>
+                <MythicIcon name="delete" size={22} color={colors.red}/>
               </Pressable>
             </View>
           ))}

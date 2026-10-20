@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, StyleSheet } from 'react-native';
+import { View, Text, Animated, StyleSheet, AccessibilityInfo } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme';
 
@@ -7,7 +7,11 @@ export default function XPBar({ xp, xpToNextLevel, level }) {
   const progress = useRef(new Animated.Value(0)).current;
   const pct = Math.min(Math.max(xp / Math.max(1, xpToNextLevel), 0), 1);
   useEffect(() => {
-    Animated.timing(progress, { toValue: pct, duration: 650, useNativeDriver: false }).start();
+    let active=true;
+    AccessibilityInfo.isReduceMotionEnabled().then(reduced=>{
+      if(active)Animated.timing(progress,{toValue:pct,duration:reduced?0:650,useNativeDriver:false}).start();
+    }).catch(()=>progress.setValue(pct));
+    return ()=>{active=false;};
   }, [pct, progress]);
   const width = progress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
   return (

@@ -13,6 +13,7 @@ import PerformanceCenter from '../components/PerformanceCenter';
 import HunterMentor from '../components/HunterMentor';
 import WorldTeaser from '../components/WorldTeaser';
 import {worldProgress} from '../game/hunterWorld';
+import {MythicIcon,Sigil,activityIcon} from '../components/MythicIcon';
 
 function Ring({value,total}){
   const radius=32,c=2*Math.PI*radius;
@@ -46,13 +47,13 @@ export default function DashboardScreen({navigation}){
     !Number.isFinite(new Date(state.lastBackupAt).getTime())||
     Date.now()-new Date(state.lastBackupAt).getTime()>7*86400000);
   return <Screen title="A küldetésed." eyebrow="CHAPTER 04 / PERSONAL HUNTER SYSTEM" subtitle="A következő szint nem magától érkezik."
-    right={<View style={styles.streak}><Text style={styles.streakFire}>✦ {progress.streak}</Text><Text style={styles.streakTiny}>DAY STREAK</Text></View>}>
+    right={<View style={styles.streak}><View style={{flexDirection:'row',alignItems:'center',gap:5}}><MythicIcon name="streak" size={22}/><Text style={styles.streakFire}>{progress.streak}</Text></View><Text style={styles.streakTiny}>DAY STREAK</Text></View>}>
     {storageWarning&&<View style={[card,styles.warning]}>
       <Text style={styles.warningTitle}>A helyi mentés nem elérhető.</Text>
       <Text style={styles.warningText}>Próbáld normál böngészőben, majd készíts biztonsági exportot.</Text>
     </View>}
     {backupDue&&<Pressable style={[card,styles.warning]} onPress={()=>navigation.navigate('Character')}>
-      <Text style={styles.warningTitle}>◇ VÉDD MEG A FEJLŐDÉSEDET</Text>
+      <View style={{flexDirection:'row',alignItems:'center',gap:8}}><MythicIcon name="shield" size={22}/><Text style={styles.warningTitle}>VÉDD MEG A FEJLŐDÉSEDET</Text></View>
       <Text style={styles.warningText}>Helyi adatok · Biztonsági mentés készítése ↗</Text>
     </Pressable>}
     <AppModeSwitcher />
@@ -86,13 +87,13 @@ export default function DashboardScreen({navigation}){
       </Pressable>
       <View style={styles.secondaryActions}>
         <Pressable onPress={()=>navigation.navigate('Quests')} style={styles.secondaryAction}>
-          <Text style={styles.secondaryIcon}>✧</Text>
+          <MythicIcon name="quest" size={26} color={colors.gold}/>
           <View style={{flex:1}}><Text style={styles.secondaryName}>Küldetések</Text>
             <Text style={styles.secondaryDesc}>XP és hőspróbák</Text></View>
           <Text style={styles.chevron}>↗</Text>
         </Pressable>
         <Pressable onPress={()=>navigation.navigate('Stats')} style={styles.secondaryAction}>
-          <Text style={styles.secondaryIcon}>◈</Text>
+          <MythicIcon name="stats" size={26} color={colors.gold}/>
           <View style={{flex:1}}><Text style={styles.secondaryName}>Rekordok</Text>
             <Text style={styles.secondaryDesc}>Fejlődési adatok</Text></View>
           <Text style={styles.chevron}>↗</Text>
@@ -113,14 +114,14 @@ export default function DashboardScreen({navigation}){
       <Ring value={days} total={weeklyGoal}/>
     </View>
     {nextTrial&&<Pressable style={styles.trial} onPress={()=>navigation.navigate('Quests')}>
-      <Text style={styles.trialIcon}>{nextTrial.emoji}</Text>
+      <Sigil name="boss" size={43} rarity="rare"/>
       <View style={{flex:1,gap:3}}><Text style={styles.trialEyebrow}>ELITE CHALLENGE</Text>
         <Text style={styles.trialTitle}>{nextTrial.title}</Text>
         <Text style={styles.trialDetail}>{nextTrial.current}/{nextTrial.target} · +{nextTrial.xp} XP</Text></View>
       <Text style={styles.trialChevron}>↗</Text>
     </Pressable>}
     {programStatus&&<Pressable style={[styles.trial,{borderColor:'#867052'}]} onPress={()=>navigation.navigate('Quests')}>
-      <Text style={styles.trialIcon}>{programStatus.program.emoji}</Text>
+      <Sigil name="quest" size={43} rarity="epic"/>
       <View style={{flex:1}}><Text style={styles.trialEyebrow}>ACTIVE CAMPAIGN</Text>
         <Text style={styles.trialTitle}>{programStatus.program.name}</Text>
         <Text style={styles.trialDetail}>{programStatus.currentDay}. nap</Text></View>
@@ -132,7 +133,7 @@ export default function DashboardScreen({navigation}){
     <View style={[card,{paddingTop:5,paddingBottom:5}]}>
       {quests.map((q,i)=><Pressable onPress={()=>navigation.navigate('Quests')} key={q.id}
         style={[styles.mission,i>0&&{borderTopColor:colors.cardBorder,borderTopWidth:1}]}>
-        <View style={[styles.tick,q.completed&&styles.tickDone]}><Text style={styles.tickIcon}>{q.completed?'✓':'◇'}</Text></View>
+        <View style={[styles.tick,q.completed&&styles.tickDone]}><MythicIcon name={q.completed?'complete':'quest'} size={22} color={q.completed?colors.green:colors.gold}/></View>
         <View style={{flex:1,gap:3}}>
           <Text style={[styles.missionTitle,q.completed&&{color:colors.textMuted}]} numberOfLines={2}>{q.title}</Text>
           <Text style={styles.missionMeta}>{q.category==='physical'?'PHYSICAL':q.category==='mental'?'MENTAL':'RECOVERY'}</Text>
@@ -143,7 +144,7 @@ export default function DashboardScreen({navigation}){
     {recent.length>0&&<>
       <SectionHeading eyebrow="LATEST ENTRIES" title="Friss aktivitás"/>
       <View style={[card,{gap:14}]}>{recent.map(a=><View style={styles.activity} key={a.id}>
-        <Text style={{fontSize:20}}>{ACTIVITY_TYPES[a.type]?.emoji||'✦'}</Text>
+        <MythicIcon name={activityIcon(a.type)} size={27} color={colors.gold}/>
         <View style={{flex:1}}><Text style={styles.activityTitle} numberOfLines={1}>{a.title}</Text>
           <Text style={styles.activitySub}>{a.duration} perc</Text></View>
         <Text style={styles.missionXP}>+{progress.xpById[a.id]||0} XP</Text>

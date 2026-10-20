@@ -14,6 +14,7 @@ import { announceReward } from '../utils/rewards';
 import { unlockAudio } from '../utils/device';
 import { createSession } from '../game/session';
 import { colors, card } from '../theme';
+import {MythicIcon,Sigil} from '../components/MythicIcon';
 
 const CATEGORY_COLORS = { physical: colors.red, mental: colors.blue, recovery: colors.green };
 
@@ -23,14 +24,14 @@ function ProgramPicker({ onStart }) {
     <View style={[card, styles.gap]}>
       <Pressable onPress={() => setOpen(!open)} style={styles.pickerHead}>
         <View style={styles.flex}>
-          <Text style={styles.sectionTitle}>🥋 Kihívás programok</Text>
+          <View style={styles.pickerLabel}><MythicIcon name="shield" size={23}/><Text style={styles.sectionTitle}>Kihívás programok</Text></View>
           <Text style={styles.muted}>Többhetes terv, minden napra pontos feladattal.</Text>
         </View>
         <Text style={styles.muted}>{open ? '▲' : '▼'}</Text>
       </Pressable>
       {open && PROGRAMS.map((p) => (
         <View key={p.id} style={styles.programOption}>
-          <Text style={styles.programName}>{p.emoji} {p.name} <Text style={styles.muted}>· {p.days.length} nap</Text></Text>
+          <View style={styles.programLabel}><MythicIcon name="quest" size={19}/><Text style={styles.programName}>{p.name} <Text style={styles.muted}>· {p.days.length} nap</Text></Text></View>
           <Text style={styles.muted}>{p.description}</Text>
           <Text style={styles.muted}>1. nap: {p.days[0].tasks.join(', ')}</Text>
           <Pressable onPress={() => onStart(p)} style={styles.outlineBtn}>
@@ -48,7 +49,7 @@ function ActiveProgram({ status, onComplete, onAbandon, onWorkout }) {
   return (
     <View style={[card, styles.gap, styles.programCard]}>
       <View style={styles.badges}>
-        <Text style={styles.programTag}>{program.emoji} {program.name}</Text>
+        <View style={styles.programLabel}><MythicIcon name="quest" size={22}/><Text style={styles.programTag}>{program.name}</Text></View>
         <Text style={styles.xp}>+{programDayXP(program.id, currentDay)} XP</Text>
       </View>
       <Text style={styles.title}>{currentDay}. nap: {today.title}</Text>
@@ -61,7 +62,7 @@ function ActiveProgram({ status, onComplete, onAbandon, onWorkout }) {
         </Pressable>
       )}
       <Pressable disabled={doneToday} onPress={onComplete} style={[styles.button, doneToday && styles.buttonDone]}>
-        <Text style={styles.buttonText}>{doneToday ? '✅ A mai programnap kész' : 'Megcsináltam'}</Text>
+        <Text style={styles.buttonText}>{doneToday ? 'A mai programnap kész' : 'Megcsináltam'}</Text>
       </Pressable>
       {doneToday && <Text style={styles.mutedCenter}>Holnap jön a {currentDay + 1}. nap.</Text>}
       <Pressable onPress={onAbandon} hitSlop={8}>
@@ -90,7 +91,7 @@ export default function QuestsScreen() {
     announceReward(result, {
       title: 'Programnap kész',
       message: result.finished
-        ? `🎉 Teljesítetted a teljes programot: ${programStatus.program.name}!`
+        ? `Teljesítetted a teljes programot: ${programStatus.program.name}!`
         : `${programStatus.program.name}: ${programStatus.currentDay}. nap`
     });
   }
@@ -98,7 +99,7 @@ export default function QuestsScreen() {
   return (
     <Screen title="A birodalmak." subtitle="Küldetések, területek és összecsapások." eyebrow="WORLD DIRECTORY / CHAPTER IV">
       <LinearGradient colors={['#34463A','#19332F','#0B181D']} style={styles.missionHero}>
-        <Text style={styles.missionEyebrow}>✦  QUEST BOARD / LIVE</Text>
+        <View style={styles.programLabel}><MythicIcon name="quest" size={23} color={colors.gold}/><Text style={styles.missionEyebrow}>QUEST BOARD / LIVE</Text></View>
         <Text style={styles.missionHeroTitle}>{quests.filter(q=>q.completed).length}<Text style={styles.missionHeroSlash}> / {quests.length}</Text></Text>
         <Text style={styles.missionHeroUnit}>MAI KÜLDETÉS TELJESÍTVE</Text>
         <Text style={styles.missionHeroCaption}>Minden teljesített feladat hozzáad a történetedhez.</Text>
@@ -133,9 +134,9 @@ export default function QuestsScreen() {
       <View style={styles.gap}>
         {weeklyTrials.map((t) => (
           <View key={t.id} style={[card,styles.eliteTrial,t.completed&&styles.eliteTrialDone]}>
-            <Text style={styles.trialEyebrow}>{t.completed?'✦ MISSION COMPLETE':'◈ ELITE CHALLENGE'}</Text>
+            <View style={styles.programLabel}><MythicIcon name={t.completed?'complete':'boss'} size={20} color={t.completed?colors.green:colors.gold}/><Text style={styles.trialEyebrow}>{t.completed?'MISSION COMPLETE':'ELITE CHALLENGE'}</Text></View>
             <View style={styles.badges}>
-              <Text style={styles.programName}>{t.emoji} {t.title}</Text>
+              <Text style={styles.programName}>{t.title}</Text>
               <Text style={styles.xp}>{t.completed ? '✓ ' : ''}+{t.xp} XP</Text>
             </View>
             <Text style={styles.muted}>{t.detail}</Text>
@@ -151,21 +152,21 @@ export default function QuestsScreen() {
       <Text style={styles.muted}>Minden nap 3 új quest. Éjfélkor frissülnek.</Text>
       {allDone && (
         <View style={[card, styles.celebrate]}>
-          <Text style={styles.celebrateText}>🏆 Minden mai quest kész! Holnap újak jönnek.</Text>
+          <View style={styles.programLabel}><Sigil name="trophy" size={45} rarity="legendary"/><Text style={styles.celebrateText}>Minden mai quest kész! Holnap újak jönnek.</Text></View>
         </View>
       )}
       {quests.map((q) => (
         <View key={q.id} style={[card, styles.quest, q.completed && styles.questDone]}>
           <View style={styles.badges}>
-            <Text style={[styles.badge, { color: CATEGORY_COLORS[q.category], borderColor: CATEGORY_COLORS[q.category] }]}>
+            <View style={styles.programLabel}><MythicIcon name={q.category==='physical'?'workout':q.category==='mental'?'study':'recovery'} size={21} color={CATEGORY_COLORS[q.category]}/><Text style={[styles.badge, { color: CATEGORY_COLORS[q.category], borderColor: CATEGORY_COLORS[q.category] }]}>
               {CATEGORY_LABELS[q.category]}
-            </Text>
+            </Text></View>
             <Text style={styles.xp}>+{q.xp} XP</Text>
           </View>
           <Text style={styles.title}>{q.title}</Text>
           <Text style={styles.desc}>{q.description}</Text>
           <Pressable disabled={q.completed} onPress={() => complete(q)} style={[styles.button, q.completed && styles.buttonDone]}>
-            <Text style={styles.buttonText}>{q.completed ? '✅ Teljesítve' : 'Teljesítettem'}</Text>
+            <Text style={styles.buttonText}>{q.completed ? 'Teljesítve' : 'Teljesítettem'}</Text>
           </Pressable>
         </View>
       ))}
@@ -174,6 +175,8 @@ export default function QuestsScreen() {
 }
 
 const styles = StyleSheet.create({
+  pickerLabel:{flexDirection:'row',alignItems:'center',gap:9},
+  programLabel:{flexDirection:'row',alignItems:'center',gap:9,flexShrink:1},
   missionHeroSlash:{fontSize:22,color:colors.textMuted,letterSpacing:-.5},
   eliteTrial:{gap:12,borderColor:'#4A475B',paddingVertical:19},
   eliteTrialDone:{borderColor:'#477564',backgroundColor:'#122720'},

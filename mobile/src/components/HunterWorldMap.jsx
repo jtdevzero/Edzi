@@ -4,6 +4,8 @@ import Svg,{Defs,LinearGradient,Stop,Path,Circle,G,Line,Polygon} from 'react-nat
 import {useGame} from '../game/GameContext';
 import {colors,card} from '../theme';
 import {worldProgress,worldUnlockedGear} from '../game/hunterWorld';
+import RegionLandscape from './RegionLandscape';
+import {MythicIcon,Sigil} from './MythicIcon';
 const NODE_SIZE=45;
 export default function HunterWorldMap(){
   const {state,progress,customizeCreator}=useGame();
@@ -14,7 +16,7 @@ export default function HunterWorldMap(){
   const done=regions.filter(r=>r.complete).length;
   return <View style={[card,styles.frame]}>
     <View style={styles.header}>
-      <View style={{flex:1,gap:5}}><Text style={styles.eyebrow}>◈ HUNTER WORLD / EXPEDITION</Text>
+      <View style={{flex:1,gap:5}}><View style={{flexDirection:'row',alignItems:'center',gap:8}}><MythicIcon name="quest" size={20}/><Text style={styles.eyebrow}>HUNTER WORLD / EXPEDITION</Text></View>
         <Text style={styles.heading}>Öt birodalom. Egy történet.</Text>
         <Text style={styles.subtitle}>A világtérkép a valódi edzéseiddel nyílik meg.</Text></View>
       <View style={styles.counter}><Text style={styles.counterN}>{done}/5</Text><Text style={styles.counterCaption}>RÉGIÓ</Text></View>
@@ -45,15 +47,16 @@ export default function HunterWorldMap(){
         accessibilityRole="button" accessibilityLabel={r.title+(r.unlocked?' feloldva':' lezárva')}
         onPress={()=>setSelected(r.id)} style={[styles.node,{left:`${r.x}%`,top:`${r.y}%`},
           r.complete&&styles.nodeDone,selected===r.id&&styles.nodeSelected,!r.unlocked&&styles.nodeLocked]}>
-        <Text style={styles.nodeSymbol}>{r.unlocked?r.icon:'◆'}</Text>
+        <MythicIcon name={r.unlocked?r.id:'locked'} size={24} color={r.complete?colors.green:r.unlocked?colors.gold:colors.textMuted}/>
         <Text style={styles.nodeNumber}>{String(i+1).padStart(2,'0')}</Text>
       </Pressable>)}
       <Text style={styles.mapStamp}>EDZI / CHAPTER IV</Text>
       <Text style={styles.mapLegend}>NORTH ↗</Text>
     </View>
+    <RegionLandscape id={region.id} height={156} locked={!region.unlocked}/>
     <View style={styles.region}>
       <View style={styles.regionHead}><Text style={styles.regionEyebrow}>REGION {String(regions.indexOf(region)+1).padStart(2,'0')} / {region.complete?'COMPLETE':region.unlocked?'EXPLORE':'LOCKED'}</Text>
-        <Text style={styles.reward}>{region.complete?'✓':'◇'}</Text></View>
+        <MythicIcon name={region.complete?'complete':region.unlocked?'quest':'locked'} size={25} color={region.complete?colors.green:colors.gold}/></View>
       <Text style={styles.regionName}>{region.title}</Text>
       <Text style={styles.subtitle}>{region.subtitle}</Text>
       <View style={styles.bar}><View style={[styles.barFill,{width:`${Math.min(100,100*region.current/region.target)}%`}]} /></View>
@@ -63,7 +66,7 @@ export default function HunterWorldMap(){
     <View style={styles.gear}>{available.map(g=><Pressable key={g.id}
       disabled={!g.unlocked} onPress={()=>customizeCreator('gear',g.id)}
       style={[styles.gearCell,g.unlocked&&{borderColor:g.accent},!g.unlocked&&{opacity:.5}]}>
-      <Text style={[styles.gearGlyph,{color:g.unlocked?g.accent:colors.textMuted}]}>{g.unlocked?g.symbol:'◇'}</Text>
+      <MythicIcon name={g.unlocked?'armor':'locked'} size={28} color={g.unlocked?g.accent:colors.textMuted}/>
       <Text style={styles.gearName} numberOfLines={2}>{g.name}</Text>
     </Pressable>)}</View>
     <Text style={styles.disclaimer}>A térképen megjelenő jutalmak kozmetikai elemek. Nem jár plusz XP a kattintásokért.</Text>

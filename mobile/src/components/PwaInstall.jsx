@@ -1,6 +1,7 @@
 import React,{useEffect,useState} from 'react';
 import {Platform,View,Text,Pressable,StyleSheet} from 'react-native';
 import {colors,card} from '../theme';
+import {MythicIcon} from './MythicIcon';
 export default function PwaInstall(){
   const [prompt,setPrompt]=useState(null);
   const [installed,setInstalled]=useState(false);
@@ -16,7 +17,7 @@ export default function PwaInstall(){
   },[]);
   if(Platform.OS!=='web'||installed)return null;
   return <View style={[card,styles.box]}>
-    <Text style={styles.eyebrow}>◈  TAKE EDZI WITH YOU</Text>
+    <View style={{flexDirection:'row',alignItems:'center',gap:8}}><MythicIcon name="shield" size={21}/><Text style={styles.eyebrow}>TAKE EDZI WITH YOU</Text></View>
     <Text style={styles.title}>Telepítés a telefonodra</Text>
     <Text style={styles.copy}>Gyors indítás a főképernyőről. A jelenlegi adataid továbbra is helyben maradnak.</Text>
     {prompt?<Pressable style={styles.button} onPress={async()=>{

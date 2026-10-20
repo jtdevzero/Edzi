@@ -8,21 +8,15 @@ import QuestsScreen from '../screens/QuestsScreen';
 import CharacterScreen from '../screens/CharacterScreen';
 import StatsScreen from '../screens/StatsScreen';
 import {colors} from '../theme';
+import {MythicIcon} from '../components/MythicIcon';
 const Tab=createBottomTabNavigator();
 function Icon({name,focused}){
   const selected=focused?colors.gold:'#93A4AA';
   if(name==='Log')return <View style={[styles.central,focused&&styles.centralFocused]}>
-    <Svg width={23} height={23} viewBox="0 0 24 24"><Path d="M12 4 V20 M4 12 H20"
-      stroke="#111B21" strokeWidth="2.6" strokeLinecap="round"/></Svg></View>;
+    <MythicIcon name="energy" size={26} color="#111B21"/></View>;
   return <View style={[styles.iconBox,focused&&styles.iconFocused]}>
     {focused&&<View style={styles.activeDot}/>}
-    <Svg width={21} height={21} viewBox="0 0 24 24" fill="none"
-      stroke={selected} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      {name==='Dashboard'?<><Path d="M3 10.4 L12 3 L21 10.4 V21 H14.8 V14.8 H9.2 V21 H3 Z"/></>:
-       name==='Quests'?<><Path d="M12 2 L17 9.1 L22 12 L17 14.9 L12 22 L7 14.9 L2 12 L7 9.1 Z"/><Circle cx="12" cy="12" r="2.3"/></>:
-       name==='Stats'?<><Rect x="3" y="11" width="4" height="10" rx="1"/><Rect x="10" y="6" width="4" height="15" rx="1"/><Rect x="17" y="2.5" width="4" height="18.5" rx="1"/></>:
-       <><Path d="M12 2 L19.5 5 V11.5 C19.5 16.2 16.3 19.4 12 22 C7.7 19.4 4.5 16.2 4.5 11.5 V5 Z"/><Path d="M9 12 L11 14 L15.5 9.5"/></>}
-    </Svg>
+    <MythicIcon name={name==='Dashboard'?'shield':name==='Quests'?'quest':name==='Stats'?'stats':'armor'} size={25} color={selected}/>
   </View>;
 }
 export default function TabNavigator(){
