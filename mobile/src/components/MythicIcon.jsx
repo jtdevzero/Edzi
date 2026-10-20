@@ -57,14 +57,15 @@ export function rankRarity(level){
   return level>=21?'mythic':level>=16?'legendary':level>=11?'epic':level>=6?'rare':'common';
 }
 export function Sigil({name='quest',size=64,color=colors.gold,rarity,locked=false,style}){
+  const gradientId='sigil'+React.useId().replace(/:/g,'');
   const hue=rarity?RARITY[rarity]?.color||color:color;
   return <View style={[{width:size,height:size,alignItems:'center',justifyContent:'center'},style]}>
     <Svg width={size} height={size} viewBox="0 0 80 80" style={StyleSheet.absoluteFill}>
-      <Defs><LinearGradient id="sigilbg" x1="0" y1="0" x2="1" y2="1">
+      <Defs><LinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
         <Stop offset="0" stopColor={hue} stopOpacity=".19"/>
         <Stop offset="1" stopColor="#0B1620" stopOpacity="1"/>
       </LinearGradient></Defs>
-      <Path d="M40 2 L69 15 L78 40 L65 68 L40 78 L13 65 L2 40 L15 13 Z" fill="url(#sigilbg)" stroke={hue} strokeOpacity=".8" strokeWidth="1.5"/>
+      <Path d="M40 2 L69 15 L78 40 L65 68 L40 78 L13 65 L2 40 L15 13 Z" fill={`url(#${gradientId})`} stroke={hue} strokeOpacity=".8" strokeWidth="1.5"/>
       <Path d="M40 10 L62 19 L70 40 L60 61 L40 70 L19 60 L10 40 L19 19 Z" fill="none" stroke={hue} strokeOpacity=".35" strokeDasharray="3 5"/>
       <Path d="M40 0 V12 M40 68 V80 M0 40 H12 M68 40 H80" stroke={hue} strokeWidth="1.2"/>
     </Svg>

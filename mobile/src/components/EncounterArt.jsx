@@ -13,13 +13,15 @@ const themes={
 export default function EncounterArt({id='iron_guardian',height=176,defeated=false}){
   const data=themes[id]||themes.iron_guardian;
   const c=data.accent;
+  const idSky='encsky'+React.useId().replace(/:/g,'');
+  const idArmor='armor'+React.useId().replace(/:/g,'');
   return <View style={[styles.frame,{height,opacity:defeated ? .74 : 1}]}>
     <Svg width="100%" height="100%" viewBox="0 0 350 180" preserveAspectRatio="xMidYMid slice">
       <Defs>
-        <LinearGradient id="encsky" x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor={data.sky[0]}/><Stop offset="1" stopColor={data.sky[1]}/></LinearGradient>
-        <LinearGradient id="armor" x1="0" y1="0" x2="1" y2="0"><Stop offset="0" stopColor="#13252B"/><Stop offset=".5" stopColor="#4D5C64"/><Stop offset="1" stopColor="#18212B"/></LinearGradient>
+        <LinearGradient id={idSky} x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor={data.sky[0]}/><Stop offset="1" stopColor={data.sky[1]}/></LinearGradient>
+        <LinearGradient id={idArmor} x1="0" y1="0" x2="1" y2="0"><Stop offset="0" stopColor="#13252B"/><Stop offset=".5" stopColor="#4D5C64"/><Stop offset="1" stopColor="#18212B"/></LinearGradient>
       </Defs>
-      <Rect width="350" height="180" fill="url(#encsky)"/>
+      <Rect width="350" height="180" fill={`url(#${idSky})`}/>
       <Circle cx="266" cy="73" r="69" stroke={c} strokeOpacity=".25" strokeWidth="1" fill="none"/>
       <Circle cx="266" cy="73" r="53" stroke={c} strokeOpacity=".22" strokeDasharray="3 8" fill="none"/>
       <Circle cx="266" cy="73" r="36" fill={c} fillOpacity=".08" stroke={c} strokeOpacity=".2"/>
@@ -28,7 +30,7 @@ export default function EncounterArt({id='iron_guardian',height=176,defeated=fal
       </G>
       {id==='iron_guardian'?<>
         <Path d="M166 185 L183 118 L221 94 L244 45 L291 45 L318 94 L348 118 L350 185 Z" fill="#131F25" stroke="#72827E" strokeWidth="1.6"/>
-        <Path d="M222 88 L232 30 L251 38 L264 7 L282 38 L301 27 L306 90 L282 111 L243 111Z" fill="url(#armor)" stroke={c} strokeWidth="1.7"/>
+        <Path d="M222 88 L232 30 L251 38 L264 7 L282 38 L301 27 L306 90 L282 111 L243 111Z" fill={`url(#${idArmor})`} stroke={c} strokeWidth="1.7"/>
         <Path d="M241 79 L258 83 L264 89 L270 83 L288 79 L282 94 L247 94 Z" fill={c}/>
         <Path d="M224 115 L261 134 L298 115 L312 175 L211 175 Z" fill="url(#armor)" stroke={c} strokeOpacity=".6"/>
         <Path d="M261 137 L261 166 M239 135 L226 161 M288 135 L298 161" stroke={c} opacity=".6"/>

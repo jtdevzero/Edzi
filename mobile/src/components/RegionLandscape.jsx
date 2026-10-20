@@ -13,11 +13,12 @@ const themes={
 };
 export default function RegionLandscape({id='awakening',height=160,locked=false}){
  const t=themes[id]||themes.awakening;
+ const skyId='worldsky'+React.useId().replace(/:/g,'');
  return <View style={[styles.frame,{height,opacity:locked ? .63 : 1}]}>
   <Svg width="100%" height="100%" viewBox="0 0 348 163" preserveAspectRatio="xMidYMid slice">
-   <Defs><LinearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+   <Defs><LinearGradient id={skyId} x1="0" y1="0" x2="1" y2="1">
      <Stop offset="0" stopColor={t.sky[0]}/><Stop offset="1" stopColor={t.sky[1]}/></LinearGradient></Defs>
-   <Rect x="0" y="0" width="348" height="163" fill="url(#sky)"/>
+   <Rect x="0" y="0" width="348" height="163" fill={`url(#${skyId})`}/>
    <Circle cx="258" cy="48" r="31" fill={t.light} fillOpacity=".13" stroke={t.light} strokeOpacity=".35"/>
    <Circle cx="258" cy="48" r="44" fill="none" stroke={t.light} strokeOpacity=".15"/>
    <G stroke={t.light} strokeOpacity=".15" strokeWidth=".75">
