@@ -104,3 +104,10 @@ CI: `cd mobile && npm ci && npm test && npm run build:web && npx expo-doctor@lat
 
 ### Ellenőrzés
 A PR automatikus CI-je futtatja a logikai teszteket, Expo Doctort, web exportot, telefonméretű Playwright tesztet, offline újratöltést és keskeny nézetet. A GitHub Pages csak zöld teszt után frissülhet.
+
+### Edzi 4.0 — opcionális Online AI Sensei
+- A Hunter Mentor **alapértelmezett része offline**, nem generatív és nem továbbít adatot.
+- A generatív AI csak saját Supabase Edge Function + szerveroldali Anthropic-kulcs telepítése után jelenik meg.
+- A felhasználó **külön, minden kéréskor** jóváhagyja az anonimizált aggregált edzésszám, perc, szint, streak és közérzet továbbítását; név, testméret, edzéssúly, szabad szöveges napló nem megy át.
+- Auth JWT validáció és szerveroldali napi 5 kérés limit szükséges: `supabase/edzi_ai_usage.sql`, `supabase/functions/hunter-coach/index.ts`.
+- A szolgáltatást élő auth-, adatvédelmi és abuse-teszt hiányában nem szabad automatikusan aktiválni.

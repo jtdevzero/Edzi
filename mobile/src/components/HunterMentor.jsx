@@ -1,10 +1,24 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {View,Text,Pressable,StyleSheet} from 'react-native';
 import {useGame} from '../game/GameContext';
+import {useCloudSession} from '../cloud/session';
+import {aiReady,requestGenerativeCoach} from '../cloud/ai';
+import {confirm,notify} from '../utils/notify';
 import {mentorBrief} from '../game/mentor';
 import {colors,card} from '../theme';
 export default function HunterMentor(){
   const {state,progress}=useGame();
+  const {session}=useCloudSession();
+  const [aiAnswer,setAiAnswer]=useState(null);
+  const [busy,setBusy]=useState(false);
+  function askAI(){
+    if(busy||!session)return;
+    confirm('Önkéntes AI-tanács','Az online AI-edzőhöz csak a heti edzésszám, percek, szint, streak és 1–5 közérzetérték kerül elküldésre. Név, edzésjegyzet, súly és testméret nem. Küldhetjük?',()=>{
+      setBusy(true);
+      requestGenerativeCoach(session,state,progress).then(setAiAnswer)
+        .catch(e=>notify('AI-edző',e.message)).finally(()=>setBusy(false));
+    });
+  }
   const insight=mentorBrief(state,progress);
   return <View style={[card,styles.box]}>
     <View style={styles.top}><Text style={styles.symbol}>✧</Text><View style={{flex:1,gap:5}}>
@@ -18,10 +32,19 @@ export default function HunterMentor(){
       <Text style={styles.body}>{insight.training.reason}</Text></View>}
     <Text style={styles.eyebrow}>MI ALAPJÁN?</Text>
     {insight.explanation.map((line,i)=><Text key={i} style={styles.reason}>◈ {line}</Text>)}
-    <Text style={styles.note}>Ez a mentor jelenleg helyben működő, szabályalapú rendszer. Nem generatív AI, és nem küldi el az egészség- vagy edzésadataidat külső szolgáltatónak.</Text>
+    <Text style={styles.note}>A fenti mentor offline, szabályalapú és nem továbbít személyes adatot.</Text>
+    {aiReady && <View style={styles.remote}>
+      <Text style={styles.eyebrow}>ONLINE AI SENSEI / KÜLÖN BELEEGYEZÉS</Text>
+      <Text style={styles.note}>{session?'A generatív tanács külön gombnyomással kérhető; napi maximum 5 kérés.':'Az AI-edzőhöz jelentkezz be a Karakter / Felhőmentés menüpontban.'}</Text>
+      {session&&<Pressable disabled={busy} onPress={askAI} style={styles.ask}><Text style={styles.askText}>{busy?'AI válasz készül…':'Generatív AI-edző megkérdezése'}</Text></Pressable>}
+      {aiAnswer&&<Text style={styles.body}>{aiAnswer}</Text>}
+    </View>}
   </View>;
 }
 const styles=StyleSheet.create({
+  remote:{gap:12,padding:14,backgroundColor:'#1D243B',borderRadius:14,borderWidth:1,borderColor:'#625781'},
+  ask:{backgroundColor:colors.primary,borderRadius:12,minHeight:45,alignItems:'center',justifyContent:'center'},
+  askText:{color:'#fff',fontSize:12,fontWeight:'900'},
   box:{gap:12,borderColor:'#5E5775'},
   top:{flexDirection:'row',alignItems:'center',gap:13},
   symbol:{fontSize:39,color:colors.gold},

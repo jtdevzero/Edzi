@@ -22,3 +22,6 @@ without a privacy/legal review, removal path and verified backup/restore test.
 This release is **not** automatic multi-device synchronization.
 
 Users may explicitly delete their remote snapshot from the Cloud Vault screen; local data stays intact. Full account deletion must additionally be handled in the Supabase Auth administration/privacy process.
+
+## Optional AI Sensei edge function
+Install `edzi_ai_usage.sql` and deploy `functions/hunter-coach/index.ts` as a Supabase Edge Function with JWT verification enabled. Set server-only secrets: ANTHROPIC_API_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL, SUPABASE_ANON_KEY, EDZI_ALLOWED_ORIGIN=https://jtdevzero.github.io. Never put secrets in EXPO_PUBLIC_* values. The browser uploads minimal counts only after explicit consent for each request. Five generations per user per UTC day are enforced by a privileged SQL RPC. Requires a live two-user authorization test, rate-limit check, provider privacy disclosure and administrator deployment.
