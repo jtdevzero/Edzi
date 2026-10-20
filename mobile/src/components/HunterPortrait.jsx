@@ -6,7 +6,7 @@ import { colors } from '../theme';
  * Procedural anime-inspired guardian artwork.
  * Entirely vector, offline-capable, no external art licences or network loading.
  */
-export default function HunterPortrait({ classId = 'hero', accent = colors.primarySoft, armorAccent = colors.primarySoft, helmetStyle = 'vanguard', size = 260 }) {
+export default function HunterPortrait({ classId = 'hero', accent = colors.primarySoft, armorAccent = colors.primarySoft, helmetStyle = 'vanguard', level = 1, size = 260 }) {
   const sigil = classId === 'shadow' ? 'shadow' : classId === 'monk' ? 'monk' : 'blade';
   return <Svg width={size} height={size * 1.26} viewBox="0 0 280 354" accessibilityLabel="Stilizált vadász karakterportré">
     <Defs>
@@ -30,6 +30,9 @@ export default function HunterPortrait({ classId = 'hero', accent = colors.prima
       </LinearGradient>
     </Defs>
     <Circle cx="150" cy="144" r="122" fill="url(#halo)"/>
+    {level>=6&&<Circle cx="150" cy="145" r="111" stroke={armorAccent} fill="none" strokeWidth="2" strokeOpacity=".32"/>}
+    {level>=16&&<Path d="M150 10 L170 33 L150 53 L130 33 Z M21 146 L41 126 L61 146 L41 166 Z M242 146 L262 126 L280 146 L262 166 Z" fill={armorAccent} fillOpacity=".26" stroke={armorAccent} strokeOpacity=".6"/>}
+    {level>=21&&<Circle cx="150" cy="145" r="128" stroke={colors.gold} strokeWidth="2" strokeDasharray="14 10 2 10" fill="none" strokeOpacity=".56"/>}
     <Circle cx="150" cy="145" r="104" fill="none" stroke={accent} strokeWidth=".8" strokeOpacity=".28"/>
     <Circle cx="150" cy="145" r="91" fill="none" stroke={accent} strokeWidth="1" strokeOpacity=".25" strokeDasharray="3 9"/>
     <Circle cx="150" cy="145" r="71" fill="none" stroke={accent} strokeWidth=".6" strokeOpacity=".25"/>
@@ -63,6 +66,8 @@ export default function HunterPortrait({ classId = 'hero', accent = colors.prima
     <Path d="M134 175 L151 181 L167 175 L154 193 L145 193 Z" fill="#1E2C48"/>
     <Path d="M108 149 L125 183 L144 200 M190 148 L174 182 L156 201" fill="none" stroke="#50607D" strokeOpacity=".65" strokeWidth=".9"/>
     <Path d="M102 228 L108 249 L137 267 M196 228 L189 251 L164 267" fill="none" stroke={armorAccent} strokeWidth="1.6" opacity=".74"/>
+    {level>=11&&<Path d="M72 261 L95 216 L114 225 L137 267 L103 301 Z M227 261 L205 216 L187 225 L166 267 L196 301Z" stroke={armorAccent} strokeWidth="2" strokeOpacity=".8" fill="#1B3140"/>}
+    {level>=21&&<Path d="M145 215 L151 202 L157 215 L167 221 L151 235 L135 221Z" fill={colors.gold} fillOpacity=".7"/>}
     <Path d="M130 279 L152 303 L173 279" fill="none" stroke={accent} strokeWidth="1.2" opacity=".52"/>
     <Rect x="134" y="321" width="36" height="2" rx="1" fill={accent} opacity=".35"/>
   </Svg>;
