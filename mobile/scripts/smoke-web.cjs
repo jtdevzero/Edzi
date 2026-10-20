@@ -40,7 +40,6 @@ const fs = require('node:fs');
     await page.getByText('FEDEZD FEL A VILÁGOD.').first().waitFor();
     assert.ok(await page.getByTestId('cinematic-campaign-art').count()>0,'Generated hero illustration must be rendered');
     assert.ok(await page.getByTestId('cinematic-world-art').count()>0,'Generated citadel illustration must be rendered');
-    assert.ok(await page.getByTestId('cinematic-rank-art').count()>0,'Generated ascension artwork must render');
     await page.getByText('PRIVATE / OFFLINE').first().waitFor();
     console.log('SMOKE: NIGHTFALL hero, expedition teaser and private-mode header');
 
@@ -57,6 +56,7 @@ const fs = require('node:fs');
     await page.getByText('Hunter Evolution').first().waitFor();
     await page.getByText('VADÁSZFORMA').first().waitFor();
     await page.getByText('CHARACTER CREATOR / ARMORY').last().waitFor();
+    assert.ok(await page.getByTestId('cinematic-rank-art').count()>0,'Generated ascension artwork must render');
     await page.getByText('SISAKFORMA').last().waitFor();
     await page.getByText('Királyi', {exact:true}).last().click();
     await page.getByText('Kezdet', {exact:true}).first().waitFor();
