@@ -104,6 +104,7 @@ export function GameProvider({ children }) {
     return {
       state,
       storageWarning,
+      storageBlocked,
       progress,
       achievements,
       quests,
@@ -242,7 +243,7 @@ export function GameProvider({ children }) {
         setState(INITIAL_STATE);
       }
     };
-  }, [state, today, session, storageWarning]);
+  }, [state, today, session, storageWarning, storageBlocked]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

@@ -10,6 +10,7 @@ import { GameProvider, useGame } from './src/game/GameContext';
 import { colors } from './src/theme';
 import RewardOverlay from './src/components/RewardOverlay';
 import OfflineStatus from './src/components/OfflineStatus';
+import RecoveryScreen from './src/screens/RecoveryScreen';
 import {registerOfflineSupport} from './src/utils/offline';
 
 const navTheme = {
@@ -26,6 +27,7 @@ function Root() {
       </View>
     );
   }
+  if (game.storageBlocked) return <RecoveryScreen />;
   if (!game.state.character) return <OnboardingScreen />;
   if (game.session) return <WorkoutSessionScreen />;
   return (

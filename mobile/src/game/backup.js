@@ -21,7 +21,10 @@ export function parseBackup(text) {
   const validSet = (v) =>
     validNumber(v, 0, 100000) ||
     (v && typeof v === 'object' && validNumber(v.reps, 0, 100000) &&
-      validNumber(v.weightKg ?? 0, 0, 1500));
+      validNumber(v.weightKg ?? 0, 0, 1500) &&
+      (v.rpe === undefined || v.rpe === null || validNumber(v.rpe, 1, 10)) &&
+      (v.rir === undefined || v.rir === null || (Number.isInteger(v.rir) && v.rir>=0 && v.rir<=10)) &&
+      (v.warmup === undefined || typeof v.warmup === 'boolean'));
   const validExercises = (a) => a.exercises === undefined ||
     (Array.isArray(a.exercises) && a.exercises.every((e) =>
       e && typeof e.name === 'string' && ['reps', 'sec'].includes(e.unit) &&

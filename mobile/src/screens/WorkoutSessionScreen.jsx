@@ -7,7 +7,7 @@ import {
   REST_OPTIONS, INTERVAL_PRESETS, elapsedSeconds, restRemaining, intervalStatus, formatClock, setValue, formatSet
 } from '../game/session';
 import { beep, keepScreenAwake, unlockAudio } from '../utils/device';
-import { confirm } from '../utils/notify';
+import { confirm, notify } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
 import { validateDetailedSet } from '../game/fitnessPro';
@@ -95,7 +95,7 @@ export default function WorkoutSessionScreen() {
     let entry = counter;
     if(ex.weighted){
       try {entry=validateDetailedSet({reps:counter,weightKg:kg,rpe:rpeInput,rir:rirInput,warmup});}
-      catch {return;}
+      catch (err) {notify('Hibás sorozatadatok',err.message);return;}
     }
     updateSession((s) => ({ ...addSet(s, s.current, entry), restEndsAt: Date.now() + s.restSeconds * 1000 }));
   }

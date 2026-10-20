@@ -58,7 +58,7 @@ export function exerciseInsights(activities, name) {
 }
 export function nextLoadSuggestion(activities,name) {
   const recent=[...activities].sort((a,b)=>b.date.localeCompare(a.date)).flatMap(a=>
-    (a.exercises||[]).filter(e=>e.name===name&&e.unit==='reps').flatMap(e=>e.sets||[]));
+    (a.exercises||[]).filter(e=>e.name===name&&e.unit==='reps').flatMap(e=>[...(e.sets||[])].reverse()));
   const last=recent.find(x=>typeof x==='object'&&Number.isFinite(x.weightKg)&&!x.warmup);
   if(!last)return null;
   const effort = last.rpe == null ? (last.rir == null ? null : 10-last.rir) : last.rpe;

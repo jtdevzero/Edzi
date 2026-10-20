@@ -6,7 +6,7 @@ import {confirm,notify} from '../utils/notify';
 import {colors,card} from '../theme';
 
 export default function CloudBackup(){
-  const {state,importState}=useGame();
+  const {state,importState,markBackedUp}=useGame();
   const [email,setEmail]=useState(''),[code,setCode]=useState(''),[submitted,setSubmitted]=useState('');
   const [session,setSession]=useState(null),[busy,setBusy]=useState(false);
   const [status,setStatus]=useState('');
@@ -41,7 +41,7 @@ export default function CloudBackup(){
       <Text style={styles.logged}>Bejelentkezve: {session.email}</Text>
       <Pressable disabled={busy} style={styles.btn} onPress={()=>confirm('Felhő felülírása',
         'A jelenlegi HELYI adatokkal felülírod a fiókod távoli mentését. Folytatod?',
-        ()=>act(async()=>{const rev=await uploadCloudSnapshot(session,state);setStatus(`Felhőmentés kész (verzió ${rev}).`);} ))}>
+        ()=>act(async()=>{const rev=await uploadCloudSnapshot(session,state);markBackedUp();setStatus(`Felhőmentés kész (verzió ${rev}).`);} ))}>
         <Text style={styles.btnText}>Helyi adatok mentése a felhőbe</Text>
       </Pressable>
       <Pressable disabled={busy} style={styles.secondary} onPress={()=>act(async()=>{
