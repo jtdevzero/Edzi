@@ -1,6 +1,8 @@
 // Browser automation uses Chromium at iPhone-sized viewport; it does not replace native Safari tests.
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -16,6 +18,7 @@ const assert = require('node:assert/strict');
   page.on('pageerror', error => errors.push(error.message));
   page.on('dialog', dialog => dialog.accept());
   try {
+    fs.mkdirSync('artifacts', { recursive: true });
     const response = await page.goto('http://127.0.0.1:4173/Edzi/', { waitUntil: 'networkidle' });
     assert.equal(response.status(), 200);
     await page.getByText('Ébredj fel, harcos').waitFor({ timeout: 15000 });
@@ -25,6 +28,15 @@ const assert = require('node:assert/strict');
     await page.getByText('Kaland indítása').click();
     await page.getByText('Teszt Harcos').waitFor();
     console.log('SMOKE: character created');
+    await page.getByText('RANK D').waitFor();
+    await page.screenshot({ path: 'artifacts/premium-dashboard.png', fullPage: true });
+    await page.getByText('Karakter', { exact: true }).last().click();
+    await page.getByText('Teszt Harcos').first().waitFor();
+    await page.screenshot({ path: 'artifacts/premium-character.png', fullPage: true });
+    await page.getByText('Questek', { exact: true }).last().click();
+    await page.getByText('MAI KÜLDETÉS TELJESÍTVE').waitFor();
+    await page.screenshot({ path: 'artifacts/premium-quests.png', fullPage: true });
+    await page.getByText('Statisztika', { exact: true }).last().click();
     await page.getByText('Statisztika', { exact: true }).last().click();
     await page.getByText('Testösszetétel és mérések', { exact: false }).waitFor();
     await page.getByText('Új mérés rögzítése', { exact: false }).click();
@@ -65,6 +77,17 @@ const assert = require('node:assert/strict');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
     assert.equal(overflow, false, '320px layout must not overflow horizontally');
     console.log('SMOKE: 320px narrow mobile layout');
+    for (const [tab, expected] of [
+      ['Főoldal', 'INDULHAT AZ EDZÉS'],
+      ['Karakter', 'Teszt Harcos'],
+      ['Questek', 'MAI KÜLDETÉS TELJESÍTVE']
+    ]) {
+      await page.getByText(tab, { exact: true }).last().click();
+      await page.getByText(expected, { exact: false }).first().waitFor();
+      const tooWide = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 2);
+      assert.equal(tooWide, false, tab + ' must fit 320px viewport');
+    }
+    console.log('SMOKE: premium pages fit 320px');
     assert.deepEqual(errors, []);
     console.log('MOBILE-SIZE BROWSER SMOKE SUCCESS');
   } finally {
