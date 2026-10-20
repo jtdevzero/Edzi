@@ -22,7 +22,7 @@ export default function RewardOverlay(){
   if(!reward)return null;
   return <View pointerEvents="box-none" style={styles.anchor}>
     <Animated.View style={{opacity:visibility,transform:[{translateY:visibility.interpolate({inputRange:[0,1],outputRange:[-24,0]})}]}}>
-      <LinearGradient colors={['#383078','#171D3B']} style={styles.panel}>
+      <LinearGradient colors={['#3C3550','#171827','#0B101C']} style={styles.panel}>
         <Text style={styles.eyebrow}>{reward.emblem}  MISSION COMPLETE</Text>
         <View style={styles.row}><View style={{flex:1}}>
           <Text style={styles.heading}>{reward.heading}</Text>
@@ -43,8 +43,8 @@ export default function RewardOverlay(){
 }
 const styles=StyleSheet.create({
   anchor:{position:'absolute',top:48,left:12,right:12,zIndex:200,elevation:40},
-  panel:{padding:17,borderRadius:22,borderWidth:1,borderColor:'#8F83E0',gap:10,shadowColor:'#05040F',shadowOpacity:.45,shadowRadius:20,elevation:10},
-  eyebrow:{fontSize:10,fontWeight:'900',color:colors.cyan,letterSpacing:2},
+  panel:{padding:19,borderRadius:22,borderWidth:1,borderColor:'#B8A47F',gap:11,shadowColor:'#05040F',shadowOpacity:.45,shadowRadius:20,elevation:10},
+  eyebrow:{fontSize:10,fontWeight:'900',color:colors.gold,letterSpacing:2},
   row:{flexDirection:'row',alignItems:'center',gap:8},
   heading:{color:'white',fontWeight:'900',fontSize:19},subtitle:{color:colors.textSoft,fontSize:12,marginTop:4},
   achievements:{color:colors.gold,fontSize:11,marginTop:6},

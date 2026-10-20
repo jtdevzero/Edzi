@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
@@ -13,6 +13,7 @@ import { colors, card } from '../theme';
 
 export default function CharacterScreen() {
   const { state, progress, achievements, resetAll, markBackedUp, importState, setWeeklyGoal } = useGame();
+  const [showAllBadges,setShowAllBadges]=useState(false);
   const cls = getClass(state.character.classId);
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const sortedAchievements = [...achievements].sort(
@@ -45,25 +46,27 @@ export default function CharacterScreen() {
   }
 
   return (
-    <Screen title="Karakter" subtitle="Egyetlen edzés sem vész el a történetedből." eyebrow="HUNTER PROFILE / ASCENSION">
+    <Screen title="Karakter" subtitle="A történeted a szintjeidben él tovább." eyebrow="CLASSIFIED · HUNTER DOSSIER">
       <CharacterCard character={state.character} progress={progress} />
 
       <SectionHeading eyebrow="HUNTER ATTRIBUTES" title="Tulajdonságok" />
-      <View style={card}>
-        <Text style={styles.sectionTitle}>Statok</Text>
+      <View style={[card, styles.radarPanel]}>
+        <Text style={styles.panelEyebrow}>ATTRIBUTES / POWER SOURCE</Text>
+        <Text style={styles.sectionTitle}>Erőprofil</Text>
         <Text style={styles.muted}>Edzés → erő, állóképesség (7+ intenzitásnál gyorsaság is) · Tanulás → intelligencia · Napló → akaraterő</Text>
         <StatsRadar attributes={progress.attributes} color={cls.color} />
       </View>
 
       <SectionHeading eyebrow="TROPHY ROOM" title="Megszerzett jelvények"
         right={<Text style={styles.badgeCount}>{unlockedCount}/{achievements.length}</Text>} />
-      <View style={card}>
+      <View style={[card,styles.trophyPanel]}>
         <View style={styles.rowBetween}>
-          <Text style={styles.sectionTitle}>🏅 Jelvények</Text>
-          <Text style={styles.muted}>{unlockedCount}/{achievements.length}</Text>
+          <View><Text style={styles.panelEyebrow}>ACHIEVEMENT ARCHIVE</Text>
+            <Text style={styles.sectionTitle}>{unlockedCount} feloldott jelvény</Text></View>
+          <Text style={styles.badgeCount}>{Math.round(unlockedCount / Math.max(1,achievements.length)*100)}%</Text>
         </View>
         <View style={styles.badgeGrid}>
-          {sortedAchievements.map((a) => (
+          {(showAllBadges ? sortedAchievements : sortedAchievements.slice(0,6)).map((a) => (
             <View key={a.id} style={[styles.badgeCell, a.unlocked && styles.badgeUnlocked]}>
               <Text style={[styles.badgeEmoji, !a.unlocked && styles.badgeLockedEmoji]}>{a.emoji}</Text>
               <Text style={[styles.badgeTitle, !a.unlocked && styles.evoLocked]} numberOfLines={2}>{a.title}</Text>
@@ -82,6 +85,10 @@ export default function CharacterScreen() {
             </View>
           ))}
         </View>
+        {sortedAchievements.length>6&&<Pressable style={styles.moreBadges} onPress={()=>setShowAllBadges(v=>!v)}
+          accessibilityRole="button">
+          <Text style={styles.moreText}>{showAllBadges?'Kevesebb jelvény ↑':'Összes jelvény megtekintése ↗'}</Text>
+        </Pressable>}
       </View>
 
       <View style={card}>
@@ -101,16 +108,18 @@ export default function CharacterScreen() {
       </View>
 
       <SectionHeading eyebrow="YOUR DESTINY" title="Evolúciós útvonal"/>
-      <View style={card}>
-        <Text style={styles.sectionTitle}>Evolúció</Text>
+      <View style={[card,styles.evoPanel]}>
+        <Text style={styles.panelEyebrow}>CLASS ASCENSION / ${cls.name.toLocaleUpperCase('hu-HU')}</Text>
+        <Text style={styles.sectionTitle}>A következő forma felé</Text>
         <Text style={styles.muted}>Minden {LEVELS_PER_EVOLUTION}. szinten új címet kapsz.</Text>
         {cls.titles.map((title, i) => {
           const reached = i <= progress.evolutionStage;
           return (
             <View key={title} style={styles.evoRow}>
-              <Text style={[styles.evoDot, { color: reached ? cls.color : colors.cardBorder }]}>●</Text>
-              <Text style={[styles.evoTitle, !reached && styles.evoLocked]}>{title}</Text>
-              <Text style={styles.muted}>{i === 0 ? 'Szint 1' : `Szint ${i * LEVELS_PER_EVOLUTION + 1}`}</Text>
+              <View style={[styles.evoEmblem,reached&&styles.evoEmblemOn]}><Text style={{color:reached?colors.gold:colors.textMuted}}>{reached?'◆':'◇'}</Text></View>
+              <View style={{flex:1,gap:4}}><Text style={[styles.evoTitle,!reached&&styles.evoLocked]}>{title}</Text>
+                <Text style={styles.evoLevel}>LEVEL {String(i * LEVELS_PER_EVOLUTION + 1).padStart(2,'0')}</Text></View>
+              <Text style={styles.evoState}>{reached?'FELOLDVA':'ZÁROLVA'}</Text>
             </View>
           );
         })}
@@ -144,10 +153,21 @@ export default function CharacterScreen() {
 }
 
 const styles = StyleSheet.create({
-  badgeCount: { color: colors.cyan, fontWeight: '900', fontSize: 12 },
+  radarPanel:{borderColor:'#4F526F',backgroundColor:'#11192A',gap:7},
+  trophyPanel:{gap:17},
+  evoPanel:{gap:11},
+  panelEyebrow:{color:colors.gold,fontSize:10,fontWeight:'900',letterSpacing:1.8,marginBottom:7},
+  moreBadges:{alignSelf:'stretch',borderWidth:1,borderColor:'#615782',borderRadius:12,padding:14,alignItems:'center'},
+  moreText:{color:colors.gold,fontSize:12,fontWeight:'900'},
+  evoEmblem:{width:33,height:33,borderRadius:10,backgroundColor:'#1C2437',borderWidth:1,borderColor:'#384255',
+    alignItems:'center',justifyContent:'center'},
+  evoEmblemOn:{backgroundColor:'#292A31',borderColor:colors.gold},
+  evoLevel:{fontSize:9,fontWeight:'900',letterSpacing:1.2,color:colors.textMuted},
+  evoState:{fontSize:9,fontWeight:'900',color:colors.gold},
+  badgeCount: { color: colors.gold, fontWeight: '900', fontSize: 17 },
   sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '900', marginBottom: 7 },
   muted: { color: colors.textMuted, fontSize: 12 },
-  evoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8 },
+  evoRow: { flexDirection: 'row', alignItems: 'center', gap: 13, paddingVertical: 11, borderBottomColor: '#303A4D', borderBottomWidth: 1 },
   evoDot: { fontSize: 14 },
   evoTitle: { color: colors.text, fontSize: 15, fontWeight: '600', flex: 1 },
   evoLocked: { color: colors.textMuted },
@@ -160,7 +180,7 @@ const styles = StyleSheet.create({
     width: '31%', flexGrow: 1, backgroundColor: colors.input, borderRadius: 16, padding: 12,
     alignItems: 'center', gap: 6, borderWidth: 1, borderColor: colors.cardBorder
   },
-  badgeUnlocked: { borderColor: colors.gold, backgroundColor: '#382F28' },
+  badgeUnlocked: { borderColor: '#A78D64', backgroundColor: '#292721' },
   badgeEmoji: { fontSize: 26 },
   badgeLockedEmoji: { opacity: 0.25 },
   badgeTitle: { color: colors.text, fontSize: 12, fontWeight: '700', textAlign: 'center' },
@@ -169,7 +189,7 @@ const styles = StyleSheet.create({
   badgeFill: { height: '100%', backgroundColor: colors.primarySoft },
   goalRow: { flexDirection: 'row', gap: 6, marginTop: 10 },
   goalBtn: { flex: 1, height: 44, borderRadius: 10, backgroundColor: colors.input, alignItems: 'center', justifyContent: 'center' },
-  goalBtnOn: { backgroundColor: colors.green },
+  goalBtnOn: { backgroundColor: '#4C4275', borderColor: colors.gold, borderWidth: 1 },
   goalBtnText: { color: colors.text, fontWeight: '700' },
   primaryBtn: { backgroundColor: colors.primary, borderRadius: 12, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   primaryText: { color: '#fff', fontWeight: '800', fontSize: 15 },

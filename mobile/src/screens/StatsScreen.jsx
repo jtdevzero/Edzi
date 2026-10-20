@@ -169,7 +169,7 @@ export default function StatsScreen() {
 
   return (
     <Screen title="Statisztika" eyebrow="ANALYTICS / PERFORMANCE" subtitle="A fejlődés láthatóvá válik.">
-      <LinearGradient colors={['#26295C','#111C37']} style={styles.statsHero}>
+      <LinearGradient colors={['#252642','#111827','#0B111B']} style={styles.statsHero}>
         <Text style={styles.heroEyebrow}>◈  PERFORMANCE RECORD</Text>
         <Text style={styles.heroNumber}>{formatMinutes(records.totalMinutes)}</Text>
         <Text style={styles.heroCaption}>ÖSSZES RÖGZÍTETT AKTIVITÁS</Text>
@@ -226,24 +226,24 @@ export default function StatsScreen() {
 const CELL = 18;
 
 const styles = StyleSheet.create({
-  statsHero: { padding: 23, borderRadius: 26, borderColor: '#4B559D', borderWidth: 1, gap: 7 },
-  heroEyebrow: { fontSize: 10, fontWeight: '900', color: colors.cyan, letterSpacing: 1.8 },
-  heroNumber: { fontSize: 32, fontWeight: '900', color: colors.text, letterSpacing: -1 },
-  heroCaption: { color: colors.textSoft, fontWeight: '900', fontSize: 10, letterSpacing: 1.4 },
+  statsHero: { padding: 26, borderRadius: 28, borderColor: '#67647D', borderWidth: 1, gap: 11, minHeight:185, justifyContent:'center' },
+  heroEyebrow: { fontSize: 10, fontWeight: '900', color: colors.gold, letterSpacing: 2.0 },
+  heroNumber: { fontSize: 42, fontWeight: '900', color: colors.text, letterSpacing: -1.4 },
+  heroCaption: { color: colors.gold, fontWeight: '900', fontSize: 10, letterSpacing: 1.7 },
   heroNote: { fontSize: 12, color: colors.textMuted, marginTop: 4 },
   center: { alignItems: 'center', marginTop: 8 },
   recGap: { gap: 10 },
   exChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   exChip: { paddingHorizontal: 12, height: 36, borderRadius: 18, backgroundColor: colors.input, justifyContent: 'center' },
-  exChipOn: { backgroundColor: colors.primarySoft },
+  exChipOn: { backgroundColor: '#594A6D', borderColor:colors.gold, borderWidth:1 },
   exChipText: { color: colors.textMuted, fontWeight: '600', fontSize: 13 },
-  exChipTextOn: { color: '#1c1206' },
-  sectionTitle: { color: colors.text, fontSize: 16, fontWeight: '900', marginBottom: 8 },
+  exChipTextOn: { color: colors.gold, fontWeight:'900' },
+  sectionTitle: { color: colors.text, fontSize: 18, fontWeight: '900', marginBottom: 10 },
   muted: { color: colors.textMuted, fontSize: 12 },
   recordGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  record: { flexBasis: '47%', flexGrow: 1, alignItems: 'center', paddingVertical: 14 },
-  recordValue: { color: colors.text, fontSize: 22, fontWeight: '900' },
-  recordLabel: { color: colors.textMuted, fontSize: 11, marginTop: 2, textAlign: 'center' },
+  record: { flexBasis: '46%', flexGrow: 1, alignItems: 'flex-start', paddingVertical: 18, paddingHorizontal: 18, backgroundColor:'#151C2D' },
+  recordValue: { color: colors.text, fontSize: 27, fontWeight: '900', letterSpacing:-.65 },
+  recordLabel: { color: colors.textMuted, fontSize: 11, marginTop: 6 },
   heatWrap: { flexDirection: 'row', marginTop: 12, justifyContent: 'center' },
   heatLabels: { marginRight: 6, gap: 4 },
   heatLabel: { color: colors.textMuted, fontSize: 9, height: CELL, lineHeight: CELL },

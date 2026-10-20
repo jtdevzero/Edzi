@@ -1,42 +1,43 @@
-// ASCENSION / 2026 — shared tokens for the fitness × RPG product.
+// Edzi Ascension V2 · Obsidian / platinum / ultraviolet / aurora.
 export const colors = {
-  bg: '#060916',
-  card: '#10172A',
-  cardElevated: '#151E34',
-  cardBorder: '#263451',
-  input: '#1A2540',
-  text: '#F6F8FF',
-  textMuted: '#94A6C6',
-  textSoft: '#D4DFFF',
-  primary: '#725CFF',
-  primarySoft: '#B2A8FF',
-  blue: '#27C8FF',
-  cyan: '#34E4E4',
-  gold: '#FBCB6C',
-  green: '#40E7AA',
-  red: '#FF6E8C',
+  bg: '#05070F',
+  card: '#101524',
+  cardElevated: '#172036',
+  cardBorder: '#2D3852',
+  input: '#1A2438',
+  text: '#F6F7FF',
+  textMuted: '#9EABC1',
+  textSoft: '#D9DFEF',
+  primary: '#7664F6',
+  primarySoft: '#B7ACFF',
+  blue: '#5FADFF',
+  cyan: '#77DBF3',
+  gold: '#EFD19C',
+  green: '#57D8AE',
+  red: '#F1798B',
   shadow: '#000000',
-  track: '#202D48',
-  surface: '#0B1223'
+  track: '#29354C',
+  surface: '#090E1B',
+  obsidian: '#05070F',
+  platinum: '#F6F7FF',
+  aurora: '#77DBF3',
+  violet: '#7664F6',
+  bronze: '#B59668'
 };
-export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
+export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, xxxl: 40 };
 export const radii = { sm: 12, md: 16, lg: 22, xl: 28, pill: 999 };
 export const type = {
-  eyebrow: { fontSize: 10, fontWeight: '800', letterSpacing: 2.4, color: colors.cyan },
-  h1: { fontSize: 32, fontWeight: '900', letterSpacing: -1, color: colors.text },
-  h2: { fontSize: 19, fontWeight: '800', letterSpacing: -.4, color: colors.text },
-  number: { fontSize: 29, fontWeight: '900', letterSpacing: -.8, color: colors.text },
-  body: { fontSize: 14, lineHeight: 22, color: colors.textMuted }
+  eyebrow: { fontSize: 10, fontWeight: '800', letterSpacing: 2.2, color: colors.gold },
+  h1: { fontSize: 34, fontWeight: '900', letterSpacing: -1.4, color: colors.text },
+  h2: { fontSize: 22, fontWeight: '900', letterSpacing: -0.6, color: colors.text },
+  number: { fontSize: 32, fontWeight: '900', letterSpacing: -1.2, color: colors.text },
+  body: { fontSize: 14, lineHeight: 23, color: colors.textMuted }
 };
 export const card = {
   backgroundColor: colors.card,
-  borderColor: colors.cardBorder,
   borderWidth: 1,
+  borderColor: colors.cardBorder,
   borderRadius: radii.lg,
-  padding: 18
+  padding: 20
 };
-export const glassCard = {
-  ...card,
-  backgroundColor: colors.cardElevated,
-  borderColor: '#34436B'
-};
+export const glassCard = { ...card, backgroundColor: colors.cardElevated, borderColor: '#46516B' };

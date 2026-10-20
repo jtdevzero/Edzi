@@ -37,6 +37,14 @@ jobs:
           python3 -m http.server 4173 --bind 127.0.0.1 --directory web-preview > /tmp/edzi-http.log 2>&1 &
           echo $! > /tmp/edzi-http.pid
           node scripts/smoke-web.cjs
+      - name: Publish premium UI screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: premium-ui-screenshots
+          path: mobile/artifacts/*.png
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Security audit details (non-blocking until triaged)
         run: |
           npm audit --json > audit.json || true
