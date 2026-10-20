@@ -147,3 +147,9 @@ A NIGHTFALL felület teljes illusztrált art-pass kiadása, v4 adatmodell válto
 - Marketing plakát nem képernyőgrafika; nem hamisított UI-szöveget használunk navigációként, hanem valós komponensek mögötti képrészletet.
 
 - Második, különálló AI-generált grafika: `mobile/assets/art/world-citadel.jpg`, amely ténylegesen megjelenik a Hunter World főoldali és térképes jeleneteiben. A böngészős füstteszt külön ellenőrzi mindkét lokális képes elemet.
+
+## Nightfall cinematic polish v8
+- A generált képek erősebb, kevésbé elmosott és még mindig olvasható megjelenítést kaptak az eredeti karakter-, rang- és citadella-illusztrációkból.
+- A Quest Board, Performance és Training hero panelek is saját jelenetet és kontrollált fény-/kontrasztréteget kaptak. A napi küldetések paneljén valódi, adatból számolt progress bar látszik.
+- A jelenetek ugyanazokat a korábbi lokális asseteket használják, nincs új hálózati igény vagy adatmodell-változás.
+- CI/browser smoke 390 és 320px, új hero-komponensek automatikus ellenőrzése. PWA cache v8 a frissített megjelenéshez.

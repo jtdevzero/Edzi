@@ -4,6 +4,7 @@ import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
 import BossBoard from '../components/BossBoard';
 import HunterWorldMap from '../components/HunterWorldMap';
+import CinematicArt from '../components/CinematicArt';
 import HunterGuild from '../components/HunterGuild';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '../game/GameContext';
@@ -98,10 +99,16 @@ export default function QuestsScreen() {
 
   return (
     <Screen title="A birodalmak." subtitle="Küldetések, területek és összecsapások." eyebrow="WORLD DIRECTORY / CHAPTER IV">
-      <LinearGradient colors={['#34463A','#19332F','#0B181D']} style={styles.missionHero}>
-        <View style={styles.programLabel}><MythicIcon name="quest" size={23} color={colors.gold}/><Text style={styles.missionEyebrow}>QUEST BOARD / LIVE</Text></View>
+      <LinearGradient testID="quest-cinematic-hero" colors={['#182C31','#101F27','#071118']} style={styles.missionHero}>
+        <CinematicArt scene="world" height={240} style={styles.missionArtwork}/>
+        <LinearGradient pointerEvents="none" colors={['rgba(7,15,20,.55)','rgba(7,15,20,.69)','rgba(7,15,20,.94)']} style={styles.missionVeil}/>
+        <View style={styles.missionHead}>
+          <View style={styles.programLabel}><MythicIcon name="quest" size={23} color={colors.gold}/><Text style={styles.missionEyebrow}>QUEST BOARD / LIVE</Text></View>
+          <Sigil name={allDone?'complete':'quest'} size={53} rarity={allDone?'legendary':'rare'}/>
+        </View>
         <Text style={styles.missionHeroTitle}>{quests.filter(q=>q.completed).length}<Text style={styles.missionHeroSlash}> / {quests.length}</Text></Text>
         <Text style={styles.missionHeroUnit}>MAI KÜLDETÉS TELJESÍTVE</Text>
+        <View style={styles.missionProgressTrack}><View style={[styles.missionProgressFill,{width:`${100*quests.filter(q=>q.completed).length/Math.max(1,quests.length)}%`}]}/></View>
         <Text style={styles.missionHeroCaption}>Minden teljesített feladat hozzáad a történetedhez.</Text>
       </LinearGradient>
       <SectionHeading eyebrow="CHAPTER IV / THE EXPEDITION" title="Hunter World" />
@@ -175,6 +182,11 @@ export default function QuestsScreen() {
 }
 
 const styles = StyleSheet.create({
+  missionArtwork:{position:'absolute',top:0,left:0,right:0,opacity:.86,borderRadius:0},
+  missionVeil:{...StyleSheet.absoluteFillObject},
+  missionHead:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',gap:10},
+  missionProgressTrack:{height:7,borderRadius:7,backgroundColor:'#405659',overflow:'hidden',marginTop:4},
+  missionProgressFill:{height:'100%',backgroundColor:colors.gold,borderRadius:7},
   pickerLabel:{flexDirection:'row',alignItems:'center',gap:9},
   programLabel:{flexDirection:'row',alignItems:'center',gap:9,flexShrink:1},
   missionHeroSlash:{fontSize:22,color:colors.textMuted,letterSpacing:-.5},
@@ -182,7 +194,7 @@ const styles = StyleSheet.create({
   eliteTrialDone:{borderColor:'#477564',backgroundColor:'#122720'},
   trialEyebrow:{color:colors.gold,fontWeight:'900',fontSize:10,letterSpacing:1.7},
   trialCount:{color:colors.textMuted,fontSize:11,letterSpacing:1.1,fontWeight:'900'},
-  missionHero: { borderWidth: 1, borderColor: '#73816A', borderRadius: 27, padding: 24, gap: 9, minHeight:177 },
+  missionHero: { borderWidth: 1, borderColor: '#84917A', borderRadius: 25, padding: 22, gap: 9, minHeight:238, overflow:'hidden' },
   missionEyebrow: { color: colors.gold, fontSize: 10, fontWeight: '900', letterSpacing: 2 },
   missionHeroTitle: { color: colors.text, fontSize: 64, fontWeight: '900', letterSpacing: -2, lineHeight: 67 },
   missionHeroUnit: { color: colors.gold, fontSize: 11, letterSpacing: 1.6, fontWeight: '900' },

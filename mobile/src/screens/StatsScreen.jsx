@@ -9,6 +9,7 @@ import { computeStats, computeExerciseRecords } from '../game/stats';
 import { formatClock } from '../game/session';
 import BodyTracker from '../components/BodyTracker';
 import PerformanceCenter from '../components/PerformanceCenter';
+import CinematicArt from '../components/CinematicArt';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
 import { colors, card } from '../theme';
 import {MythicIcon} from '../components/MythicIcon';
@@ -171,7 +172,9 @@ export default function StatsScreen() {
 
   return (
     <Screen title="Statisztika" eyebrow="ANALYTICS / PERFORMANCE" subtitle="A fejlődés láthatóvá válik.">
-      <LinearGradient colors={['#223B3C','#0F2328','#0B181D']} style={styles.statsHero}>
+      <LinearGradient testID="stats-cinematic-hero" colors={['#1F3437','#0F2328','#0B181D']} style={styles.statsHero}>
+        <CinematicArt scene="ascension" height={210} style={styles.statsArtwork}/>
+        <LinearGradient pointerEvents="none" colors={['rgba(11,22,28,.48)','rgba(11,22,28,.67)','rgba(11,22,28,.9)']} style={StyleSheet.absoluteFill}/>
         <View style={{flexDirection:'row',alignItems:'center',gap:8}}><MythicIcon name="stats" size={24}/><Text style={styles.heroEyebrow}>PERFORMANCE RECORD</Text></View>
         <Text style={styles.heroNumber}>{formatMinutes(records.totalMinutes)}</Text>
         <Text style={styles.heroCaption}>ÖSSZES RÖGZÍTETT AKTIVITÁS</Text>
@@ -230,7 +233,8 @@ export default function StatsScreen() {
 const CELL = 18;
 
 const styles = StyleSheet.create({
-  statsHero: { padding: 26, borderRadius: 28, borderColor: '#6D8173', borderWidth: 1, gap: 11, minHeight:185, justifyContent:'center' },
+  statsArtwork:{position:'absolute',left:0,right:0,top:0,opacity:.7,borderRadius:0},
+  statsHero: { padding: 24, borderRadius: 25, borderColor: '#738C86', borderWidth: 1, gap: 12, minHeight:210, justifyContent:'center',overflow:'hidden' },
   heroEyebrow: { fontSize: 10, fontWeight: '900', color: colors.gold, letterSpacing: 2.0 },
   heroNumber: { fontSize: 42, fontWeight: '900', color: colors.text, letterSpacing: -1.4 },
   heroCaption: { color: colors.gold, fontWeight: '900', fontSize: 10, letterSpacing: 1.7 },

@@ -11,6 +11,7 @@ import { unlockAudio } from '../utils/device';
 import Pomodoro from '../components/Pomodoro';
 import TrainingPlanner from '../components/TrainingPlanner';
 import SmartTrainingPanel from '../components/SmartTrainingPanel';
+import CinematicArt from '../components/CinematicArt';
 import { confirm } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
@@ -77,7 +78,9 @@ export default function LogScreen({ navigation }) {
       </View>
 
       {type === 'workout' && (
-        <LinearGradient colors={['#35534E','#182D33','#0D1921']} style={styles.trainingHero}>
+        <LinearGradient testID="training-cinematic-hero" colors={['#213D3E','#132730','#0A161E']} style={styles.trainingHero}>
+          <CinematicArt scene="hero" height={350} style={styles.trainingArtwork}/>
+          <LinearGradient pointerEvents="none" colors={['rgba(10,21,28,.73)','rgba(10,21,28,.69)','rgba(10,21,28,.90)']} style={StyleSheet.absoluteFill}/>
           <View style={{flexDirection:'row',alignItems:'center',gap:8}}><MythicIcon name="energy" size={19}/><Text style={styles.trainingLabel}>TRAINING SYSTEM / READY</Text></View>
           <Text style={styles.trainingTitle}>A VALÓDI ERŐT\nTE ÉPÍTED.</Text>
           <Text style={styles.trainingCopy}>Indíts edzést, vezess minden sorozatot, és gyűjts valódi XP-t.</Text>
@@ -214,7 +217,8 @@ export default function LogScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   miniEyebrow: { color: colors.gold, fontSize: 10, fontWeight: '900', letterSpacing: 1.9 },
-  trainingHero: { borderRadius: 27, padding: 24, borderColor: '#6F947A', borderWidth: 1, gap: 16, minHeight:228 },
+  trainingArtwork:{position:'absolute',top:0,left:0,right:0,opacity:.78,borderRadius:0},
+  trainingHero: { borderRadius: 25, padding: 22, borderColor: '#739987', borderWidth: 1, gap: 15, minHeight:260,overflow:'hidden' },
   trainingLabel: { color: colors.gold, fontWeight: '900', fontSize: 10, letterSpacing: 2.2 },
   trainingTitle: { fontSize: 27, fontWeight: '900', color: colors.text, letterSpacing: -1, lineHeight:31 },
   trainingCopy: { fontSize: 12, color: colors.textSoft, lineHeight: 19 },

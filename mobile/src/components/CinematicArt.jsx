@@ -15,14 +15,15 @@ export default function CinematicArt({scene='hero',height=220,style}){
  const [base,middle,beam,gold]=palettes[scene]||palettes.hero;
  const uid='edziScene'+React.useId().replace(/:/g,'');
  const showGeneratedImage=scene==='hero'||scene==='origin';
- const rasterStyle={position:'absolute',top:0,left:0,right:0,bottom:0,width:'100%',height:'100%',opacity:scene==='origin' ? .24 : .19};
+ const rasterOpacity={origin:.65,hero:.52,world:.67,ascension:.61}[scene]||0;
+ const rasterStyle={position:'absolute',top:0,left:0,right:0,bottom:0,width:'100%',height:'100%',opacity:rasterOpacity};
  return <View pointerEvents="none" style={[styles.container,{height},style]}>
   {showGeneratedImage&&<Image testID="cinematic-campaign-art" accessibilityIgnoresInvertColors source={require('../../assets/art/hero-scene.jpg')}
-    style={rasterStyle} resizeMode="cover" blurRadius={2}/>}
+    style={rasterStyle} resizeMode="cover" blurRadius={1}/>}
   {scene==='world'&&<Image testID="cinematic-world-art" accessibilityIgnoresInvertColors source={require('../../assets/art/world-citadel.jpg')}
-    style={rasterStyle} resizeMode="cover" blurRadius={2}/>}
+    style={rasterStyle} resizeMode="cover" blurRadius={1}/>}
   {scene==='ascension'&&<Image testID="cinematic-rank-art" accessibilityIgnoresInvertColors source={require('../../assets/art/rank-evolution.jpg')}
-    style={rasterStyle} resizeMode="cover" blurRadius={2}/>}
+    style={rasterStyle} resizeMode="cover" blurRadius={1}/>}
   <Svg width="100%" height="100%" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
    <Defs>
     <LinearGradient id={uid+'sky'} x1="0" x2="1" y1="0" y2="1">
@@ -40,8 +41,8 @@ export default function CinematicArt({scene='hero',height=220,style}){
       <Stop offset="1" stopColor="#03070D"/>
     </LinearGradient>
    </Defs>
-   <Rect x="0" y="0" width="400" height="250" fill={'url(#'+uid+'sky)'} fillOpacity={(showGeneratedImage||scene==='world'||scene==='ascension') ? 0.5 : 1}/>
-   <Rect width="400" height="250" fill={'url(#'+uid+'shine)'} fillOpacity={showGeneratedImage?.56:1}/>
+   <Rect x="0" y="0" width="400" height="250" fill={'url(#'+uid+'sky)'} fillOpacity={(showGeneratedImage||scene==='world'||scene==='ascension') ? .32 : 1}/>
+   <Rect width="400" height="250" fill={'url(#'+uid+'shine)'} fillOpacity={showGeneratedImage?.45:1}/>
    <G stroke={gold} fill="none" opacity=".28">
      <Circle cx="299" cy="119" r="99" strokeWidth="1.2"/>
      <Circle cx="299" cy="119" r="82" strokeDasharray="4 9"/>

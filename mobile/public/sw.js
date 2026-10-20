@@ -1,5 +1,5 @@
 /* Edzi offline shell. No personal fitness records or API responses are cached. */
-const CACHE = 'edzi-cinematic-v7';
+const CACHE = 'edzi-cinematic-polish-v8';
 const ROOT = '/Edzi/';
 const SHELL = [ROOT, ROOT + 'manifest.json'];
 self.addEventListener('install', event => {

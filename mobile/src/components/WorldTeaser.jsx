@@ -10,6 +10,7 @@ export default function WorldTeaser({explored,onPress}){
     <LinearGradient colors={['#21383A','#111D25','#0B141A']} start={{x:0,y:0}} end={{x:1,y:1}}
       style={StyleSheet.absoluteFill}/>
     <CinematicArt scene="world" height={188} style={styles.cinematicBackground}/>
+    <LinearGradient colors={['rgba(6,16,22,.87)','rgba(6,16,22,.53)','rgba(6,16,22,.11)']} start={{x:0,y:0}} end={{x:1,y:0}} style={StyleSheet.absoluteFill} pointerEvents="none"/>
     <Svg width="100%" height="100%" viewBox="0 0 350 185" preserveAspectRatio="xMidYMid slice"
       pointerEvents="none" style={StyleSheet.absoluteFill}>
       <Defs><SvgGradient id="ambient" x1="0" x2="1" y1="0" y2="1">
