@@ -5,6 +5,7 @@ import Screen from '../components/Screen';
 import {CLASSES} from '../game/characters';
 import {useGame} from '../game/GameContext';
 import ClassArtwork from '../components/ClassArtwork';
+import CinematicArt from '../components/CinematicArt';
 import {MythicIcon,Sigil} from '../components/MythicIcon';
 import {colors,card} from '../theme';
 export default function OnboardingScreen(){
@@ -17,7 +18,8 @@ export default function OnboardingScreen(){
     <LinearGradient colors={['#405250','#17252C','#0B151D']} style={s.hero}>
       <View style={s.top}><Text style={s.eyebrow}>CHAPTER 00 / THE AWAKENING</Text>
         <View style={s.sign}><MythicIcon name="star" size={19} color={colors.gold}/></View></View>
-      <View style={s.heroArt}><Sigil name="hero" size={116} rarity="legendary"/></View>
+      <CinematicArt scene="origin" height={191} style={s.chapterArtwork}/>
+      <View style={s.heroArt}><Sigil name="hero" size={69} rarity="legendary"/></View>
       <Text style={s.heroTitle}>LÉGY A SAJÁT TÖRTÉNETED HŐSE.</Text>
       <Text style={s.heroSub}>Valódi edzések. Valódi fejlődés. Minden perc XP-vé válik.</Text>
       <Text style={s.heroIndex}>001 — THE ORIGIN</Text>
@@ -70,6 +72,7 @@ export default function OnboardingScreen(){
   </Screen>;
 }
 const s=StyleSheet.create({
+ chapterArtwork:{borderColor:'#75938B',borderWidth:1,marginVertical:3},
   hero:{borderRadius:25,borderWidth:1,borderColor:'#779188',padding:22,gap:10,overflow:'hidden'},
   top:{flexDirection:'row',alignItems:'center',justifyContent:'space-between'},
   eyebrow:{fontSize:9,letterSpacing:1.7,fontWeight:'900',color:colors.gold},

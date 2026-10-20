@@ -3,6 +3,7 @@ import {View,StyleSheet} from 'react-native';
 import Svg,{Defs,LinearGradient,Stop,Path,Circle,Rect,Line,Polygon,G} from 'react-native-svg';
 import {colors} from '../theme';
 import {MythicIcon} from './MythicIcon';
+import CinematicArt from './CinematicArt';
 
 // Unique vector antagonist silhouettes. All artwork is local and scalable.
 const themes={
@@ -50,10 +51,12 @@ export default function EncounterArt({id='iron_guardian',height=176,defeated=fal
       <Path d="M0 175 L76 145 L131 157 L170 140 L227 179 Z" fill="#0C1720" fillOpacity=".8"/>
       <Path d="M0 176 H350" stroke={c} strokeOpacity=".36"/>
     </Svg>
+    <CinematicArt scene={id==='titan'?'boss':id==='time_wraith'?'ascension':'hero'} height={height} style={styles.atmosphere}/>
     <View style={styles.icon}><MythicIcon name={id} size={24} color={c}/></View>
   </View>;
 }
 const styles=StyleSheet.create({
+  atmosphere:{position:'absolute',top:0,left:0,right:0,opacity:.28,borderRadius:0},
   frame:{backgroundColor:colors.surface,borderRadius:17,overflow:'hidden',borderColor:'#405A60',borderWidth:1},
   icon:{position:'absolute',top:11,left:11,backgroundColor:'rgba(7,15,19,.85)',
     width:38,height:38,borderWidth:1,borderColor:'#5A6463',borderRadius:11,alignItems:'center',justifyContent:'center'}

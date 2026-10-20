@@ -4,6 +4,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {subscribeRewards} from '../utils/rewards';
 import {colors} from '../theme';
 import {MythicIcon,Sigil,RARITY} from './MythicIcon';
+import CinematicArt from './CinematicArt';
 // Overlay is non-blocking. It can be dismissed and automatically clears itself.
 export default function RewardOverlay(){
   const [reward,setReward]=useState(null);
@@ -24,6 +25,7 @@ export default function RewardOverlay(){
   return <View pointerEvents="box-none" style={styles.anchor}>
     <Animated.View style={{opacity:visibility,transform:[{translateY:visibility.interpolate({inputRange:[0,1],outputRange:[-24,0]})}]}}>
       <LinearGradient colors={reward.heading==='EVOLÚCIÓ!'?['#4B3D28','#282621','#0D171E']:['#20464A','#16242C','#0D171E']} style={styles.panel}>
+        <CinematicArt scene="ascension" height={125} style={{opacity:.65}}/>
         <View style={{flexDirection:'row',alignItems:'center',gap:11}}><Sigil name={reward.heading==='EVOLÚCIÓ!'?'crown':reward.heading==='SZINTLÉPÉS!'?'unlock':'complete'} size={53} rarity={reward.heading==='EVOLÚCIÓ!'?'mythic':reward.heading==='SZINTLÉPÉS!'?'legendary':'rare'}/><View style={{flex:1}}><Text style={styles.eyebrow}>NIGHTFALL / MISSION COMPLETE</Text><Text style={styles.rarity}>{reward.heading==='EVOLÚCIÓ!'?'MYTHIC ASCENSION':reward.heading==='SZINTLÉPÉS!'?'LEVEL REVEAL':'REWARD ACQUIRED'}</Text></View></View>
         <View style={styles.row}><View style={{flex:1}}>
           <Text style={styles.heading}>{reward.heading}</Text>
