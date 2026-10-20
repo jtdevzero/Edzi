@@ -2,6 +2,7 @@ import React,{useState} from 'react';
 import {View,Text,TextInput,Pressable,StyleSheet} from 'react-native';
 import {useGame} from '../game/GameContext';
 import {localGuildChallenges} from '../game/guild';
+import OnlineGuild from './OnlineGuild';
 import {colors,card} from '../theme';
 export default function HunterGuild(){
   const {state,setGuild}=useGame();
@@ -13,7 +14,7 @@ export default function HunterGuild(){
   return <View style={[card,styles.root]}>
     <Text style={styles.eyebrow}>GUILD HALL / PRIVATE SQUAD</Text>
     <Text style={styles.heading}>{guild?.name||'Alapíts egy céhet'}</Text>
-    <Text style={styles.note}>A céh most helyi tervező- és közös célfelület. Nem valódi online multiplayer: a meghívottak nevei nem jelennek meg más eszközön, és senki más teljesítményét nem követjük.</Text>
+    <Text style={styles.note}>Helyi csapatcélokat tervezhetsz offline. Opcionális online céh csak bejelentkezéssel és külön Supabase-beállítással használható.</Text>
     {guild&&<Text style={styles.members}>CSAPAT: {guild.members.length?guild.members.join(' · '):'Még nincs megadott név'}</Text>}
     <Pressable onPress={()=>setEditing(v=>!v)} style={styles.edit}><Text style={styles.action}>{editing?'Szerkesztő bezárása':'Céh és taglista szerkesztése ↗'}</Text></Pressable>
     {editing&&<View style={styles.form}>
@@ -31,7 +32,8 @@ export default function HunterGuild(){
         <Text style={styles.count}>{task.current}/{task.target}</Text></View>
       <View style={styles.track}><View style={[styles.fill,{width:`${100*task.current/task.target}%`,backgroundColor:task.complete?colors.green:colors.gold}]}/></View>
     </View>)}
-    <Text style={styles.note}>Az értékek csak a te naplód alapján számolódnak. Nem jár külön XP és nem történik adatküldés.</Text>
+    <Text style={styles.note}>Az értékek a te naplódból számolódnak. Nem jár külön XP; online megosztás csak külön beleegyezéssel történik.</Text>
+    <OnlineGuild />
   </View>;
 }
 const styles=StyleSheet.create({

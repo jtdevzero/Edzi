@@ -111,3 +111,6 @@ A PR automatikus CI-je futtatja a logikai teszteket, Expo Doctort, web exportot,
 - A felhasználó **külön, minden kéréskor** jóváhagyja az anonimizált aggregált edzésszám, perc, szint, streak és közérzet továbbítását; név, testméret, edzéssúly, szabad szöveges napló nem megy át.
 - Auth JWT validáció és szerveroldali napi 5 kérés limit szükséges: `supabase/edzi_ai_usage.sql`, `supabase/functions/hunter-coach/index.ts`.
 - A szolgáltatást élő auth-, adatvédelmi és abuse-teszt hiányában nem szabad automatikusan aktiválni.
+
+### Hunter World – online közösség (külön konfigurációhoz kötve)
+Az Edzi 4.0 tartalmaz opcionális, Supabase RLS-sel védett valódi céhes bejelentkezést, meghívókódos csatlakozást és kézzel megosztható heti összesítőket. A szolgáltatás **csak Supabase-projekt konfigurálásával**, a `supabase/edzi_guilds.sql` telepítésével és két fiókos jogosultságteszttel válik használhatóvá. A helyi Guild Hall offline is működik. Nincs alapértelmezett automatikus közösségi adatmegosztás.

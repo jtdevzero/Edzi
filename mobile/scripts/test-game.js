@@ -14,6 +14,8 @@ import {smartLoadAdvice,groupSuperset,workoutWeekSummary} from '../src/game/smar
 import {mentorBrief} from '../src/game/mentor';
 import {sanitizeGuild,localGuildChallenges} from '../src/game/guild';
 import {safeCreatorChoice,portraitOptions} from '../src/game/characterCreator';
+import {minimalAIPayload} from '../src/cloud/ai';
+import {minimalGuildStats} from '../src/cloud/guild';
 import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
 import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
@@ -352,6 +354,14 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(sanitizeGuild({name:'  Hunters  ',members:['Anna','Béla']} ).name,'Hunters');
   assert.equal(sanitizeGuild({name:' '}),null);
   assert.equal(localGuildChallenges(log,'2026-10-21')[0].complete,true);
+  const shared=minimalGuildStats(log,'2026-10-21');
+  assert.deepEqual(shared,{week:'2026-10-19',days:3,minutes:90,focus:0});
+  const anon=minimalAIPayload(log,{level:7,streak:2});
+  assert.deepEqual(Object.keys(anon).sort(),['currentStreak','hunterLevel','readiness','recentMinutes','recentWorkoutCount'].sort());
+  assert.equal(anon.recentWorkoutCount,3);
+  assert.ok(!JSON.stringify(anon).includes('Teszt'));
+  assert.ok(!JSON.stringify(shared).includes('Teszt'));
+
   const v4={...training,guild:{name:'Ezüst osztag',members:['Anna']},
     supersets:[{id:'A::B',names:['A','B']}],
     character:{...character,appearance:{visorId:'ember',helmetId:'shadow',gearId:'origin'}}};
