@@ -326,12 +326,12 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   const log = state([workout('mon','2026-10-19'),workout('tue','2026-10-20'),
     workout('wed','2026-10-21')]);
   const levels={level:25,bossWins:5};
-  const regions=worldProgress(log,levels);
+  const regions=worldProgress(log,levels,'2026-10-21');
   assert.deepEqual(regions.slice(0,3).map(x=>x.complete),[true,true,false]);
   assert.equal(worldUnlockedGear(regions).filter(x=>x.unlocked).length,2);
   assert.equal(selectWorldGear(character,regions).id,'forest');
   const after={...log,activities:log.activities.slice(0,1)};
-  assert.equal(worldUnlockedGear(worldProgress(after,levels)).filter(x=>x.unlocked).length,1);
+  assert.equal(worldUnlockedGear(worldProgress(after,levels,'2026-10-21')).filter(x=>x.unlocked).length,1);
   assert.equal(safeCreatorChoice('visor','aurora'),true);
   assert.equal(safeCreatorChoice('helmet','unknown'),false);
   assert.equal(portraitOptions({appearance:{visorId:'ember'}},{accent:'#123456'}).visorColor,'#F7B46B');
