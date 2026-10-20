@@ -17,8 +17,8 @@ export const WORLD_GEAR = [
   {id:'sentinel',name:'Citadella őrzője',symbol:'♜',accent:'#E1BE89',description:'3 legyőzött boss.'},
   {id:'celestial',name:'Csillaglovag',symbol:'✧',accent:'#D4A8F0',description:'20 edzésnap.'}
 ];
-export function worldProgress(state, progress) {
-  const activities=(state.activities||[]).filter(a=>a.type==='workout');
+export function worldProgress(state, progress, today = dayKey()) {
+  const activities=(state.activities||[]).filter(a=>a.type==='workout' && dayKey(a.date)<=today);
   const metrics={
     sessions:activities.length,
     days:new Set(activities.map(a=>dayKey(a.date))).size,
