@@ -228,6 +228,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(setWeightKg(10), 0);
   assert.equal(formatSet({ reps: 8, weightKg: 60 }, 'reps'), '8 × 60 kg');
   assert.equal(formatSet(10, 'reps'), '10 ism.');
+  assert.equal(formatSet({reps:8,weightKg:60,rpe:7,rir:3},'reps'),'8 × 60 kg · RPE 7 · RIR 3');
   const weighted = { ...workout('w', today),
     exercises: [{ name: 'Fekvenyomás', unit: 'reps',
       sets: [{ reps: 8, weightKg: 60 }, { reps: 6, weightKg: 70 }] }] };
@@ -311,5 +312,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(restored.trainingPlan.days.length,3);
   assert.equal(restored.recoveryEntries.length,1);
   assert.throws(()=>parseBackup(serializeBackup({...v3,recoveryEntries:[{date:'x',readiness:9}]})),/sérült/);
+  const badRPE={...v3,activities:[{...w,exercises:[{name:'Fekvenyomás',unit:'reps',sets:[{reps:8,weightKg:50,rpe:99}]}]}]};
+  assert.throws(()=>parseBackup(serializeBackup(badRPE)),/sérült/);
 }
 console.log('Minden játéklogika teszt átment.');

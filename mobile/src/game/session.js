@@ -7,7 +7,10 @@ export function setWeightKg(entry) {
 export function formatSet(entry, unit) {
   if (unit === 'sec') return formatClock(setValue(entry));
   const kg = setWeightKg(entry);
-  return kg > 0 ? `${setValue(entry)} × ${kg} kg` : `${setValue(entry)} ism.`;
+  const base=kg>0 ? `${setValue(entry)} × ${kg} kg` : `${setValue(entry)} ism.`;
+  if(!entry || typeof entry!=='object')return base;
+  return base + (entry.rpe!=null?` · RPE ${entry.rpe}`:'') +
+    (entry.rir!=null?` · RIR ${entry.rir}`:'') + (entry.warmup?' · Bemelegítés':'');
 }
 export const REST_OPTIONS = [60, 90, 120];
 export const INTERVAL_PRESETS = [
