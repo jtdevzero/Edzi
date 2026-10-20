@@ -1,5 +1,5 @@
 /* Edzi offline shell. No personal fitness records or API responses are cached. */
-const CACHE = 'edzi-ascension-shell-v5-nightfall';
+const CACHE = 'edzi-mythic-ui-v6';
 const ROOT = '/Edzi/';
 const SHELL = [ROOT, ROOT + 'manifest.json'];
 self.addEventListener('install', event => {
