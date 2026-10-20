@@ -94,9 +94,10 @@ export default function QuestsScreen() {
 
   return (
     <Screen title="Questek" subtitle="Napi küldetések, heti hőspróbák és legendás kihívások." eyebrow="HUNTER'S GUILD">
-      <LinearGradient colors={['#272659','#101C38']} style={styles.missionHero}>
+      <LinearGradient colors={['#292B49','#101522','#070D19']} style={styles.missionHero}>
         <Text style={styles.missionEyebrow}>✦  QUEST BOARD / LIVE</Text>
-        <Text style={styles.missionHeroTitle}>{quests.filter(q=>q.completed).length}/{quests.length} <Text style={styles.missionHeroUnit}>MAI KÜLDETÉS</Text></Text>
+        <Text style={styles.missionHeroTitle}>{quests.filter(q=>q.completed).length}<Text style={styles.missionHeroSlash}> / {quests.length}</Text></Text>
+        <Text style={styles.missionHeroUnit}>MAI KÜLDETÉS TELJESÍTVE</Text>
         <Text style={styles.missionHeroCaption}>Minden teljesített feladat hozzáad a történetedhez.</Text>
       </LinearGradient>
       <SectionHeading eyebrow="MAIN CAMPAIGN" title="Aktív történetszál"/>
@@ -119,11 +120,11 @@ export default function QuestsScreen() {
       )}
 
       <SectionHeading eyebrow="ELITE OPERATIONS" title="Heti hőspróbák"/>
-      <View style={[card, styles.gap]}>
-        <Text style={styles.sectionTitle}>🌟 Heti hőspróbák</Text>
-        <Text style={styles.muted}>Valódi edzések és fókuszidő alapján teljesülnek. A jutalom automatikus, és visszavonódik, ha törlöd az alapjául szolgáló naplóbejegyzést.</Text>
+      <Text style={styles.muted}>A hőspróbák valós naplózott aktivitással teljesülnek. Törléskor a kapcsolódó XP is levonódik.</Text>
+      <View style={styles.gap}>
         {weeklyTrials.map((t) => (
-          <View key={t.id} style={styles.programOption}>
+          <View key={t.id} style={[card,styles.eliteTrial,t.completed&&styles.eliteTrialDone]}>
+            <Text style={styles.trialEyebrow}>{t.completed?'✦ MISSION COMPLETE':'◈ ELITE CHALLENGE'}</Text>
             <View style={styles.badges}>
               <Text style={styles.programName}>{t.emoji} {t.title}</Text>
               <Text style={styles.xp}>{t.completed ? '✓ ' : ''}+{t.xp} XP</Text>
@@ -132,7 +133,7 @@ export default function QuestsScreen() {
             <View style={styles.track}>
               <View style={[styles.fill, { backgroundColor: t.completed ? colors.green : colors.primary, width: `${100 * t.current / t.target}%` }]} />
             </View>
-            <Text style={styles.muted}>{t.current}/{t.target} {t.completed ? '· Teljesítve' : ''}</Text>
+            <Text style={styles.trialCount}>{t.current}/{t.target} {t.completed ? '· TELJESÍTVE' : ''}</Text>
           </View>
         ))}
       </View>
@@ -164,10 +165,15 @@ export default function QuestsScreen() {
 }
 
 const styles = StyleSheet.create({
-  missionHero: { borderWidth: 1, borderColor: '#4F4C9D', borderRadius: 26, padding: 21, gap: 7 },
-  missionEyebrow: { color: colors.cyan, fontSize: 10, fontWeight: '900', letterSpacing: 2 },
-  missionHeroTitle: { color: colors.text, fontSize: 35, fontWeight: '900', letterSpacing: -1 },
-  missionHeroUnit: { color: colors.primarySoft, fontSize: 13, letterSpacing: 1 },
+  missionHeroSlash:{fontSize:22,color:colors.textMuted,letterSpacing:-.5},
+  eliteTrial:{gap:12,borderColor:'#4A475B',paddingVertical:19},
+  eliteTrialDone:{borderColor:'#477564',backgroundColor:'#122720'},
+  trialEyebrow:{color:colors.gold,fontWeight:'900',fontSize:10,letterSpacing:1.7},
+  trialCount:{color:colors.textMuted,fontSize:11,letterSpacing:1.1,fontWeight:'900'},
+  missionHero: { borderWidth: 1, borderColor: '#68647C', borderRadius: 27, padding: 24, gap: 9, minHeight:177 },
+  missionEyebrow: { color: colors.gold, fontSize: 10, fontWeight: '900', letterSpacing: 2 },
+  missionHeroTitle: { color: colors.text, fontSize: 64, fontWeight: '900', letterSpacing: -2, lineHeight: 67 },
+  missionHeroUnit: { color: colors.gold, fontSize: 11, letterSpacing: 1.6, fontWeight: '900' },
   missionHeroCaption: { color: colors.textMuted, fontSize: 12, lineHeight: 19 },
   flex: { flex: 1 },
   gap: { gap: 8 },
@@ -176,11 +182,11 @@ const styles = StyleSheet.create({
   muted: { color: colors.textMuted, fontSize: 12 },
   mutedCenter: { color: colors.textMuted, fontSize: 12, textAlign: 'center' },
   pickerHead: { flexDirection: 'row', alignItems: 'center', minHeight: 44, gap: 8 },
-  programOption: { backgroundColor: colors.input, borderRadius: 12, padding: 12, gap: 6 },
-  programName: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  programOption: { backgroundColor: colors.input, borderRadius: 15, padding: 15, gap: 8 },
+  programName: { color: colors.text, fontSize: 16, fontWeight: '900', flexShrink: 1 },
   outlineBtn: { borderColor: colors.primary, borderWidth: 1, borderRadius: 10, height: 44, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   outlineText: { color: colors.primarySoft, fontWeight: '700' },
-  programCard: { borderColor: colors.gold },
+  programCard: { borderColor: '#A28A64', backgroundColor: '#22212A', paddingVertical: 24 },
   programTag: { color: colors.gold, fontWeight: '700', fontSize: 13, flex: 1 },
   task: { color: colors.text, fontSize: 15 },
   track: { height: 9, backgroundColor: colors.track, borderRadius: 8, overflow: 'hidden', marginTop: 4 },
@@ -190,14 +196,14 @@ const styles = StyleSheet.create({
   abandon: { color: colors.textMuted, fontSize: 12, textAlign: 'center', textDecorationLine: 'underline', paddingVertical: 6 },
   celebrate: { borderColor: colors.gold, alignItems: 'center' },
   celebrateText: { color: colors.gold, fontWeight: '700', fontSize: 15, textAlign: 'center' },
-  quest: { gap: 12, borderColor: '#3A4B6B', paddingVertical: 19 },
-  questDone: { opacity: 0.6 },
+  quest: { gap: 15, borderColor: '#3C455A', paddingVertical: 21, paddingHorizontal: 19 },
+  questDone: { borderColor: '#446D5F', backgroundColor: '#14251F' },
   badges: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   badge: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, fontSize: 12, fontWeight: '700', overflow: 'hidden' },
-  xp: { color: colors.primarySoft, fontWeight: '800', fontSize: 14 },
+  xp: { color: colors.gold, fontWeight: '900', fontSize: 14 },
   title: { color: colors.text, fontSize: 18, fontWeight: '900' },
   desc: { color: colors.textMuted, fontSize: 14 },
   button: { backgroundColor: colors.primary, borderRadius: 15, height: 51, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
-  buttonDone: { backgroundColor: '#14532d' },
+  buttonDone: { backgroundColor: '#285142' },
   buttonText: { color: '#fff', fontWeight: '800', fontSize: 15 }
 });
