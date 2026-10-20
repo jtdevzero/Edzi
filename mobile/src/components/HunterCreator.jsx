@@ -4,6 +4,7 @@ import {useGame} from '../game/GameContext';
 import {VISORS,HELMETS,portraitOptions} from '../game/characterCreator';
 import {worldProgress,selectWorldGear} from '../game/hunterWorld';
 import HunterPortrait from './HunterPortrait';
+import CinematicArt from './CinematicArt';
 import {colors,card} from '../theme';
 import {MythicIcon} from './MythicIcon';
 export default function HunterCreator(){
@@ -13,7 +14,7 @@ export default function HunterCreator(){
   return <View style={[card,styles.box]}>
     <Text style={styles.eyebrow}>CHARACTER CREATOR / ARMORY</Text>
     <Text style={styles.title}>Alakítsd a vadászodat!</Text>
-    <View style={styles.hero}><HunterPortrait classId={state.character.classId} size={168}
+    <View style={styles.hero}><CinematicArt scene="ascension" height={204} style={styles.heroBackdrop}/><HunterPortrait classId={state.character.classId} size={168}
       accent={creator.visorColor} helmetStyle={creator.helmetStyle} armorAccent={creator.armorAccent}/></View>
     <Text style={styles.label}>ENERGIA / SISAKFÉNY</Text>
     <View style={styles.row}>{VISORS.map(c=><Pressable key={c.id} onPress={()=>customizeCreator('visor',c.id)}
@@ -32,6 +33,7 @@ export default function HunterCreator(){
   </View>;
 }
 const styles=StyleSheet.create({
+  heroBackdrop:{position:'absolute',top:0,left:0,right:0,opacity:.45,borderRadius:0},
   box:{gap:14,borderColor:'#607970'},
   eyebrow:{color:colors.gold,fontWeight:'900',fontSize:10,letterSpacing:1.4},
   title:{fontSize:21,fontWeight:'900',color:colors.text},

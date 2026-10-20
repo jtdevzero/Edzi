@@ -4,10 +4,12 @@ import {LinearGradient} from 'expo-linear-gradient';
 import Svg,{Circle,Path,Line,G,Defs,LinearGradient as SvgGradient,Stop} from 'react-native-svg';
 import {colors} from '../theme';
 import {MythicIcon} from './MythicIcon';
+import CinematicArt from './CinematicArt';
 export default function WorldTeaser({explored,onPress}){
   return <Pressable onPress={onPress} accessibilityRole="button" style={styles.frame}>
     <LinearGradient colors={['#21383A','#111D25','#0B141A']} start={{x:0,y:0}} end={{x:1,y:1}}
       style={StyleSheet.absoluteFill}/>
+    <CinematicArt scene="world" height={188} style={styles.cinematicBackground}/>
     <Svg width="100%" height="100%" viewBox="0 0 350 185" preserveAspectRatio="xMidYMid slice"
       pointerEvents="none" style={StyleSheet.absoluteFill}>
       <Defs><SvgGradient id="ambient" x1="0" x2="1" y1="0" y2="1">
@@ -33,6 +35,7 @@ export default function WorldTeaser({explored,onPress}){
   </Pressable>;
 }
 const styles=StyleSheet.create({
+  cinematicBackground:{position:'absolute',top:0,left:0,right:0,opacity:.86,borderRadius:0},
   frame:{height:188,overflow:'hidden',borderWidth:1,borderColor:'#53706E',borderRadius:22,
     backgroundColor:'#102128'},
   top:{flex:1,padding:18,gap:8},

@@ -3,6 +3,7 @@ import {View,Text,StyleSheet} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import Svg,{Path,Circle,Line,G} from 'react-native-svg';
 import {MythicIcon,Sigil} from './MythicIcon';
+import CinematicArt from './CinematicArt';
 import {colors} from '../theme';
 const themes={
  hero:{tones:['#50422D','#121C25'],accent:'#F6C67B',caption:'VANGUARD'},
@@ -15,6 +16,7 @@ export default function ClassArtwork({classId='hero',selected=false}){
  const t=themes[classId]||themes.hero;
  return <View style={[styles.root,selected&&{borderColor:t.accent}]}>
    <LinearGradient colors={t.tones} start={{x:0,y:0}} end={{x:1,y:1}} style={StyleSheet.absoluteFill}/>
+   <CinematicArt scene={classId==='shadow'?'ascension':classId==='slayer'?'boss':classId==='monk'?'world':'hero'} height={134} style={styles.artwork}/>
    <Svg width="100%" height="100%" viewBox="0 0 112 138" style={StyleSheet.absoluteFill}>
      <Circle cx="56" cy="56" r="48" stroke={t.accent} strokeOpacity=".3" fill="none"/>
      <Circle cx="56" cy="56" r="38" stroke={t.accent} strokeOpacity=".22" strokeDasharray="3 7" fill="none"/>
@@ -28,6 +30,7 @@ export default function ClassArtwork({classId='hero',selected=false}){
  </View>;
 }
 const styles=StyleSheet.create({
+ artwork:{position:'absolute',top:0,left:0,right:0,opacity:.82,borderRadius:0},
  root:{width:117,height:134,overflow:'hidden',borderRadius:15,borderWidth:1,borderColor:'#47616D'},
  icon:{position:'absolute',right:8,top:8,padding:4,backgroundColor:'rgba(10,15,22,.8)',borderRadius:8},
  caption:{position:'absolute',bottom:7,left:9,fontSize:8,fontWeight:'900',letterSpacing:1.8}

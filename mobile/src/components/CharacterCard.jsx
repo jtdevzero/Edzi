@@ -4,6 +4,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import Svg,{Circle,Line,Path,Defs,RadialGradient,Stop,Rect,G} from 'react-native-svg';
 import {getClass,characterTitle} from '../game/characters';
 import HunterPortrait from './HunterPortrait';
+import CinematicArt from './CinematicArt';
 import XPBar from './XPBar';
 import {worldProgress,selectWorldGear} from '../game/hunterWorld';
 import {portraitOptions} from '../game/characterCreator';
@@ -32,6 +33,7 @@ export default function CharacterCard({character,progress}){
     <View style={styles.frame}>
       <LinearGradient colors={['#1C3033','#121D24','#0A1119','#05080D']} locations={[0,.37,.75,1]}
         style={StyleSheet.absoluteFill}/>
+      <CinematicArt scene={progress.level>=16?'ascension':'hero'} height={446} style={styles.cinematicBackground}/>
       <View style={styles.aurora} pointerEvents="none"/>
       <Svg viewBox="0 0 360 445" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"
         style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -88,6 +90,7 @@ export default function CharacterCard({character,progress}){
   </Animated.View>;
 }
 const styles=StyleSheet.create({
+  cinematicBackground:{position:'absolute',top:0,left:0,right:0,opacity:.46,borderRadius:0},
   frame:{height:446,borderRadius:27,overflow:'hidden',borderWidth:1,borderColor:'#62766F',
     backgroundColor:'#091219',shadowColor:'#000',shadowRadius:35,shadowOpacity:.55,elevation:12},
   aurora:{position:'absolute',width:280,height:280,borderRadius:150,

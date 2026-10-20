@@ -5,6 +5,7 @@ import {useGame} from '../game/GameContext';
 import {colors,card} from '../theme';
 import {worldProgress,worldUnlockedGear} from '../game/hunterWorld';
 import RegionLandscape from './RegionLandscape';
+import CinematicArt from './CinematicArt';
 import {MythicIcon,Sigil} from './MythicIcon';
 const NODE_SIZE=45;
 export default function HunterWorldMap(){
@@ -43,6 +44,7 @@ export default function HunterWorldMap(){
         <Circle cx="80" cy="72" r="31" stroke="#D2C29A" fill="none" strokeOpacity=".16"/>
         <Polygon points="80,28 86,57 117,72 86,79 80,116 73,79 42,72 73,58" fill="#A3BEE5" opacity=".09"/>
       </Svg>
+      <CinematicArt scene="world" height={375} style={styles.terrain}/>
       {regions.map((r,i)=><Pressable key={r.id}
         accessibilityRole="button" accessibilityLabel={r.title+(r.unlocked?' feloldva':' lezárva')}
         onPress={()=>setSelected(r.id)} style={[styles.node,{left:`${r.x}%`,top:`${r.y}%`},
@@ -73,6 +75,7 @@ export default function HunterWorldMap(){
   </View>;
 }
 const styles=StyleSheet.create({
+  terrain:{position:'absolute',left:0,right:0,top:0,opacity:.3,borderRadius:0},
   frame:{gap:15,borderColor:'#5D5975',padding:16},
   header:{flexDirection:'row',alignItems:'center',gap:12},
   eyebrow:{color:colors.gold,fontSize:10,fontWeight:'900',letterSpacing:1.4},
