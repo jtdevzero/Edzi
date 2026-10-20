@@ -1,9 +1,11 @@
 import {cloudEnabled} from './supabase';
+// Explicit launch gate: Cloud Vault setup alone must not switch on social sharing.
+export const onlineGuildReady=cloudEnabled && process.env.EXPO_PUBLIC_EDZI_ONLINE_GUILDS_ENABLED==='true';
 import {dayKey,weekKey} from '../game/gamification';
 const BASE=(process.env.EXPO_PUBLIC_SUPABASE_URL||'').replace(/\/$/,'');
 const KEY=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'';
 function api(session){
-  if(!cloudEnabled||!session?.token||!session.userId)throw new Error('A bejelentkezett felhőfiók szükséges.');
+  if(!onlineGuildReady||!session?.token||!session.userId)throw new Error('A bejelentkezett felhőfiók szükséges.');
   return {headers:{apikey:KEY,Authorization:'Bearer '+session.token,'Content-Type':'application/json'}};
 }
 async function call(session,path,opts={}){
