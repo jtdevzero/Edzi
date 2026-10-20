@@ -31,7 +31,7 @@ const fs = require('node:fs');
     await page.getByText('RANK D').waitFor();
     await page.screenshot({ path: 'artifacts/premium-dashboard.png', fullPage: true });
     await page.getByText('Karakter', { exact: true }).last().click();
-    await page.getByText('Teszt Harcos').first().waitFor();
+    await page.getByText('Teszt Harcos', {exact:true}).last().waitFor();
     await page.screenshot({ path: 'artifacts/premium-character.png', fullPage: true });
     await page.getByText('Questek', { exact: true }).last().click();
     await page.getByText('MAI KÜLDETÉS TELJESÍTVE').waitFor();
