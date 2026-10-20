@@ -14,8 +14,8 @@ import {smartLoadAdvice,groupSuperset,workoutWeekSummary} from '../src/game/smar
 import {mentorBrief} from '../src/game/mentor';
 import {sanitizeGuild,localGuildChallenges,guildRaidProgress} from '../src/game/guild';
 import {safeCreatorChoice,portraitOptions} from '../src/game/characterCreator';
-import {minimalAIPayload} from '../src/cloud/ai';
-import {minimalGuildStats} from '../src/cloud/guild';
+import {minimalAIPayload,aiReady} from '../src/cloud/ai';
+import {minimalGuildStats,onlineGuildReady} from '../src/cloud/guild';
 import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
 import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
@@ -25,6 +25,8 @@ import { computeAchievements, newlyUnlocked } from '../src/game/achievements';
 import { PROGRAMS, programRunStatus, programDayXP, finishedPrograms, PROGRAM_FINISH_BONUS } from '../src/game/programs';
 
 const character = { name: 'Teszt', classId: 'hero' };
+assert.equal(aiReady, false, 'AI stays off without an explicit launch flag');
+assert.equal(onlineGuildReady, false, 'Online guilds stay off without an explicit launch flag');
 const at = (day, hour = 12) => new Date(`${day}T${String(hour).padStart(2, '0')}:00:00`).toISOString();
 const workout = (id, day) => ({ id, type: 'workout', title: 'x', duration: 30, intensity: 7, date: at(day) });
 const state = (activities, questCompletions = []) => ({ ...INITIAL_STATE, character, activities, questCompletions });
