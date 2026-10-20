@@ -16,7 +16,7 @@ export default function CinematicArt({scene='hero',height=220,style}){
  const uid='edziScene'+React.useId().replace(/:/g,'');
  const showGeneratedImage=scene==='hero'||scene==='origin'||scene==='ascension';
  return <View pointerEvents="none" style={[styles.container,{height},style]}>
-  {showGeneratedImage&&<Image accessibilityIgnoresInvertColors source={require('../../assets/art/hero-scene.jpg')}
+  {showGeneratedImage&&<Image testID="cinematic-campaign-art" accessibilityIgnoresInvertColors source={require('../../assets/art/hero-scene.jpg')}
     style={StyleSheet.absoluteFill} resizeMode="cover"/>}
   <Svg width="100%" height="100%" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
    <Defs>

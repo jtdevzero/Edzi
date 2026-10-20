@@ -138,3 +138,10 @@ A NIGHTFALL felület teljes illusztrált art-pass kiadása, v4 adatmodell válto
 - CI-képernyőképek: mythic-onboarding, mythic-dashboard, mythic-character, mythic-bosses-world a GitHub Actions artifactban, valamint Chromium 390px/320px funkcionális, offline és recovery smoke tesztek.
 
 **Korlátok:** Az iOS régebbi ikon gyorsítótárazása miatt a kezdőképernyőhöz adott ikon frissítése az alkalmazás újratelepítését igényelheti; az alkalmazás **helyi adatait ne töröld mentés nélkül**. Fizikai Safari/iOS, Android és natív EAS build vizsgálata külön szükséges. A Cloud Vault/AI/Guild szerveres funkciói továbbra is inaktívak, és az ismert függőségi figyelmeztetések is külön feladatot képeznek.
+
+## EDZI CINEMATIC – tényleges képintegráció (2026-10-20)
+- AI-val generált kampánygrafikából előkészített, lokálisan csomagolt, optimalizált **eredeti képrészlet**: `mobile/assets/art/hero-scene.jpg`, a főoldali és onboarding környezet rétegeként megjelenítve.
+- Saját React Native SVG `CinematicArt` kompozíció, hunter-sziluett és dinamikus rétegek, 8 képernyőterületre bekötve (CharacterCard, WorldTeaser, ClassArtwork, Onboarding, EncounterArt, HunterWorldMap, HunterCreator, RewardOverlay).
+- Nem függ a hálózattól: a kép lokális build asset. A karakter, XP, helyi mentés és régiók számítása változatlan.
+- Weben Chromium smoke ellenőrzi az eredeti kép tényleges betöltését az onboardingban és főoldalon. PWA service worker cache új neve `edzi-cinematic-v7`, eltávolítja a régebbi edzi cache-verziókat.
+- Marketing plakát nem képernyőgrafika; nem hamisított UI-szöveget használunk navigációként, hanem valós komponensek mögötti képrészletet.

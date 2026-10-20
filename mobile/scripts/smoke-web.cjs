@@ -23,6 +23,7 @@ const fs = require('node:fs');
     assert.equal(response.status(), 200);
     await page.getByText('Ébredj fel, harcos').waitFor({ timeout: 15000 });
     await page.getByText('CHAPTER 01 / IDENTITY').waitFor();
+    await page.getByTestId('cinematic-campaign-art').first().waitFor();
     await page.getByText('CHAPTER 02 / THE PATH').waitFor();
     await page.getByText('CHAPTER 03 / THE CONTRACT').waitFor();
     await page.getByText('CLASS 01', {exact:false}).first().waitFor();
@@ -37,6 +38,7 @@ const fs = require('node:fs');
     await page.getByText('COMMON HUNTER').last().waitFor();
     await page.getByText('A küldetésed.', {exact:true}).first().waitFor();
     await page.getByText('FEDEZD FEL A VILÁGOD.').first().waitFor();
+    assert.ok(await page.getByTestId('cinematic-campaign-art').count()>0,'Generated hero illustration must be rendered');
     await page.getByText('PRIVATE / OFFLINE').first().waitFor();
     console.log('SMOKE: NIGHTFALL hero, expedition teaser and private-mode header');
 
