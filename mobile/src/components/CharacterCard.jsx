@@ -17,7 +17,7 @@ export default function CharacterCard({character,progress}){
   const equipment=selectWorldGear(character,worldProgress(state,progress));
   const avatar=portraitOptions(character,equipment);
   const rank=hunterRank(progress.level);
-  const enter=useRef(new Animated.Value(0)).current;
+  const enter=useRef(new Animated.Value(.96)).current;
   useEffect(()=>{
     let active=true;
     AccessibilityInfo.isReduceMotionEnabled().then(reduced=>{
