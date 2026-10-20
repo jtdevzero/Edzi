@@ -66,7 +66,7 @@ export default function LogScreen({ navigation }) {
   }
 
   return (
-    <Screen title="Naplózás" subtitle="Egy mozdulattal indul a következő menet." eyebrow="THE TRAINING GROUND">
+    <Screen title="Az aréna." subtitle="A következő sorozatod itt kezdődik." eyebrow="TRAINING LAB / PERFORMANCE MODE">
       <View style={styles.tabs}>
         {Object.entries(ACTIVITY_TYPES).map(([key, t]) => (
           <Pressable key={key} onPress={() => { setType(key); setForm(EMPTY_FORM); }} style={[styles.tab, type === key && styles.tabActive]}>
@@ -76,9 +76,9 @@ export default function LogScreen({ navigation }) {
       </View>
 
       {type === 'workout' && (
-        <LinearGradient colors={['#322D59','#171E32','#0E1421']} style={styles.trainingHero}>
-          <Text style={styles.trainingLabel}>TRAINING MODE  /  READY</Text>
-          <Text style={styles.trainingTitle}>IDEJE ERŐSEBBÉ VÁLNI.</Text>
+        <LinearGradient colors={['#35534E','#182D33','#0D1921']} style={styles.trainingHero}>
+          <Text style={styles.trainingLabel}>◈  TRAINING SYSTEM / READY FOR DEPLOYMENT</Text>
+          <Text style={styles.trainingTitle}>A VALÓDI ERŐT\nTE ÉPÍTED.</Text>
           <Text style={styles.trainingCopy}>Indíts edzést, vezess minden sorozatot, és gyűjts valódi XP-t.</Text>
           <Pressable onPress={() => startWorkout(null)} style={styles.sessionBtn}>
             <Text style={styles.sessionText}>▶ Üres edzés indítása</Text>
@@ -213,12 +213,12 @@ export default function LogScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   miniEyebrow: { color: colors.gold, fontSize: 10, fontWeight: '900', letterSpacing: 1.9 },
-  trainingHero: { borderRadius: 27, padding: 24, borderColor: '#7C7093', borderWidth: 1, gap: 16, minHeight:228 },
+  trainingHero: { borderRadius: 27, padding: 24, borderColor: '#6F947A', borderWidth: 1, gap: 16, minHeight:228 },
   trainingLabel: { color: colors.gold, fontWeight: '900', fontSize: 10, letterSpacing: 2.2 },
   trainingTitle: { fontSize: 27, fontWeight: '900', color: colors.text, letterSpacing: -1, lineHeight:31 },
   trainingCopy: { fontSize: 12, color: colors.textSoft, lineHeight: 19 },
   quickTemplates: { flexDirection: 'row', gap: 9 },
-  quickItem: { flex: 1, backgroundColor: '#1C2438', borderColor: '#48526A', borderWidth: 1,
+  quickItem: { flex: 1, backgroundColor: '#1E3433', borderColor: '#41665F', borderWidth: 1,
     borderRadius: 13, minHeight: 64, padding: 9, gap: 4 },
   quickName: { color: colors.text, fontSize: 12, fontWeight: '900' },
   quickMeta: { color: colors.gold, fontWeight: '800', fontSize: 10 },
@@ -226,11 +226,11 @@ const styles = StyleSheet.create({
   gap: { gap: 10 },
   tabs: { flexDirection: 'row', backgroundColor: colors.cardElevated, borderRadius: 16, padding: 5, gap: 5, borderColor: colors.cardBorder, borderWidth: 1 },
   tab: { flex: 1, height: 44, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  tabActive: { backgroundColor: '#29253E', borderColor: colors.gold, borderWidth: 1 },
+  tabActive: { backgroundColor: '#31483F', borderColor: colors.gold, borderWidth: 1 },
   tabText: { color: colors.textMuted, fontWeight: '600', fontSize: 14 },
   tabTextActive: { color: '#fff' },
   sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '900', letterSpacing: -.2 },
-  template: { backgroundColor: colors.input, borderRadius: 16, padding: 15, gap: 10, borderWidth: 1, borderColor: '#384158' },
+  template: { backgroundColor: colors.input, borderRadius: 16, padding: 15, gap: 10, borderWidth: 1, borderColor: '#3B5F5A' },
   templateSelected: { borderColor: colors.gold },
   templateHead: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
   templateName: { color: colors.text, fontWeight: '700', fontSize: 15 },
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   videoText: { color: '#fca5a5', fontSize: 12, fontWeight: '700' },
   sessionCard: { borderColor: colors.green },
   sessionBtn: { backgroundColor: colors.gold, borderRadius: 14, height: 51, alignItems: 'center', justifyContent: 'center' },
-  sessionText: { color: '#17151B', fontWeight: '900', fontSize: 15 },
+  sessionText: { color: '#201E19', fontWeight: '900', fontSize: 15 },
   useBtn: { borderColor: colors.primary, borderWidth: 1, borderRadius: 10, height: 44, alignItems: 'center', justifyContent: 'center' },
   useText: { color: colors.primarySoft, fontWeight: '700' },
   label: { color: colors.textSoft, fontSize: 13, fontWeight: '600' },

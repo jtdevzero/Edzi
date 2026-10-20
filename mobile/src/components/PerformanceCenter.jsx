@@ -65,7 +65,7 @@ const styles=StyleSheet.create({
   estimate:{color:colors.gold,fontSize:11},
   fine:{color:colors.textMuted,fontSize:10,lineHeight:17},sub:{color:colors.textMuted,fontSize:12},
   ratings:{flexDirection:'row',gap:7},rating:{flex:1,padding:12,backgroundColor:colors.input,borderRadius:10,alignItems:'center'},
-  ratingActive:{backgroundColor:'#4A426B',borderWidth:1,borderColor:colors.gold},
+  ratingActive:{backgroundColor:'#394F47',borderWidth:1,borderColor:colors.gold},
   ratingText:{color:colors.text,fontSize:16,fontWeight:'900'},
   input:{backgroundColor:colors.input,color:colors.text,padding:13,borderRadius:12},
   save:{backgroundColor:colors.primary,padding:13,borderRadius:12,alignItems:'center'},

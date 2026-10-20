@@ -31,15 +31,15 @@ export default function HunterCreator(){
   </View>;
 }
 const styles=StyleSheet.create({
-  box:{gap:14,borderColor:'#5D536E'},
+  box:{gap:14,borderColor:'#607970'},
   eyebrow:{color:colors.gold,fontWeight:'900',fontSize:10,letterSpacing:1.4},
   title:{fontSize:21,fontWeight:'900',color:colors.text},
-  hero:{alignItems:'center',backgroundColor:'#171C2C',borderRadius:19,overflow:'hidden',paddingTop:7},
+  hero:{alignItems:'center',backgroundColor:'#152A2F',borderRadius:19,overflow:'hidden',paddingTop:7},
   label:{fontSize:10,fontWeight:'900',letterSpacing:1.4,color:colors.gold},
   row:{flexDirection:'row',gap:7,flexWrap:'wrap'},
-  cell:{flexGrow:1,minWidth:67,backgroundColor:'#1A2537',padding:10,borderRadius:12,
+  cell:{flexGrow:1,minWidth:67,backgroundColor:'#1C3333',padding:10,borderRadius:12,
     alignItems:'center',gap:6,borderColor:colors.cardBorder,borderWidth:1},
-  selected:{borderColor:colors.gold,backgroundColor:'#3D344B'},
+  selected:{borderColor:colors.gold,backgroundColor:'#33493E'},
   swatch:{width:26,height:26,borderRadius:13},
   name:{color:colors.textSoft,fontSize:10,fontWeight:'800',textAlign:'center'},
   icon:{color:colors.gold,fontSize:23},

@@ -37,7 +37,7 @@ export default function HunterGuild(){
   </View>;
 }
 const styles=StyleSheet.create({
-  root:{gap:14,borderColor:'#56516C'},
+  root:{gap:14,borderColor:'#486B69'},
   eyebrow:{color:colors.gold,fontWeight:'900',fontSize:10,letterSpacing:1.4},
   heading:{color:colors.text,fontSize:21,fontWeight:'900'},
   note:{color:colors.textMuted,fontSize:11,lineHeight:18},

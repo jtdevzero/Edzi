@@ -29,11 +29,17 @@ const fs = require('node:fs');
     await page.getByText('Teszt Harcos').waitFor();
     console.log('SMOKE: character created');
     await page.getByText('RANK D').waitFor();
+    await page.getByText('A küldetésed.', {exact:true}).first().waitFor();
+    await page.getByText('FEDEZD FEL A VILÁGOD.').first().waitFor();
+    await page.getByText('PRIVATE / OFFLINE').first().waitFor();
+    console.log('SMOKE: NIGHTFALL hero, expedition teaser and private-mode header');
+
     await page.getByText('SENSEI / PRIVATE INTELLIGENCE').last().waitFor();
     await page.getByText('Hunter Mode').first().waitFor();
     await page.getByText('Performance', {exact:false}).first().click();
     await page.getByText('PERFORMANCE / LAST 7 DAYS').last().waitFor();
     await page.getByText('Hunter Mode').first().click();
+    await page.screenshot({ path: 'artifacts/nightfall-dashboard.png', fullPage: true });
     await page.screenshot({ path: 'artifacts/premium-dashboard.png', fullPage: true });
     await page.getByText('Karakter', { exact: true }).last().click();
     await page.getByText('Teszt Harcos', {exact:true}).last().waitFor();

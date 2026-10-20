@@ -11,6 +11,7 @@ import {colors,card} from '../theme';
 import AppModeSwitcher from '../components/AppModeSwitcher';
 import PerformanceCenter from '../components/PerformanceCenter';
 import HunterMentor from '../components/HunterMentor';
+import WorldTeaser from '../components/WorldTeaser';
 import {worldProgress} from '../game/hunterWorld';
 
 function Ring({value,total}){
@@ -44,7 +45,7 @@ export default function DashboardScreen({navigation}){
   const backupDue=state.activities.length>=3&&(!state.lastBackupAt||
     !Number.isFinite(new Date(state.lastBackupAt).getTime())||
     Date.now()-new Date(state.lastBackupAt).getTime()>7*86400000);
-  return <Screen title="Edzi" eyebrow="ASCENSION · THE NEXT LEVEL" subtitle="A fejlődésed új fejezete."
+  return <Screen title="A küldetésed." eyebrow="CHAPTER 04 / PERSONAL HUNTER SYSTEM" subtitle="A következő szint nem magától érkezik."
     right={<View style={styles.streak}><Text style={styles.streakFire}>✦ {progress.streak}</Text><Text style={styles.streakTiny}>DAY STREAK</Text></View>}>
     {storageWarning&&<View style={[card,styles.warning]}>
       <Text style={styles.warningTitle}>A helyi mentés nem elérhető.</Text>
@@ -56,12 +57,7 @@ export default function DashboardScreen({navigation}){
     </Pressable>}
     <AppModeSwitcher />
     {state.preferences?.appMode==='performance' ? <PerformanceCenter /> : <CharacterCard character={state.character} progress={progress}/>}
-    <Pressable style={[card,styles.worldEntry]} onPress={()=>navigation.navigate('Quests')}>
-      <Text style={styles.worldTag}>✦ HUNTER WORLD  /  {explored} / 5 RÉGIÓ</Text>
-      <Text style={styles.worldTitle}>A világod rád vár ↗</Text>
-      <Text style={styles.worldCopy}>Új területek, feloldható páncélok és céhes kihívások.</Text>
-    </Pressable>
-    <HunterMentor />
+    <WorldTeaser explored={explored} onPress={()=>navigation.navigate('Quests')}/>
     <View style={styles.report}>
       <Text style={styles.reportEyebrow}>FIELD REPORT <Text style={{color:colors.textMuted}}> /  LIFETIME</Text></Text>
       <View style={styles.statRow}>
@@ -74,9 +70,9 @@ export default function DashboardScreen({navigation}){
     </View>
 
     <View style={styles.actionGroup}>
-      <SectionHeading eyebrow="MAKE YOUR MOVE" title="Kezdődik a következő szint"/>
+      <SectionHeading eyebrow="PRIORITY 01 / ACTION" title="Mai bevetés"/>
       <Pressable onPress={()=>navigation.navigate('Log')} style={styles.heroAction} accessibilityRole="button">
-        <LinearGradient colors={['#675CE6','#332F88','#201D4C']} style={styles.heroActionGradient}
+        <LinearGradient colors={['#916E3C','#4A3D2F','#1F2C2C']} style={styles.heroActionGradient}
           start={{x:0,y:0}} end={{x:1,y:1}}>
           <Svg width={96} height={100} style={styles.actionMark} viewBox="0 0 100 100">
             <Circle cx="60" cy="44" r="38" stroke="#F8F6FF" strokeOpacity=".25" strokeWidth="1" fill="none"/>
@@ -104,6 +100,7 @@ export default function DashboardScreen({navigation}){
       </View>
     </View>
 
+    <HunterMentor />
     <SectionHeading eyebrow="THE CONSISTENCY ENGINE" title="Heti teljesítmény"/>
     <View style={[card,styles.weekCard]}>
       <View style={{flex:1,gap:9}}>
@@ -155,32 +152,32 @@ export default function DashboardScreen({navigation}){
   </Screen>;
 }
 const styles=StyleSheet.create({
-  worldEntry:{backgroundColor:'#1D223A',borderColor:'#68618C',gap:7,padding:20},
+  worldEntry:{backgroundColor:'#132B2F',borderColor:'#547F77',gap:7,padding:20},
   worldTag:{color:colors.gold,fontSize:10,fontWeight:'900',letterSpacing:1.5},
   worldTitle:{color:colors.text,fontSize:20,fontWeight:'900'},
   worldCopy:{color:colors.textMuted,fontSize:12,lineHeight:19},
-  streak:{backgroundColor:'#242322',borderRadius:13,borderColor:'#6E5D43',borderWidth:1,paddingVertical:8,paddingHorizontal:12,alignItems:'center',minWidth:78},
+  streak:{backgroundColor:'#2D281E',borderRadius:13,borderColor:'#957246',borderWidth:1,paddingVertical:8,paddingHorizontal:12,alignItems:'center',minWidth:78},
   streakFire:{fontSize:18,color:colors.gold,fontWeight:'900'},streakTiny:{color:colors.textMuted,fontSize:8,letterSpacing:1.1,fontWeight:'900',marginTop:2},
   warning:{backgroundColor:'#293041',borderColor:colors.gold,gap:6},
   warningTitle:{color:colors.gold,fontWeight:'900',fontSize:12},warningText:{color:colors.textSoft,fontSize:12},
-  report:{backgroundColor:'#111726',borderWidth:1,borderColor:'#3D465E',borderRadius:20,padding:16,gap:14},
+  report:{backgroundColor:'#102025',borderWidth:1,borderColor:'#375159',borderRadius:20,padding:16,gap:14},
   reportEyebrow:{color:colors.gold,fontSize:10,fontWeight:'900',letterSpacing:1.7},
   statRow:{flexDirection:'row',alignItems:'center'},
   stat:{flex:1,gap:3,minWidth:0},
   statValue:{fontSize:24,color:colors.text,fontWeight:'900',letterSpacing:-.6},
   statLabel:{fontSize:9,color:colors.textMuted,fontWeight:'800',letterSpacing:.5},
   separator:{height:32,width:1,backgroundColor:'#394154',marginHorizontal:11},
-  actionGroup:{gap:11},heroAction:{overflow:'hidden',borderRadius:24,borderWidth:1,borderColor:'#8577D7'},
+  actionGroup:{gap:11},heroAction:{overflow:'hidden',borderRadius:24,borderWidth:1,borderColor:'#C4A068'},
   heroActionGradient:{padding:22,gap:9,minHeight:180},
   actionMark:{position:'absolute',right:2,top:2,opacity:.48},
   actionEyebrow:{color:colors.gold,fontWeight:'900',fontSize:10,letterSpacing:1.8},
   actionTitle:{color:'#FFFFFF',fontSize:22,fontWeight:'900',letterSpacing:-.5,marginTop:7},
-  actionSubtitle:{color:'#DAD8FF',fontSize:12,lineHeight:18,maxWidth:'86%'},
+  actionSubtitle:{color:'#F1E3CA',fontSize:12,lineHeight:18,maxWidth:'86%'},
   actionArrow:{backgroundColor:'rgba(255,255,255,.13)',borderColor:'rgba(255,255,255,.24)',borderWidth:1,
     borderRadius:9,paddingHorizontal:13,paddingVertical:9,alignSelf:'flex-start',marginTop:8},
   actionArrowText:{color:'white',fontSize:11,fontWeight:'900',letterSpacing:1.1},
   secondaryActions:{flexDirection:'row',gap:9},
-  secondaryAction:{flex:1,borderWidth:1,borderColor:'#364158',borderRadius:18,backgroundColor:'#151C2D',
+  secondaryAction:{flex:1,borderWidth:1,borderColor:'#37535A',borderRadius:18,backgroundColor:'#102129',
     paddingHorizontal:13,paddingVertical:15,gap:8,alignItems:'center',flexDirection:'row',minWidth:0},
   secondaryIcon:{fontSize:24,color:colors.gold},secondaryName:{color:colors.text,fontWeight:'900',fontSize:12},
   secondaryDesc:{color:colors.textMuted,fontSize:10,marginTop:3},chevron:{color:colors.gold,fontSize:19},
@@ -190,7 +187,7 @@ const styles=StyleSheet.create({
   weekSub:{color:colors.textMuted,fontSize:12,lineHeight:18},
   ring:{width:93,height:93,alignItems:'center',justifyContent:'center'},
   ringNumber:{fontSize:24,color:colors.text,fontWeight:'900'},ringOf:{fontSize:11,color:colors.textMuted},
-  trial:{borderColor:'#44436D',borderWidth:1,backgroundColor:'#141B30',borderRadius:18,
+  trial:{borderColor:'#38585A',borderWidth:1,backgroundColor:'#101F27',borderRadius:18,
     padding:17,flexDirection:'row',alignItems:'center',gap:12},
   trialIcon:{fontSize:29},trialEyebrow:{color:colors.gold,fontSize:10,letterSpacing:1.2,fontWeight:'900'},
   trialTitle:{fontWeight:'900',color:colors.text,fontSize:14},

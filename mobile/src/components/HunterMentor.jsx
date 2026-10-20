@@ -42,16 +42,16 @@ export default function HunterMentor(){
   </View>;
 }
 const styles=StyleSheet.create({
-  remote:{gap:12,padding:14,backgroundColor:'#1D243B',borderRadius:14,borderWidth:1,borderColor:'#625781'},
+  remote:{gap:12,padding:14,backgroundColor:'#182C2E',borderRadius:14,borderWidth:1,borderColor:'#47736A'},
   ask:{backgroundColor:colors.primary,borderRadius:12,minHeight:45,alignItems:'center',justifyContent:'center'},
   askText:{color:'#fff',fontSize:12,fontWeight:'900'},
-  box:{gap:12,borderColor:'#5E5775'},
+  box:{gap:12,borderColor:'#486D66'},
   top:{flexDirection:'row',alignItems:'center',gap:13},
   symbol:{fontSize:39,color:colors.gold},
   eyebrow:{color:colors.gold,fontSize:10,fontWeight:'900',letterSpacing:1.4},
   heading:{color:colors.text,fontSize:20,fontWeight:'900'},
   body:{color:colors.textSoft,fontSize:13,lineHeight:21},
-  tip:{backgroundColor:'#222137',borderRadius:14,padding:14,gap:8},
+  tip:{backgroundColor:'#202F30',borderRadius:14,padding:14,gap:8},
   tipLabel:{color:colors.gold,fontSize:10,fontWeight:'900'},
   tipTitle:{color:colors.text,fontSize:15,fontWeight:'900'},
   reason:{color:colors.textMuted,fontSize:11,lineHeight:18},

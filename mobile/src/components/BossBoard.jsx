@@ -22,14 +22,14 @@ export default function BossBoard(){
   </View>;
 }
 const styles=StyleSheet.create({
-  container:{gap:11},heading:{gap:10,borderColor:'#6B5C58',backgroundColor:'#24202B'},
+  container:{gap:11},heading:{gap:10,borderColor:'#807052',backgroundColor:'#302B24'},
   tag:{fontSize:10,fontWeight:'900',color:colors.gold,letterSpacing:1.3},
   title:{fontSize:22,color:colors.text,fontWeight:'900'},
   sub:{color:colors.textMuted,fontSize:12,lineHeight:18},
   wins:{color:colors.gold,fontSize:12,fontWeight:'800'},
   boss:{gap:10},defeated:{borderColor:colors.green,backgroundColor:'#112822'},
   row:{flexDirection:'row',alignItems:'center',gap:10},
-  avatar:{width:46,height:46,borderRadius:14,backgroundColor:'#2B2A3C',alignItems:'center',justifyContent:'center'},
+  avatar:{width:46,height:46,borderRadius:14,backgroundColor:'#1D3433',alignItems:'center',justifyContent:'center'},
   emoji:{fontSize:25},eyebrow:{color:colors.gold,fontSize:9,letterSpacing:1.3,fontWeight:'900'},
   name:{color:colors.text,fontSize:17,fontWeight:'900'},xp:{color:colors.gold,fontWeight:'900',fontSize:12},
   track:{height:8,borderRadius:6,backgroundColor:colors.track,overflow:'hidden'},

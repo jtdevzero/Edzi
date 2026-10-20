@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   chipsScroll: { flexGrow: 0, marginTop: 12 },
   chips: { paddingHorizontal: 16, gap: 8 },
   chip: { height: 43, paddingHorizontal: 14, borderRadius: 13, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder, justifyContent: 'center' },
-  chipOn: { backgroundColor: '#353268', borderColor: colors.primarySoft },
+  chipOn: { backgroundColor: '#304E47', borderColor: colors.primarySoft },
   chipAdd: { borderStyle: 'dashed' },
   chipText: { color: colors.textMuted, fontWeight: '600', fontSize: 14 },
   chipTextOn: { color: '#fff' },

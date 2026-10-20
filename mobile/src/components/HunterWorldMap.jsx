@@ -23,18 +23,18 @@ export default function HunterWorldMap(){
       <Svg width="100%" height="100%" viewBox="0 0 330 378" preserveAspectRatio="xMidYMid meet"
         style={StyleSheet.absoluteFill} pointerEvents="none">
         <Defs><LinearGradient id="worldBg" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#232946"/><Stop offset=".6" stopColor="#101A2F"/>
-          <Stop offset="1" stopColor="#0A101D"/></LinearGradient></Defs>
+          <Stop offset="0" stopColor="#294741"/><Stop offset=".6" stopColor="#14272C"/>
+          <Stop offset="1" stopColor="#071116"/></LinearGradient></Defs>
         <Path d="M0 0 H330 V378 H0 Z" fill="url(#worldBg)"/>
         <G opacity=".23" stroke="#7F8DAB" strokeWidth=".55">
           {Array.from({length:10},(_,i)=><Line key={'v'+i} x1={i*38} y1="0" x2={i*38} y2="378"/>)}
           {Array.from({length:12},(_,i)=><Line key={'h'+i} x1="0" y1={i*36} x2="330" y2={i*36}/>)}
         </G>
-        <Path d="M13 273 Q72 218 81 194 T227 119 T97 53" fill="none" stroke="#D8BE91" strokeWidth="1.5" strokeOpacity=".5" strokeDasharray="5 7"/>
+        <Path d="M13 273 Q72 218 81 194 T227 119 T97 53" fill="none" stroke="#F6C67B" strokeWidth="1.5" strokeOpacity=".5" strokeDasharray="5 7"/>
         <Path d="M28 360 L65 329 L105 351 L148 324 L181 344 L243 305 L319 324 V378 H0 Z"
-          fill="#283B53" opacity=".52"/>
+          fill="#294E49" opacity=".52"/>
         <Path d="M0 134 L44 108 L69 143 L111 118 L156 160 L182 145 L229 176 L289 127 L330 157 V210 L0 209 Z"
-          fill="#293856" opacity=".33"/>
+          fill="#254E46" opacity=".33"/>
         <Path d="M0 65 L42 49 L71 87 L114 65 L144 78 L202 32 L241 65 L294 28 L330 43"
           fill="none" stroke="#91A1B9" opacity=".22"/>
         <Circle cx="80" cy="72" r="44" stroke="#D2C29A" fill="none" strokeOpacity=".28"/>
@@ -78,9 +78,9 @@ const styles=StyleSheet.create({
   counter:{padding:8,backgroundColor:'#29263A',borderRadius:12,alignItems:'center'},
   counterN:{color:colors.gold,fontSize:20,fontWeight:'900'},
   counterCaption:{color:colors.textMuted,fontSize:9,fontWeight:'900'},
-  map:{height:375,backgroundColor:colors.surface,borderColor:'#414D67',borderWidth:1,borderRadius:19,overflow:'hidden'},
+  map:{height:375,backgroundColor:colors.surface,borderColor:'#5A7C78',borderWidth:1,borderRadius:19,overflow:'hidden'},
   node:{position:'absolute',width:NODE_SIZE,height:NODE_SIZE,borderRadius:15,marginLeft:-NODE_SIZE/2,marginTop:-NODE_SIZE/2,
-    backgroundColor:'#303E63',borderWidth:1,borderColor:'#889CBF',alignItems:'center',justifyContent:'center'},
+    backgroundColor:'#274B47',borderWidth:1,borderColor:'#8AAEA5',alignItems:'center',justifyContent:'center'},
   nodeDone:{backgroundColor:'#304C44',borderColor:colors.green},
   nodeSelected:{borderColor:colors.gold,borderWidth:2,backgroundColor:'#4E4261'},
   nodeLocked:{opacity:.65,backgroundColor:'#1A2335'},
