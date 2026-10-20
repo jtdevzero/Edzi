@@ -1,11 +1,11 @@
-import {mentorBrief} from '../game/mentor';
+import {performanceOverview} from '../game/performance';
 // External generative AI is disabled until the project owner deploys a secured
 // Supabase Edge Function and provides the already-public Supabase project URL/key.
 const BASE=(process.env.EXPO_PUBLIC_SUPABASE_URL||'').replace(/\/$/,'');
 const ANON=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'';
 export const aiReady=/^https:\/\/[a-z0-9.-]+$/i.test(BASE)&&ANON.length>20;
 export function minimalAIPayload(state,progress){
-  const brief=mentorBrief(state,progress);
+  const overview=performanceOverview(state);
   // Share no name, birth date, location, measurements, notes or raw workout history.
   const activities=state.activities||[];
   const workouts=activities.filter(a=>a.type==='workout');
@@ -15,8 +15,8 @@ export function minimalAIPayload(state,progress){
     recentMinutes:Math.min(3000,recent.reduce((n,a)=>n+a.duration,0)),
     hunterLevel:Math.min(999,Math.max(1,progress.level||1)),
     currentStreak:Math.min(365,Math.max(0,progress.streak||0)),
-    readiness:brief.explanation[1]?.includes('Legutóbbi közérzet:')
-      ? Math.max(1,Math.min(5,Number(brief.explanation[1].match(/(\d)\/5/)?.[1]||3))) : null
+    readiness:Number.isInteger(overview.recentCheckin?.readiness)
+      ? Math.max(1,Math.min(5,overview.recentCheckin.readiness)) : null
   };
 }
 export async function requestGenerativeCoach(session,state,progress){

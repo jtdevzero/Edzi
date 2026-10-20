@@ -19,8 +19,11 @@ function validPayload(p:unknown):p is Record<string,number|null>{
     currentStreak:[0,365],readiness:[1,5]
   };
   if(Object.keys(a).some(k=>!(k in limits)))return false;
-  return Object.entries(limits).every(([k,[min,max]])=>a[k]===null&&k==='readiness' ||
-    Number.isInteger(a[k])&&(a[k] as number)>=min&&(a[k] as number)<=max);
+  return Object.entries(limits).every(([k,[min,max]])=>{
+    const value=a[k];
+    return (k==='readiness'&&value===null) ||
+      (typeof value==='number'&&Number.isInteger(value)&&value>=min&&value<=max);
+  });
 }
 Deno.serve(async request=>{
   if(request.headers.get('origin')&&request.headers.get('origin')!==origin)
