@@ -8,6 +8,10 @@ import { computeExerciseRecords, newRecords } from './stats';
 import { sessionMinutes } from './session';
 import { parseMeasurement } from './body';
 import { trialsForWeek } from './weeklyTrials';
+import { hunterEvolution, validAppearanceChoice } from './evolution';
+import { bossCampaigns } from './bosses';
+import { cleanTrainingPlan } from './fitnessPro';
+import { validateRecovery } from './performance';
 
 const SESSION_KEY = 'animefitness:session';
 
@@ -51,6 +55,8 @@ export function GameProvider({ children }) {
     const quests = questsForDay(today).map((q) => ({ ...q, completed: completedToday.has(q.id) }));
     const programStatus = programRunStatus(state, today);
     const weeklyTrials = trialsForWeek(state, weekKey(today), weekKey, dayKey);
+    const bosses = bossCampaigns(state, today);
+    const hunter = hunterEvolution(state.character, progress, progress.bossWins);
 
     function commit(nextState) {
       const after = computeProgress(nextState, today);
@@ -102,6 +108,24 @@ export function GameProvider({ children }) {
       quests,
       programStatus,
       weeklyTrials,
+      bosses,
+      hunter,
+      setAppMode(mode) {
+        if (!['hunter','performance'].includes(mode)) return;
+        setState(s=>({ ...s, preferences:{...s.preferences,appMode:mode} }));
+      },
+      customizeHunter(type,id) {
+        if (!validAppearanceChoice(type,id,hunter)) return;
+        setState(s=>({ ...s,character:{...s.character,appearance:{...(s.character.appearance||{}),[type==='style'?'styleId':'trailId']:id}}}));
+      },
+      setTrainingPlan(input) {
+        const plan=cleanTrainingPlan(input);
+        setState(s=>({...s,trainingPlan:plan}));
+      },
+      addRecoveryCheckin(readiness,note='') {
+        const entry=validateRecovery(readiness,note);
+        setState(s=>({...s,recoveryEntries:[...s.recoveryEntries,{...entry,id:newId(),date:new Date().toISOString()}]}));
+      },
       createCharacter(name, classId) {
         setState((s) => ({ ...s, character: { name, classId, createdAt: new Date().toISOString() } }));
       },

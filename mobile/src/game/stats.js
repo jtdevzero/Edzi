@@ -1,6 +1,7 @@
 import { dayKey, addDays, weekKey, QUEST_XP, weeklyGoalFor, WEEKLY_GOAL_BONUS } from './gamification';
 import { programDayXP } from './programs';
 import { weeklyRewardsByWeek } from './weeklyTrials';
+import { bossCampaigns } from './bosses';
 
 export const HEATMAP_WEEKS = 12;
 export const CHART_WEEKS = 8;
@@ -52,6 +53,13 @@ export function computeStats(state, progress, today = dayKey()) {
   }
   for (const [week, xp] of Object.entries(weeklyRewardsByWeek(state, weekKey, dayKey))) {
     (weeks[week] ??= { xp: 0, minutes: 0 }).xp += xp;
+  }
+  // Daily and weekly charts include the automatically earned boss XP.
+  const bossWeeks=new Set(state.activities.filter(a=>a.type==='workout').map(a=>weekKey(dayKey(a.date))));
+  for(const week of bossWeeks){
+    const sunday=addDays(week,6);
+    const reward=bossCampaigns(state,sunday).filter(b=>b.complete).reduce((n,b)=>n+b.xp,0);
+    (weeks[week] ??= {xp:0,minutes:0}).xp+=reward;
   }
   const thisWeek = weekKey(today);
   const heatmapStart = addDays(thisWeek, -7 * (HEATMAP_WEEKS - 1));
