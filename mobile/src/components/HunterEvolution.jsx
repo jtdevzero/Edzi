@@ -34,7 +34,7 @@ export default function HunterEvolution(){
   </View>;
 }
 const styles=StyleSheet.create({
-  box:{gap:16,borderColor:'#574E6D'},
+  box:{gap:16,borderColor:'#4E7165'},
   eyebrow:{color:colors.gold,fontWeight:'900',letterSpacing:1.4,fontSize:10},
   preview:{flexDirection:'row',alignItems:'center',gap:8,overflow:'hidden'},
   info:{flex:1,gap:4},big:{fontSize:30,color:colors.gold},name:{fontSize:20,fontWeight:'900',color:colors.text},
@@ -42,7 +42,7 @@ const styles=StyleSheet.create({
   label:{fontSize:10,fontWeight:'900',color:colors.gold,letterSpacing:1.5},
   options:{flexDirection:'row',flexWrap:'wrap',gap:8},
   option:{width:'30%',flexGrow:1,minHeight:80,backgroundColor:colors.input,borderWidth:1,borderColor:colors.cardBorder,borderRadius:12,alignItems:'center',justifyContent:'center',padding:6,gap:3},
-  active:{borderColor:colors.gold,backgroundColor:'#302B37'},
+  active:{borderColor:colors.gold,backgroundColor:'#34473C'},
   locked:{opacity:.5},
   emblem:{fontSize:20,color:colors.gold},
   optionText:{fontSize:11,fontWeight:'800',color:colors.text,textAlign:'center'},

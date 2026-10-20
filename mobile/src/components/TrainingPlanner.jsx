@@ -61,7 +61,7 @@ const styles=StyleSheet.create({
   eyebrow:{color:colors.gold,fontWeight:'900',letterSpacing:1.4,fontSize:10},
   heading:{color:colors.text,fontWeight:'900',fontSize:19,marginTop:6},
   edit:{padding:8},action:{color:colors.gold,fontWeight:'800',fontSize:12},
-  today:{gap:8,backgroundColor:'#26253E',padding:13,borderRadius:13,borderColor:colors.gold,borderWidth:1},
+  today:{gap:8,backgroundColor:'#2E352B',padding:13,borderRadius:13,borderColor:colors.gold,borderWidth:1},
   todayLabel:{color:colors.gold,fontWeight:'900',fontSize:12},
   cta:{padding:13,alignItems:'center',borderRadius:12,backgroundColor:colors.primary},
   ctaText:{color:'white',fontSize:13,fontWeight:'900'},

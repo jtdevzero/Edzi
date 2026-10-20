@@ -22,7 +22,7 @@ export default function Screen({title,subtitle,right,children,eyebrow='EDZI / NI
       <View style={styles.brandLine}>
         <View style={styles.brandSymbol}><Text style={styles.symbol}>✦</Text></View>
         <Text style={styles.brand}>EDZI<Text style={styles.brandSlash}> / </Text>NIGHTFALL</Text>
-        <View style={styles.signal}><View style={styles.dot}/><Text style={styles.signalText}>SYSTEM ONLINE</Text></View>
+        <View style={styles.signal}><View style={styles.dot}/><Text style={styles.signalText}>PRIVATE / OFFLINE</Text></View>
       </View>
       {title?<View style={styles.header}>
         <View style={styles.headerText}>

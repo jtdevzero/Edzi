@@ -12,7 +12,7 @@ import PerformanceCenter from '../components/PerformanceCenter';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
 import { colors, card } from '../theme';
 
-const HEAT_COLORS = ['#192641', '#263E61', '#375E8C', '#4071AF', '#44DFD0'];
+const HEAT_COLORS = ['#193033', '#24544E', '#3F7771', '#5CA6A0', '#6EE3D8'];
 const WEEKDAYS = ['H', 'K', 'Sz', 'Cs', 'P', 'Sz', 'V'];
 const TYPE_COLORS = { workout: colors.red, study: colors.blue, journal: colors.green };
 const FONT = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
@@ -170,7 +170,7 @@ export default function StatsScreen() {
 
   return (
     <Screen title="Statisztika" eyebrow="ANALYTICS / PERFORMANCE" subtitle="A fejlődés láthatóvá válik.">
-      <LinearGradient colors={['#252642','#111827','#0B111B']} style={styles.statsHero}>
+      <LinearGradient colors={['#223B3C','#0F2328','#0B181D']} style={styles.statsHero}>
         <Text style={styles.heroEyebrow}>◈  PERFORMANCE RECORD</Text>
         <Text style={styles.heroNumber}>{formatMinutes(records.totalMinutes)}</Text>
         <Text style={styles.heroCaption}>ÖSSZES RÖGZÍTETT AKTIVITÁS</Text>
@@ -229,7 +229,7 @@ export default function StatsScreen() {
 const CELL = 18;
 
 const styles = StyleSheet.create({
-  statsHero: { padding: 26, borderRadius: 28, borderColor: '#67647D', borderWidth: 1, gap: 11, minHeight:185, justifyContent:'center' },
+  statsHero: { padding: 26, borderRadius: 28, borderColor: '#6D8173', borderWidth: 1, gap: 11, minHeight:185, justifyContent:'center' },
   heroEyebrow: { fontSize: 10, fontWeight: '900', color: colors.gold, letterSpacing: 2.0 },
   heroNumber: { fontSize: 42, fontWeight: '900', color: colors.text, letterSpacing: -1.4 },
   heroCaption: { color: colors.gold, fontWeight: '900', fontSize: 10, letterSpacing: 1.7 },
@@ -238,13 +238,13 @@ const styles = StyleSheet.create({
   recGap: { gap: 10 },
   exChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   exChip: { paddingHorizontal: 12, height: 36, borderRadius: 18, backgroundColor: colors.input, justifyContent: 'center' },
-  exChipOn: { backgroundColor: '#594A6D', borderColor:colors.gold, borderWidth:1 },
+  exChipOn: { backgroundColor: '#3E5A4B', borderColor:colors.gold, borderWidth:1 },
   exChipText: { color: colors.textMuted, fontWeight: '600', fontSize: 13 },
   exChipTextOn: { color: colors.gold, fontWeight:'900' },
   sectionTitle: { color: colors.text, fontSize: 18, fontWeight: '900', marginBottom: 10 },
   muted: { color: colors.textMuted, fontSize: 12 },
   recordGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  record: { flexBasis: '46%', flexGrow: 1, alignItems: 'flex-start', paddingVertical: 18, paddingHorizontal: 18, backgroundColor:'#151C2D' },
+  record: { flexBasis: '46%', flexGrow: 1, alignItems: 'flex-start', paddingVertical: 18, paddingHorizontal: 18, backgroundColor:'#12262A' },
   recordValue: { color: colors.text, fontSize: 27, fontWeight: '900', letterSpacing:-.65 },
   recordLabel: { color: colors.textMuted, fontSize: 11, marginTop: 6 },
   heatWrap: { flexDirection: 'row', marginTop: 12, justifyContent: 'center' },
