@@ -10,6 +10,7 @@ import { createSession } from '../game/session';
 import { unlockAudio } from '../utils/device';
 import Pomodoro from '../components/Pomodoro';
 import TrainingPlanner from '../components/TrainingPlanner';
+import SmartTrainingPanel from '../components/SmartTrainingPanel';
 import { confirm } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
@@ -95,6 +96,7 @@ export default function LogScreen({ navigation }) {
 
       {type === 'study' && <Pomodoro onLogged={() => navigation.navigate('Dashboard')} />}
       {type === 'workout' && <TrainingPlanner />}
+      {type === 'workout' && <SmartTrainingPanel />}
 
       {type === 'workout' && (
         <View style={[card, styles.gap]}>

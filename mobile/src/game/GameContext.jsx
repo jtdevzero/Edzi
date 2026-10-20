@@ -12,6 +12,10 @@ import { hunterEvolution, validAppearanceChoice } from './evolution';
 import { bossCampaigns } from './bosses';
 import { cleanTrainingPlan } from './fitnessPro';
 import { validateRecovery } from './performance';
+import {worldProgress,worldUnlockedGear} from './hunterWorld';
+import {safeCreatorChoice} from './characterCreator';
+import {sanitizeGuild} from './guild';
+import {groupSuperset} from './smartTraining';
 
 const SESSION_KEY = 'animefitness:session';
 
@@ -58,6 +62,7 @@ export function GameProvider({ children }) {
     const weeklyTrials = trialsForWeek(state, weekKey(today), weekKey, dayKey);
     const bosses = bossCampaigns(state, today);
     const hunter = hunterEvolution(state.character, progress, progress.bossWins);
+    const worldRegions = worldProgress(state,progress);
 
     function commit(nextState) {
       const after = computeProgress(nextState, today);
@@ -112,6 +117,27 @@ export function GameProvider({ children }) {
       weeklyTrials,
       bosses,
       hunter,
+      worldRegions,
+      customizeCreator(type,id) {
+        if(type==='gear') {
+          if(!worldUnlockedGear(worldRegions).some(g=>g.id===id&&g.unlocked))return;
+        } else if(!safeCreatorChoice(type,id))return;
+        const key=type==='gear'?'gearId':type==='visor'?'visorId':'helmetId';
+        setState(s=>({...s,character:{...s.character,appearance:{...s.character.appearance,[key]:id}}}));
+      },
+      setGuild(input) {
+        const guild=sanitizeGuild(input);
+        if(!guild)return;
+        setState(s=>({...s,guild}));
+      },
+      updateSuperset(first,second) {
+        const exercises=[...new Set(cleanTrainingPlan(state.trainingPlan).days.flatMap(d=>d.exercises))];
+        const pair=groupSuperset(exercises,first,second);
+        setState(s=>({...s,supersets:[...s.supersets.filter(p=>p.id!==pair.id),pair].slice(0,12)}));
+      },
+      clearSuperset(id) {
+        setState(s=>({...s,supersets:s.supersets.filter(p=>p.id!==id)}));
+      },
       setAppMode(mode) {
         if (!['hunter','performance'].includes(mode)) return;
         setState(s=>({ ...s, preferences:{...s.preferences,appMode:mode} }));
