@@ -83,7 +83,7 @@ const fs = require('node:fs');
       ['Questek', 'MAI KÜLDETÉS TELJESÍTVE']
     ]) {
       await page.getByText(tab, { exact: true }).last().click();
-      await page.getByText(expected, { exact: false }).first().waitFor();
+      await page.getByText(expected, { exact: false }).last().waitFor();
       const tooWide = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 2);
       assert.equal(tooWide, false, tab + ' must fit 320px viewport');
     }
