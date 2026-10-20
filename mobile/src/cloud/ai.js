@@ -1,15 +1,16 @@
 import {performanceOverview} from '../game/performance';
+import {dayKey,addDays} from '../game/gamification';
 // External generative AI is disabled until the project owner deploys a secured
 // Supabase Edge Function and provides the already-public Supabase project URL/key.
 const BASE=(process.env.EXPO_PUBLIC_SUPABASE_URL||'').replace(/\/$/,'');
 const ANON=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'';
 export const aiReady=/^https:\/\/[a-z0-9.-]+$/i.test(BASE)&&ANON.length>20;
-export function minimalAIPayload(state,progress){
-  const overview=performanceOverview(state);
+export function minimalAIPayload(state,progress,today=dayKey()){
+  const overview=performanceOverview(state,today);
   // Share no name, birth date, location, measurements, notes or raw workout history.
-  const activities=state.activities||[];
-  const workouts=activities.filter(a=>a.type==='workout');
-  const recent=workouts.slice(-7);
+  const from=addDays(today,-6);
+  const recent=(state.activities||[]).filter(a=>a.type==='workout' &&
+    dayKey(a.date)>=from && dayKey(a.date)<=today);
   return {
     recentWorkoutCount:Math.min(recent.length,7),
     recentMinutes:Math.min(3000,recent.reduce((n,a)=>n+a.duration,0)),

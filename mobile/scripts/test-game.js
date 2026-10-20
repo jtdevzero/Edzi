@@ -356,7 +356,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(localGuildChallenges(log,'2026-10-21')[0].complete,true);
   const shared=minimalGuildStats(log,'2026-10-21');
   assert.deepEqual(shared,{week:'2026-10-19',days:3,minutes:90,focus:0});
-  const anon=minimalAIPayload(log,{level:7,streak:2});
+  const anon=minimalAIPayload(log,{level:7,streak:2},'2026-10-21');
   assert.deepEqual(Object.keys(anon).sort(),['currentStreak','hunterLevel','readiness','recentMinutes','recentWorkoutCount'].sort());
   assert.equal(anon.recentWorkoutCount,3);
   assert.ok(!JSON.stringify(anon).includes('Teszt'));
