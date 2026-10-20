@@ -1,5 +1,5 @@
 import React from 'react';
-import {View,StyleSheet} from 'react-native';
+import {View,Image,StyleSheet} from 'react-native';
 import Svg,{Defs,LinearGradient,RadialGradient,Stop,Rect,Path,Circle,Polygon,Line,G} from 'react-native-svg';
 
 // EDZI CINEMATIC ART: native/offline vector environments inspired by the
@@ -14,7 +14,10 @@ const palettes={
 export default function CinematicArt({scene='hero',height=220,style}){
  const [base,middle,beam,gold]=palettes[scene]||palettes.hero;
  const uid='edziScene'+React.useId().replace(/:/g,'');
+ const showGeneratedImage=scene==='hero'||scene==='origin'||scene==='ascension';
  return <View pointerEvents="none" style={[styles.container,{height},style]}>
+  {showGeneratedImage&&<Image accessibilityIgnoresInvertColors source={require('../../assets/art/hero-scene.jpg')}
+    style={StyleSheet.absoluteFill} resizeMode="cover"/>}
   <Svg width="100%" height="100%" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
    <Defs>
     <LinearGradient id={uid+'sky'} x1="0" x2="1" y1="0" y2="1">
@@ -32,8 +35,8 @@ export default function CinematicArt({scene='hero',height=220,style}){
       <Stop offset="1" stopColor="#03070D"/>
     </LinearGradient>
    </Defs>
-   <Rect x="0" y="0" width="400" height="250" fill={'url(#'+uid+'sky)'}/>
-   <Rect width="400" height="250" fill={'url(#'+uid+'shine)'}/>
+   <Rect x="0" y="0" width="400" height="250" fill={'url(#'+uid+'sky)'} fillOpacity={showGeneratedImage?.62:1}/>
+   <Rect width="400" height="250" fill={'url(#'+uid+'shine)'} fillOpacity={showGeneratedImage?.56:1}/>
    <G stroke={gold} fill="none" opacity=".28">
      <Circle cx="299" cy="119" r="99" strokeWidth="1.2"/>
      <Circle cx="299" cy="119" r="82" strokeDasharray="4 9"/>
