@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import {View,Text,TextInput,Pressable,StyleSheet} from 'react-native';
 import {useGame} from '../game/GameContext';
-import {cloudEnabled,requestEmailCode,verifyEmailCode,uploadCloudSnapshot,readCloudSnapshot} from '../cloud/supabase';
+import {cloudEnabled,requestEmailCode,verifyEmailCode,uploadCloudSnapshot,readCloudSnapshot,deleteCloudSnapshot} from '../cloud/supabase';
 import {confirm,notify} from '../utils/notify';
 import {colors,card} from '../theme';
 
@@ -51,6 +51,10 @@ export default function CloudBackup(){
           `A ${new Date(remote.updatedAt).toLocaleString('hu-HU')} időpontú mentés felülírja a HELYI adataidat. Előbb exportálj JSON-mentést! Folytatod?`,
           ()=>{importState(remote.state);setStatus('Távoli mentés betöltve.');});
       })}><Text style={styles.secondaryText}>Felhőmentés visszatöltése</Text></Pressable>
+      <Pressable disabled={busy} onPress={()=>confirm('Felhőmentés törlése',
+        'A távoli mentés végleg törlődik. A HELYI adataid megmaradnak. Előbb készíts JSON-exportot. Biztos?',
+        ()=>act(async()=>{await deleteCloudSnapshot(session);setStatus('A felhőmentést töröltük. A helyi adatok változatlanok.');}))}
+        style={styles.delete}><Text style={styles.deleteText}>Távoli adataim törlése</Text></Pressable>
       <Pressable onPress={()=>{setSession(null);setStatus('Kijelentkezve.');}}><Text style={styles.logout}>Kijelentkezés</Text></Pressable>
     </>}
     {status?<Text style={styles.status}>{status}</Text>:null}
@@ -66,5 +70,7 @@ const styles=StyleSheet.create({
   secondary:{borderWidth:1,borderColor:colors.gold,borderRadius:12,minHeight:47,justifyContent:'center',alignItems:'center'},
   secondaryText:{color:colors.gold,fontWeight:'800'},
   logged:{color:colors.green,fontSize:12},logout:{color:colors.textMuted,textAlign:'center',padding:10},
-  status:{color:colors.cyan,fontSize:12,lineHeight:18}
+  status:{color:colors.cyan,fontSize:12,lineHeight:18},
+  delete:{borderColor:colors.red,borderWidth:1,borderRadius:11,alignItems:'center',padding:12},
+  deleteText:{color:colors.red,fontSize:12,fontWeight:'800'}
 });

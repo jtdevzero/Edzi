@@ -64,3 +64,10 @@ export async function uploadCloudSnapshot(session,state) {
   if(!Array.isArray(rows)||rows.length!==1)throw new Error('A távoli mentés időközben változott. Ellenőrizd újra.');
   return next;
 }
+
+export async function deleteCloudSnapshot(session){
+  if(!session?.token)throw new Error('Először jelentkezz be.');
+  await request(`/rest/v1/edzi_snapshots?user_id=eq.${encodeURIComponent(session.userId)}`,
+    {method:'DELETE'},session.token);
+  return true;
+}

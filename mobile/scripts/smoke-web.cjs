@@ -110,6 +110,16 @@ const fs = require('node:fs');
       assert.equal(tooWide, false, tab + ' must fit 320px viewport');
     }
     console.log('SMOKE: premium pages fit 320px');
+    // Recovery regression in a separate throwaway browser context; never corrupt the active test profile.
+    const badContext=await browser.newContext({viewport:{width:390,height:844}});
+    try {
+      const bad=await badContext.newPage();
+      await bad.goto('http://127.0.0.1:4173/Edzi/',{waitUntil:'networkidle'});
+      await bad.evaluate(()=>localStorage.setItem('animefitness:state','{corrupted'));
+      await bad.reload({waitUntil:'networkidle'});
+      await bad.getByText('A mentésed nem olvasható.').waitFor({timeout:15000});
+      console.log('SMOKE: corrupt local state safely displays recovery screen');
+    } finally {await badContext.close();}
     assert.deepEqual(errors, []);
     console.log('MOBILE-SIZE BROWSER SMOKE SUCCESS');
   } finally {

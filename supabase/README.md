@@ -20,3 +20,5 @@ Data is transmitted via TLS but **not end-to-end encrypted**; users should under
 their cloud provider can technically access their data. Do not enable for sensitive users
 without a privacy/legal review, removal path and verified backup/restore test.
 This release is **not** automatic multi-device synchronization.
+
+Users may explicitly delete their remote snapshot from the Cloud Vault screen; local data stays intact. Full account deletion must additionally be handled in the Supabase Auth administration/privacy process.
