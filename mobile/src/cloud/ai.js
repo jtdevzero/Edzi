@@ -4,7 +4,7 @@ import {dayKey,addDays} from '../game/gamification';
 // Supabase Edge Function and provides the already-public Supabase project URL/key.
 const BASE=(process.env.EXPO_PUBLIC_SUPABASE_URL||'').replace(/\/$/,'');
 const ANON=process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY||'';
-export const aiReady=/^https:\/\/[a-z0-9.-]+$/i.test(BASE)&&ANON.length>20;
+export const aiReady=process.env.EXPO_PUBLIC_EDZI_AI_ENABLED==='true' && /^https:\/\/[a-z0-9.-]+$/i.test(BASE)&&ANON.length>20;
 export function minimalAIPayload(state,progress,today=dayKey()){
   const overview=performanceOverview(state,today);
   // Share no name, birth date, location, measurements, notes or raw workout history.
