@@ -3,6 +3,7 @@ import {View,Text,Pressable,StyleSheet} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import Svg,{Circle,Path,Line,G,Defs,LinearGradient as SvgGradient,Stop} from 'react-native-svg';
 import {colors} from '../theme';
+import {MythicIcon} from './MythicIcon';
 export default function WorldTeaser({explored,onPress}){
   return <Pressable onPress={onPress} accessibilityRole="button" style={styles.frame}>
     <LinearGradient colors={['#21383A','#111D25','#0B141A']} start={{x:0,y:0}} end={{x:1,y:1}}
@@ -23,7 +24,7 @@ export default function WorldTeaser({explored,onPress}){
         <Circle cx={x} cy={y} r="13" fill="#102025" stroke={i<explored?'#F6C67B':'#6CA49F'} strokeOpacity=".9"/>
         <Circle cx={x} cy={y} r="4" fill={i<explored?'#F6C67B':'#5C807E'}/></G>)}
     </Svg>
-    <View style={styles.top}><Text style={styles.eyebrow}>◈  WORLD MAP / CHAPTER IV</Text>
+    <View style={styles.top}><View style={{flexDirection:'row',alignItems:'center',gap:6}}><MythicIcon name="quest" size={17} color={colors.cyan}/><Text style={styles.eyebrow}>WORLD MAP / CHAPTER IV</Text></View>
       <Text style={styles.title}>FEDEZD FEL A VILÁGOD.</Text>
       <Text style={styles.caption}>Öt régió. Feloldható ereklyék. A te történeted.</Text>
       <View style={styles.bottom}><Text style={styles.status}>{explored}/5 FELFEDEZVE</Text>

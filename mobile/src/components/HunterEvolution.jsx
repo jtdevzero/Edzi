@@ -4,13 +4,14 @@ import HunterPortrait from './HunterPortrait';
 import {useGame} from '../game/GameContext';
 import {colors,card} from '../theme';
 import {getClass} from '../game/characters';
+import {MythicIcon,Sigil,RARITY} from './MythicIcon';
 export default function HunterEvolution(){
   const {hunter,customizeHunter,state,progress}=useGame();
   return <View style={[card,styles.box]}>
     <Text style={styles.eyebrow}>HUNTER EVOLUTION / COSMETICS</Text>
     <View style={styles.preview}>
       <HunterPortrait size={146} accent={hunter.style.accent} classId={getClass(state.character.classId).id}/>
-      <View style={styles.info}><Text style={styles.big}>{hunter.style.emblem}</Text>
+      <View style={styles.info}><Sigil name="armor" size={61} rarity={progress.level>=16?'legendary':progress.level>=11?'epic':'rare'}/>
         <Text style={styles.name}>{hunter.style.name}</Text><Text style={styles.sub}>{hunter.title}</Text>
         <Text style={styles.muted}>LEVEL {progress.level} · {progress.bossWins} boss legyőzve</Text>
         {hunter.nextLevel&&<Text style={styles.muted}>Következő forma: {hunter.nextLevel}. szint</Text>}
@@ -20,13 +21,13 @@ export default function HunterEvolution(){
     <View style={styles.options}>{hunter.styles.map(opt=><Pressable key={opt.id}
       disabled={!opt.unlocked} onPress={()=>customizeHunter('style',opt.id)}
       style={[styles.option,hunter.style.id===opt.id&&styles.active,!opt.unlocked&&styles.locked]}>
-      <Text style={styles.emblem}>{opt.unlocked?opt.emblem:'🔒'}</Text>
+      <MythicIcon name={opt.unlocked?'armor':'locked'} size={30} color={opt.unlocked?colors.gold:colors.textMuted}/>
       <Text style={styles.optionText}>{opt.name}</Text><Text style={styles.req}>Lv.{opt.minLevel}</Text>
     </Pressable>)}</View>
     <Text style={styles.label}>BOSS-AURA</Text>
     <View style={styles.options}>{hunter.trails.map(opt=><Pressable key={opt.id} disabled={!opt.unlocked}
       onPress={()=>customizeHunter('trail',opt.id)} style={[styles.option,hunter.trail.id===opt.id&&styles.active,!opt.unlocked&&styles.locked]}>
-      <Text style={styles.emblem}>{opt.unlocked?'✧':'🔒'}</Text>
+      <MythicIcon name={opt.unlocked?'energy':'locked'} size={30} color={opt.unlocked?colors.cyan:colors.textMuted}/>
       <Text style={styles.optionText}>{opt.name}</Text>
       <Text style={styles.req}>{opt.minimumBosses} boss</Text>
     </Pressable>)}</View>

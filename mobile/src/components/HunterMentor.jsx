@@ -6,6 +6,7 @@ import {aiReady,requestGenerativeCoach} from '../cloud/ai';
 import {confirm,notify} from '../utils/notify';
 import {mentorBrief} from '../game/mentor';
 import {colors,card} from '../theme';
+import {MythicIcon} from './MythicIcon';
 export default function HunterMentor(){
   const {state,progress}=useGame();
   const {session}=useCloudSession();
@@ -21,7 +22,7 @@ export default function HunterMentor(){
   }
   const insight=mentorBrief(state,progress);
   return <View style={[card,styles.box]}>
-    <View style={styles.top}><Text style={styles.symbol}>✧</Text><View style={{flex:1,gap:5}}>
+    <View style={styles.top}><MythicIcon name="monk" size={47} color={colors.gold}/><View style={{flex:1,gap:5}}>
       <Text style={styles.eyebrow}>SENSEI / PRIVATE INTELLIGENCE</Text>
       <Text style={styles.heading}>{insight.title}</Text></View></View>
     <Text style={styles.body}>{insight.advice}</Text>
@@ -31,7 +32,7 @@ export default function HunterMentor(){
         {insight.training.weightKg!=null?` · ${insight.training.weightKg} kg`:''}</Text>
       <Text style={styles.body}>{insight.training.reason}</Text></View>}
     <Text style={styles.eyebrow}>MI ALAPJÁN?</Text>
-    {insight.explanation.map((line,i)=><Text key={i} style={styles.reason}>◈ {line}</Text>)}
+    {insight.explanation.map((line,i)=><View key={i} style={{flexDirection:'row',alignItems:'center',gap:7}}><MythicIcon name="quest" size={14} color={colors.cyan}/><Text style={[styles.reason,{flex:1}]}>{line}</Text></View>)}
     <Text style={styles.note}>A fenti mentor offline, szabályalapú és nem továbbít személyes adatot.</Text>
     {aiReady && <View style={styles.remote}>
       <Text style={styles.eyebrow}>ONLINE AI SENSEI / KÜLÖN BELEEGYEZÉS</Text>

@@ -1,14 +1,20 @@
 {
-  "name": "Edzi – Anime Fitness",
+  "name": "Edzi NIGHTFALL – Hunter Ascension",
   "short_name": "Edzi",
   "lang": "hu",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#060916",
-  "theme_color": "#060916",
+  "background_color": "#05080D",
+  "theme_color": "#05080D",
   "icons": [
+    {
+      "src": "icons/nightfall-sigil.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
@@ -26,5 +32,5 @@
       "purpose": "maskable"
     }
   ],
-  "description": "Edzi ASCENSION — prémium anime RPG és fitnesz fejlődéskövető."
+  "description": "Prémium anime RPG + fitnesz. Saját ikonok, karakterek, bossok és fejlődéskövetés."
 }

@@ -5,6 +5,7 @@ import {VISORS,HELMETS,portraitOptions} from '../game/characterCreator';
 import {worldProgress,selectWorldGear} from '../game/hunterWorld';
 import HunterPortrait from './HunterPortrait';
 import {colors,card} from '../theme';
+import {MythicIcon} from './MythicIcon';
 export default function HunterCreator(){
   const {state,progress,customizeCreator}=useGame();
   const gear=selectWorldGear(state.character,worldProgress(state,progress));
@@ -24,7 +25,7 @@ export default function HunterCreator(){
     <View style={styles.row}>{HELMETS.map(c=><Pressable key={c.id} onPress={()=>customizeCreator('helmet',c.id)}
       accessibilityRole="button" accessibilityState={{selected:creator.helmetStyle===c.id}}
       style={[styles.cell,creator.helmetStyle===c.id&&styles.selected]}>
-      <Text style={styles.icon}>{c.id==='royal'?'♛':c.id==='shadow'?'◈':'◇'}</Text>
+      <MythicIcon name={c.id==='royal'?'crown':c.id==='shadow'?'shadow':'shield'} size={26}/>
       <Text style={styles.name}>{c.name}</Text>
     </Pressable>)}</View>
     <Text style={styles.small}>A karaktered kinézete lokálisan mentődik. Valódi személyfotó feltöltése nélkül működik, offline is.</Text>
