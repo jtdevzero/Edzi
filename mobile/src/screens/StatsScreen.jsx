@@ -8,6 +8,7 @@ import { useGame } from '../game/GameContext';
 import { computeStats, computeExerciseRecords } from '../game/stats';
 import { formatClock } from '../game/session';
 import BodyTracker from '../components/BodyTracker';
+import PerformanceCenter from '../components/PerformanceCenter';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
 import { colors, card } from '../theme';
 
@@ -183,6 +184,8 @@ export default function StatsScreen() {
         <Record value={formatMinutes(records.totalMinutes)} label="Összesen" />
       </View>
 
+      <SectionHeading eyebrow="PERFORMANCE INTELLIGENCE" title="Teljesítményközpont" />
+      <PerformanceCenter />
       <SectionHeading eyebrow="BODY COMPOSITION" title="Testméretek és trendek"/>
       <BodyTracker />
       <SectionHeading eyebrow="PERSONAL RECORDS" title="Gyakorlatok"/>

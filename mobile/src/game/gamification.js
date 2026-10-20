@@ -2,6 +2,7 @@ import { getClass, evolutionStage } from './characters';
 import { QUEST_POOL } from './quests';
 import { programDayXP } from './programs';
 import { earnedWeeklyTrials } from './weeklyTrials';
+import { earnedBossRewards } from './bosses';
 
 export const ACTIVITY_TYPES = {
   workout: { label: 'Edzés', emoji: '💪', xpMultiplier: 1.5 },
@@ -163,6 +164,8 @@ export function computeProgress(state, today = dayKey()) {
   }
   const trialRewards = earnedWeeklyTrials(state, weekKey, dayKey);
   totalXP += trialRewards.xp;
+  const bossRewards=earnedBossRewards(state);
+  totalXP += bossRewards.xp;
   const thisWeek = weekKey(today);
   const weeklyGoal = weeklyGoalFor(state.settings, thisWeek);
   const thisWeekActiveDays = activeDaysByWeek[thisWeek]?.size ?? 0;
@@ -194,6 +197,8 @@ export function computeProgress(state, today = dayKey()) {
     weeksGoalMet,
     weeklyTrialsCompleted: trialRewards.completed,
     weeklyTrialXP: trialRewards.xp,
+    bossXP: bossRewards.xp,
+    bossWins: bossRewards.wins,
     xpById
   };
 }

@@ -8,6 +8,10 @@ import { computeExerciseRecords, newRecords } from './stats';
 import { sessionMinutes } from './session';
 import { parseMeasurement } from './body';
 import { trialsForWeek } from './weeklyTrials';
+import { hunterEvolution, validAppearanceChoice } from './evolution';
+import { bossCampaigns } from './bosses';
+import { cleanTrainingPlan } from './fitnessPro';
+import { validateRecovery } from './performance';
 
 const SESSION_KEY = 'animefitness:session';
 
@@ -22,15 +26,16 @@ export function GameProvider({ children }) {
   const [today, setToday] = useState(dayKey());
   const [session, setSession] = useState(undefined);
   const [storageWarning, setStorageWarning] = useState(false);
+  const [storageBlocked,setStorageBlocked]=useState(false);
 
   useEffect(() => {
-    loadState().then(setState);
+    loadState().then(setState).catch(()=>{setStorageBlocked(true);setStorageWarning(true);setState(INITIAL_STATE);});
     loadJSON(SESSION_KEY).then(setSession);
   }, []);
 
   useEffect(() => {
-    if (state) saveState(state).then(ok=>{if(!ok)setStorageWarning(true);});
-  }, [state]);
+    if (state && !storageBlocked) saveState(state).then(ok=>setStorageWarning(!ok));
+  }, [state, storageBlocked]);
 
   useEffect(() => {
     if (session !== undefined) saveJSON(SESSION_KEY, session);
@@ -51,6 +56,8 @@ export function GameProvider({ children }) {
     const quests = questsForDay(today).map((q) => ({ ...q, completed: completedToday.has(q.id) }));
     const programStatus = programRunStatus(state, today);
     const weeklyTrials = trialsForWeek(state, weekKey(today), weekKey, dayKey);
+    const bosses = bossCampaigns(state, today);
+    const hunter = hunterEvolution(state.character, progress, progress.bossWins);
 
     function commit(nextState) {
       const after = computeProgress(nextState, today);
@@ -97,11 +104,30 @@ export function GameProvider({ children }) {
     return {
       state,
       storageWarning,
+      storageBlocked,
       progress,
       achievements,
       quests,
       programStatus,
       weeklyTrials,
+      bosses,
+      hunter,
+      setAppMode(mode) {
+        if (!['hunter','performance'].includes(mode)) return;
+        setState(s=>({ ...s, preferences:{...s.preferences,appMode:mode} }));
+      },
+      customizeHunter(type,id) {
+        if (!validAppearanceChoice(type,id,hunter)) return;
+        setState(s=>({ ...s,character:{...s.character,appearance:{...(s.character.appearance||{}),[type==='style'?'styleId':'trailId']:id}}}));
+      },
+      setTrainingPlan(input) {
+        const plan=cleanTrainingPlan(input);
+        setState(s=>({...s,trainingPlan:plan}));
+      },
+      addRecoveryCheckin(readiness,note='') {
+        const entry=validateRecovery(readiness,note);
+        setState(s=>({...s,recoveryEntries:[...s.recoveryEntries,{...entry,id:newId(),date:new Date().toISOString()}]}));
+      },
       createCharacter(name, classId) {
         setState((s) => ({ ...s, character: { name, classId, createdAt: new Date().toISOString() } }));
       },
@@ -206,14 +232,18 @@ export function GameProvider({ children }) {
         setState((s) => ({ ...s, lastBackupAt: new Date().toISOString() }));
       },
       importState(imported) {
+        setStorageBlocked(false);
+        setStorageWarning(false);
         setSession(null);
         setState({ ...imported, lastBackupAt: new Date().toISOString() });
       },
       resetAll() {
+        setStorageBlocked(false);
+        setStorageWarning(false);
         setState(INITIAL_STATE);
       }
     };
-  }, [state, today, session, storageWarning]);
+  }, [state, today, session, storageWarning, storageBlocked]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

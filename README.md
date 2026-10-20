@@ -68,3 +68,27 @@ Push a `main` branchre → a GitHub Action buildel és kiteszi a `gh-pages` bran
 `npm ci && npm test && npm run build:web && npx expo-doctor@latest`
 CI-ben: 390×844-es mobilméretű Chromium, karakterlétrehozás, mérés és visszaolvasás, súlyzós edzés, offline újratöltés.
 Natív iOS/Android és tényleges Safari-készülékteszt továbbra is külön szükséges. A még nyitott magas/közepes függőségi jelzéseket a #2 issue követi.
+
+
+## Edzi 3.0 – EVOLUTION (2026. október)
+
+A korábbi helyi, offline adatbázis v2→v3 migrációval bővül. Megmaradnak a meglévő naplók, testmérések, XP és karakterek.
+
+**Hunter Evolution:** 5 szintalapú karakterforma, bossgyőzelmekkel nyitható aurák; csak vizuális jutalmak, személyre szabható karakterlapon.
+
+**Fitness Pro 2.0:** szerkeszthető heti edzésterv, RPE (1–10), RIR (0–10), bemelegítő sorozatok, volumen és becsült 1RM legfeljebb 12 ismétlésből. A súlyjavaslat visszafogott; nem helyettesíti a megfelelő technikát, bemelegítést és pihenést.
+
+**Bossok:** minden héten három objektív kihívás: két edzésnap, 90 edzésperc, 15 naplózott erősítő sorozat. Jutalmak a valódi naplókból számolódnak, törlésre visszavonhatók. A korábban rögzített aktivitások után is járhat visszamenőleges XP.
+
+**Performance Intelligence:** előző és aktuális héthez viszonyított terhelés, gyakorlatvolumen, időkövetés, szubjektív 1–5 regenerációs check-in. Két megjelenítési mód: Hunter és Performance.
+
+**Cloud Vault (opcionális):** kézi felhőfeltöltés és visszaállítás Supabase email OTP + RLS alapján. *Alapértelmezetten nincs konfigurálva és nincs automatikus szinkron.* A működéshez külső Supabase projekt, a `supabase/edzi_snapshots.sql` RLS szabályainak telepítése és éles hozzáférési/kockázati tesztelés kell. A Supabase szolgáltató látja a tárolt adatokat, nincs végpontok közötti titkosítás; ne használj service-role kulcsot a kliensben. A titkos adatokat soha ne tedd fel a nyilvános repóba.
+
+**Mentésvédelem:** a sérült helyi adattároló automatikus üres felülírása blokkolt; mentés visszaállítása vagy kifejezetten megerősített újrakezdés választható.
+
+### Nem lezárt munkák
+- Supabase Cloud Vault éles integrációs teszt tényleges, felhasználónként elkülönített fiókokkal; élő fiókot csak adatvédelmi ellenőrzés után kapcsolj be.
+- Fizikai iPhone/Safari és Android, valamint EAS natív buildek ellenőrzése.
+- Korábban azonosított npm audit figyelmeztetések részletes triage (#2).
+
+CI: `cd mobile && npm ci && npm test && npm run build:web && npx expo-doctor@latest` + Chromium mobil smoke, offline reload és 320px viewport.

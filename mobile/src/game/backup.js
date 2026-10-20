@@ -21,7 +21,10 @@ export function parseBackup(text) {
   const validSet = (v) =>
     validNumber(v, 0, 100000) ||
     (v && typeof v === 'object' && validNumber(v.reps, 0, 100000) &&
-      validNumber(v.weightKg ?? 0, 0, 1500));
+      validNumber(v.weightKg ?? 0, 0, 1500) &&
+      (v.rpe === undefined || v.rpe === null || validNumber(v.rpe, 1, 10)) &&
+      (v.rir === undefined || v.rir === null || (Number.isInteger(v.rir) && v.rir>=0 && v.rir<=10)) &&
+      (v.warmup === undefined || typeof v.warmup === 'boolean'));
   const validExercises = (a) => a.exercises === undefined ||
     (Array.isArray(a.exercises) && a.exercises.every((e) =>
       e && typeof e.name === 'string' && ['reps', 'sec'].includes(e.unit) &&
@@ -43,6 +46,18 @@ export function parseBackup(text) {
         validNumber(m.weightKg, 20, 600) &&
         ['waistCm', 'chestCm', 'hipsCm', 'armCm', 'thighCm'].every((field) =>
           m[field] == null || validNumber(m[field], 10, 400))))) &&
+    (s.recoveryEntries === undefined || (Array.isArray(s.recoveryEntries) &&
+      s.recoveryEntries.every(x=>x && typeof x.id==='string' && validDate(x.date) &&
+        Number.isInteger(x.readiness) && x.readiness>=1 && x.readiness<=5 &&
+        (x.note===undefined || typeof x.note==='string')))) &&
+    (s.trainingPlan === undefined || s.trainingPlan === null || (s.trainingPlan &&
+      typeof s.trainingPlan==='object' && !Array.isArray(s.trainingPlan) &&
+      typeof s.trainingPlan.title==='string' && Array.isArray(s.trainingPlan.days) &&
+      s.trainingPlan.days.length<=7 && s.trainingPlan.days.every(d=>d && Number.isInteger(d.weekday) &&
+        d.weekday>=0 && d.weekday<=6 && typeof d.title==='string' && Array.isArray(d.exercises) &&
+        d.exercises.length<=10 && d.exercises.every(e=>typeof e==='string')))) &&
+    (s.preferences===undefined || (s.preferences && typeof s.preferences==='object' &&
+      ['hunter','performance'].includes(s.preferences.appMode||'hunter'))) &&
     (s.settings === undefined || (s.settings && typeof s.settings === 'object' &&
       (s.settings.weeklyGoals === undefined || (Array.isArray(s.settings.weeklyGoals) &&
         s.settings.weeklyGoals.every((g) => g && typeof g.from === 'string' &&

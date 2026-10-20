@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
+import BossBoard from '../components/BossBoard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '../game/GameContext';
 import { CATEGORY_LABELS } from '../game/quests';
@@ -119,6 +120,8 @@ export default function QuestsScreen() {
         <ProgramPicker onStart={start} />
       )}
 
+      <SectionHeading eyebrow="WEEKLY RAID" title="Boss-aréna" />
+      <BossBoard />
       <SectionHeading eyebrow="ELITE OPERATIONS" title="Heti hőspróbák"/>
       <Text style={styles.muted}>A hőspróbák valós naplózott aktivitással teljesülnek. Törléskor a kapcsolódó XP is levonódik.</Text>
       <View style={styles.gap}>

@@ -8,6 +8,8 @@ import SectionHeading from '../components/SectionHeading';
 import {useGame} from '../game/GameContext';
 import {ACTIVITY_TYPES,WEEKLY_GOAL_BONUS} from '../game/gamification';
 import {colors,card} from '../theme';
+import AppModeSwitcher from '../components/AppModeSwitcher';
+import PerformanceCenter from '../components/PerformanceCenter';
 
 function Ring({value,total}){
   const radius=32,c=2*Math.PI*radius;
@@ -48,7 +50,8 @@ export default function DashboardScreen({navigation}){
       <Text style={styles.warningTitle}>◇ VÉDD MEG A FEJLŐDÉSEDET</Text>
       <Text style={styles.warningText}>Helyi adatok · Biztonsági mentés készítése ↗</Text>
     </Pressable>}
-    <CharacterCard character={state.character} progress={progress}/>
+    <AppModeSwitcher />
+    {state.preferences?.appMode==='performance' ? <PerformanceCenter /> : <CharacterCard character={state.character} progress={progress}/>}
     <View style={styles.report}>
       <Text style={styles.reportEyebrow}>FIELD REPORT <Text style={{color:colors.textMuted}}> /  LIFETIME</Text></Text>
       <View style={styles.statRow}>
