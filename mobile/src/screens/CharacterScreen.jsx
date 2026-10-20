@@ -3,6 +3,8 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
 import PwaInstall from '../components/PwaInstall';
+import HunterEvolution from '../components/HunterEvolution';
+import AppModeSwitcher from '../components/AppModeSwitcher';
 import CharacterCard from '../components/CharacterCard';
 import StatsRadar from '../components/StatsRadar';
 import { useGame } from '../game/GameContext';
@@ -47,7 +49,10 @@ export default function CharacterScreen() {
 
   return (
     <Screen title="Karakter" subtitle="A történeted a szintjeidben él tovább." eyebrow="CLASSIFIED · HUNTER DOSSIER">
+      <AppModeSwitcher />
       <CharacterCard character={state.character} progress={progress} />
+      <SectionHeading eyebrow="UNLOCKED STYLES" title="Hunter Evolution" />
+      <HunterEvolution />
 
       <SectionHeading eyebrow="HUNTER ATTRIBUTES" title="Tulajdonságok" />
       <View style={[card, styles.radarPanel]}>

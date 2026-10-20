@@ -10,6 +10,7 @@ import { beep, keepScreenAwake, unlockAudio } from '../utils/device';
 import { confirm } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
+import { validateDetailedSet } from '../game/fitnessPro';
 
 function useTicker(active) {
   const [now, setNow] = useState(Date.now());
@@ -32,6 +33,9 @@ export default function WorkoutSessionScreen() {
   const now = useTicker(true);
   const [counter, setCounter] = useState(0);
   const [weightInput, setWeightInput] = useState('');
+  const [rpeInput,setRpeInput]=useState('');
+  const [rirInput,setRirInput]=useState('');
+  const [warmup,setWarmup]=useState(false);
   const [exerciseSearch, setExerciseSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [finishing, setFinishing] = useState(false);
@@ -49,6 +53,9 @@ export default function WorkoutSessionScreen() {
     setCounter(ex?.target ?? setValue(ex?.sets.at(-1)) ?? 0);
     const prior = ex?.sets.at(-1);
     setWeightInput(prior && typeof prior === 'object' ? String(prior.weightKg ?? '') : '');
+    setRpeInput(prior && typeof prior === 'object' && prior.rpe!=null ? String(prior.rpe) : '');
+    setRirInput(prior && typeof prior === 'object' && prior.rir!=null ? String(prior.rir) : '');
+    setWarmup(false);
   }, [session.current]);
 
   useEffect(() => {
@@ -85,7 +92,11 @@ export default function WorkoutSessionScreen() {
     unlockAudio();
     const kg = Number(weightInput.replace(',', '.'));
     if (ex.weighted && (weightInput.trim() === '' || !Number.isFinite(kg) || kg < 0 || kg > 1500)) return;
-    const entry = ex.weighted ? { reps: counter, weightKg: Math.round(kg * 10) / 10 } : counter;
+    let entry = counter;
+    if(ex.weighted){
+      try {entry=validateDetailedSet({reps:counter,weightKg:kg,rpe:rpeInput,rir:rirInput,warmup});}
+      catch {return;}
+    }
     updateSession((s) => ({ ...addSet(s, s.current, entry), restEndsAt: Date.now() + s.restSeconds * 1000 }));
   }
 
@@ -243,6 +254,19 @@ export default function WorkoutSessionScreen() {
                       style={styles.weightStep}><Text style={styles.weightStepText}>＋</Text></Pressable>
                   </View>
                 )}
+                {ex.weighted && <View style={styles.effortBox}>
+                  <Text style={styles.muted}>Terhelésérzet · opcionális</Text>
+                  <View style={styles.effortRow}>
+                    <TextInput style={styles.effortInput} keyboardType="decimal-pad" placeholder="RPE 1–10"
+                      placeholderTextColor={colors.textMuted} value={rpeInput} onChangeText={setRpeInput}/>
+                    <TextInput style={styles.effortInput} keyboardType="number-pad" placeholder="RIR 0–10"
+                      placeholderTextColor={colors.textMuted} value={rirInput} onChangeText={setRirInput}/>
+                  </View>
+                  <Pressable onPress={()=>setWarmup(v=>!v)} style={styles.warmupBtn}
+                    accessibilityRole="checkbox" accessibilityState={{checked:warmup}}>
+                    <Text style={styles.warmupText}>{warmup?'☑':'□'} Bemelegítő sorozat</Text>
+                  </Pressable>
+                </View>}
                 <Pressable disabled={counter <= 0 || (ex.weighted && (weightInput.trim() === '' || !Number.isFinite(Number(weightInput.replace(',', '.')))))} onPress={completeRepSet} style={[styles.primary, counter <= 0 && styles.disabled]}>
                   <Text style={styles.primaryText}>✓ Sorozat kész ({counter})</Text>
                 </Pressable>
@@ -342,6 +366,11 @@ export default function WorkoutSessionScreen() {
 }
 
 const styles = StyleSheet.create({
+  effortBox:{gap:9,padding:12,borderRadius:12,backgroundColor:colors.surface},
+  effortRow:{flexDirection:'row',gap:9},
+  effortInput:{flex:1,paddingHorizontal:11,minHeight:44,borderRadius:10,backgroundColor:colors.input,color:colors.text},
+  warmupBtn:{minHeight:40,justifyContent:'center'},
+  warmupText:{color:colors.gold,fontSize:12,fontWeight:'800'},
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1 },
   gap: { gap: 10 },
