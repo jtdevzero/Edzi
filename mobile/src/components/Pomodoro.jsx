@@ -7,6 +7,7 @@ import { beep, keepScreenAwake, unlockAudio } from '../utils/device';
 import { confirm } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
+import {MythicIcon} from './MythicIcon';
 
 const KEY = 'animefitness:pomodoro';
 
@@ -67,7 +68,7 @@ export default function Pomodoro({ onLogged }) {
 
   return (
     <View style={[card, styles.gap, run && (status.phase === 'focus' ? styles.focusCard : styles.breakCard)]}>
-      <Text style={styles.title}>🍅 Pomodoro</Text>
+      <View style={{flexDirection:'row',alignItems:'center',gap:9}}><MythicIcon name="time" size={24}/><Text style={styles.title}>Pomodoro</Text></View>
       {!run ? (
         <>
           <Text style={styles.muted}>{POMODORO.focus} perc fókusz, {POMODORO.break} perc szünet, ismétlés. A végén automatikusan naplózza a tanulást.</Text>

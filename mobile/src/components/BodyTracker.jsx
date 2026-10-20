@@ -5,6 +5,7 @@ import { useGame } from '../game/GameContext';
 import { BODY_FIELDS, bodySummary } from '../game/body';
 import { confirm, notify } from '../utils/notify';
 import { card, colors } from '../theme';
+import {MythicIcon} from './MythicIcon';
 
 const INITIAL = { weightKg: '', waistCm: '', chestCm: '', hipsCm: '', armCm: '', thighCm: '' };
 function WeightChart({ history }) {
@@ -55,7 +56,7 @@ export default function BodyTracker() {
   return (
     <View style={[card, styles.gap]}>
       <Text style={styles.eyebrow}>YOUR BODY / YOUR BASELINE</Text>
-      <Text style={styles.title}>⚖️ Testösszetétel és mérések</Text>
+      <View style={{flexDirection:'row',alignItems:'center',gap:9}}><MythicIcon name="stats" size={24}/><Text style={styles.title}>Testösszetétel és mérések</Text></View>
       <Text style={styles.muted}>Testsúly, körfogatok és időbeli változás. A mérések nem minősülnek egészségügyi értékelésnek.</Text>
       {summary.latest ? (
         <View style={styles.metricRow}>

@@ -2,15 +2,16 @@ import React from 'react';
 import {View,Text,Pressable,StyleSheet} from 'react-native';
 import {useGame} from '../game/GameContext';
 import {colors} from '../theme';
+import {MythicIcon} from './MythicIcon';
 export default function AppModeSwitcher(){
   const {state,setAppMode}=useGame();
   const active=state.preferences?.appMode||'hunter';
   return <View style={styles.bar}>
     <Text style={styles.caption}>VIEW</Text>
-    {[['hunter','⚔ Hunter Mode'],['performance','◈ Performance']].map(([id,label])=>
+    {[['hunter','Hunter Mode'],['performance','Performance']].map(([id,label])=>
       <Pressable key={id} accessibilityRole="button" accessibilityState={{selected:active===id}}
         onPress={()=>setAppMode(id)} style={[styles.option,active===id&&styles.selected]}>
-        <Text style={[styles.label,active===id&&styles.activeText]}>{label}</Text>
+        <View style={{flexDirection:'row',alignItems:'center',gap:6}}><MythicIcon name={id==='hunter'?'shield':'stats'} size={18} color={active===id?colors.gold:colors.textMuted}/><Text style={[styles.label,active===id&&styles.activeText]}>{label}</Text></View>
       </Pressable>)}
   </View>;
 }
