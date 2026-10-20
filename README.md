@@ -124,3 +124,17 @@ Az Edzi 4.0 tartalmaz opcionális, Supabase RLS-sel védett valódi céhes bejel
 - Nincs külső képbetöltés vagy licencfüggő vizuális elem; az illusztrációk helyben renderelt vektorok.
 - Frissített PWA-cache név; a régi tartalom helyett új buildre kényszerítő service worker aktiválás.
 - Vizuális ellenőrzés: GitHub CI Chromium 390px + 320px képernyőméretek, screenshot artefakt `nightfall-dashboard.png`. A fizikai iOS Safari teszt külön szükséges.
+
+## EDZI MYTHIC — prémium vizuális csomag
+
+A NIGHTFALL felület teljes illusztrált art-pass kiadása, v4 adatmodell változtatása nélkül:
+- A teljesen saját, offline `MythicIcon` SVG emblémarendszer kiváltja a platformonként eltérő emojikat az onboardingban, főoldalon, statisztikákban, karakterlapon, fitnesznaplóban, guild/küldetés felületeken, rangokon és a jutalom-overlayben.
+- Öt egyedi, illusztrált karakterosztály-kártya, három fejezetre bontott, cinematic, de gyorsan használható onboarding. A kezdő karakteradatok és osztályazonosítók változatlanok.
+- Három saját vektoros boss-sziluett, fenyegetéskártya, feloldás előrehaladása; öt különböző világrégió eredeti környezetillusztrációval.
+- Rangfüggő D→S páncél-, fény-, aura- és háttérevolúció a központi `HunterPortrait` komponensben; a rendszer kizárólag a meglévő szintet használja.
+- Common / Rare / Epic / Legendary / Mythic ritkasági paletta és ritkasági jelvények. Az effektusok nem módosítják az XP-t, a játéklogikát vagy az adatbázist.
+- Jutalomkártya emblematikus XP-visszajelzéssel, fejlesztett fejléc és újjáhangolt navigáció; a mozgáscsökkentési operációsrendszer-beállítást az XP-sáv figyelembe veszi.
+- Új `nightfall-sigil.svg` logó és PWA-manifeszt, HTML témaszín és v6 offline cache.
+- CI-képernyőképek: mythic-onboarding, mythic-dashboard, mythic-character, mythic-bosses-world a GitHub Actions artifactban, valamint Chromium 390px/320px funkcionális, offline és recovery smoke tesztek.
+
+**Korlátok:** Az iOS régebbi ikon gyorsítótárazása miatt a kezdőképernyőhöz adott ikon frissítése az alkalmazás újratelepítését igényelheti; az alkalmazás **helyi adatait ne töröld mentés nélkül**. Fizikai Safari/iOS, Android és natív EAS build vizsgálata külön szükséges. A Cloud Vault/AI/Guild szerveres funkciói továbbra is inaktívak, és az ismert függőségi figyelmeztetések is külön feladatot képeznek.
