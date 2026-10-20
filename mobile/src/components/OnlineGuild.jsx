@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import {View,Text,TextInput,Pressable,StyleSheet} from 'react-native';
 import {useCloudSession} from '../cloud/session';
 import {cloudEnabled} from '../cloud/supabase';
-import {createOnlineGuild,joinOnlineGuild,fetchOnlineGuild,uploadGuildContribution,leaveOnlineGuild} from '../cloud/guild';
+import {createOnlineGuild,joinOnlineGuild,fetchOnlineGuild,uploadGuildContribution,leaveOnlineGuild,onlineGuildReady} from '../cloud/guild';
 import {useGame} from '../game/GameContext';
 import {guildRaidProgress} from '../game/guild';
 import {confirm} from '../utils/notify';
@@ -12,7 +12,7 @@ export default function OnlineGuild(){
   const {state}=useGame();
   const [name,setName]=useState(''),[nickname,setNickname]=useState(''),[code,setCode]=useState('');
   const [snapshot,setSnapshot]=useState(null),[loading,setLoading]=useState(false),[message,setMessage]=useState('');
-  if(!cloudEnabled)return null;
+  if(!onlineGuildReady)return null;
   async function act(fn){
     if(loading)return;
     setLoading(true);try{await fn();}catch(e){setMessage(e.message)}finally{setLoading(false)}
