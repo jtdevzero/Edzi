@@ -145,3 +145,5 @@ A NIGHTFALL felület teljes illusztrált art-pass kiadása, v4 adatmodell válto
 - Nem függ a hálózattól: a kép lokális build asset. A karakter, XP, helyi mentés és régiók számítása változatlan.
 - Weben Chromium smoke ellenőrzi az eredeti kép tényleges betöltését az onboardingban és főoldalon. PWA service worker cache új neve `edzi-cinematic-v7`, eltávolítja a régebbi edzi cache-verziókat.
 - Marketing plakát nem képernyőgrafika; nem hamisított UI-szöveget használunk navigációként, hanem valós komponensek mögötti képrészletet.
+
+- Második, különálló AI-generált grafika: `mobile/assets/art/world-citadel.jpg`, amely ténylegesen megjelenik a Hunter World főoldali és térképes jeleneteiben. A böngészős füstteszt külön ellenőrzi mindkét lokális képes elemet.

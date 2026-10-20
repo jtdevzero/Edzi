@@ -39,6 +39,7 @@ const fs = require('node:fs');
     await page.getByText('A küldetésed.', {exact:true}).first().waitFor();
     await page.getByText('FEDEZD FEL A VILÁGOD.').first().waitFor();
     assert.ok(await page.getByTestId('cinematic-campaign-art').count()>0,'Generated hero illustration must be rendered');
+    assert.ok(await page.getByTestId('cinematic-world-art').count()>0,'Generated citadel illustration must be rendered');
     await page.getByText('PRIVATE / OFFLINE').first().waitFor();
     console.log('SMOKE: NIGHTFALL hero, expedition teaser and private-mode header');
 
