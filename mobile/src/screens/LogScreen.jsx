@@ -66,7 +66,7 @@ export default function LogScreen({ navigation }) {
   }
 
   return (
-    <Screen title="Naplózás" subtitle="Egy mozdulattal indul a következő menet." eyebrow="THE TRAINING GROUND">
+    <Screen title="Az aréna." subtitle="A következő sorozatod itt kezdődik." eyebrow="TRAINING LAB / PERFORMANCE MODE">
       <View style={styles.tabs}>
         {Object.entries(ACTIVITY_TYPES).map(([key, t]) => (
           <Pressable key={key} onPress={() => { setType(key); setForm(EMPTY_FORM); }} style={[styles.tab, type === key && styles.tabActive]}>
@@ -76,9 +76,9 @@ export default function LogScreen({ navigation }) {
       </View>
 
       {type === 'workout' && (
-        <LinearGradient colors={['#322D59','#171E32','#0E1421']} style={styles.trainingHero}>
-          <Text style={styles.trainingLabel}>TRAINING MODE  /  READY</Text>
-          <Text style={styles.trainingTitle}>IDEJE ERŐSEBBÉ VÁLNI.</Text>
+        <LinearGradient colors={['#35534E','#182D33','#0D1921']} style={styles.trainingHero}>
+          <Text style={styles.trainingLabel}>◈  TRAINING SYSTEM / READY FOR DEPLOYMENT</Text>
+          <Text style={styles.trainingTitle}>A VALÓDI ERŐT\nTE ÉPÍTED.</Text>
           <Text style={styles.trainingCopy}>Indíts edzést, vezess minden sorozatot, és gyűjts valódi XP-t.</Text>
           <Pressable onPress={() => startWorkout(null)} style={styles.sessionBtn}>
             <Text style={styles.sessionText}>▶ Üres edzés indítása</Text>

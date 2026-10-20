@@ -18,7 +18,7 @@ export default function XPBar({ xp, xpToNextLevel, level }) {
       </View>
       <View style={styles.track}>
         <Animated.View style={[styles.fill, { width }]}>
-          <LinearGradient colors={[colors.primary, '#B377FF', colors.cyan]}
+          <LinearGradient colors={[colors.gold, '#DEAC6B', colors.cyan]}
             start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
         </Animated.View>
       </View>

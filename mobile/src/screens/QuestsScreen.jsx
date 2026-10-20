@@ -96,8 +96,8 @@ export default function QuestsScreen() {
   }
 
   return (
-    <Screen title="Questek" subtitle="Napi küldetések, heti hőspróbák és legendás kihívások." eyebrow="HUNTER'S GUILD">
-      <LinearGradient colors={['#292B49','#101522','#070D19']} style={styles.missionHero}>
+    <Screen title="A birodalmak." subtitle="Küldetések, területek és összecsapások." eyebrow="WORLD DIRECTORY / CHAPTER IV">
+      <LinearGradient colors={['#34463A','#19332F','#0B181D']} style={styles.missionHero}>
         <Text style={styles.missionEyebrow}>✦  QUEST BOARD / LIVE</Text>
         <Text style={styles.missionHeroTitle}>{quests.filter(q=>q.completed).length}<Text style={styles.missionHeroSlash}> / {quests.length}</Text></Text>
         <Text style={styles.missionHeroUnit}>MAI KÜLDETÉS TELJESÍTVE</Text>
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   eliteTrialDone:{borderColor:'#477564',backgroundColor:'#122720'},
   trialEyebrow:{color:colors.gold,fontWeight:'900',fontSize:10,letterSpacing:1.7},
   trialCount:{color:colors.textMuted,fontSize:11,letterSpacing:1.1,fontWeight:'900'},
-  missionHero: { borderWidth: 1, borderColor: '#68647C', borderRadius: 27, padding: 24, gap: 9, minHeight:177 },
+  missionHero: { borderWidth: 1, borderColor: '#73816A', borderRadius: 27, padding: 24, gap: 9, minHeight:177 },
   missionEyebrow: { color: colors.gold, fontSize: 10, fontWeight: '900', letterSpacing: 2 },
   missionHeroTitle: { color: colors.text, fontSize: 64, fontWeight: '900', letterSpacing: -2, lineHeight: 67 },
   missionHeroUnit: { color: colors.gold, fontSize: 11, letterSpacing: 1.6, fontWeight: '900' },
