@@ -24,3 +24,20 @@ export function localGuildChallenges(state,today=dayKey()) {
   };
   return GUILD_TARGETS.map(q=>({...q,current:Math.min(q.target,metrics[q.kind]),complete:metrics[q.kind]>=q.target}));
 }
+
+export const GUILD_RAIDS = [
+  {id:'gate',title:'A Titánkapu ostroma',target:540,kind:'minutes',icon:'♜'},
+  {id:'rally',title:'Kilencnapos hadjárat',target:9,kind:'days',icon:'⚔'},
+  {id:'oracle',title:'Az Orákulum rejtélye',target:180,kind:'focus',icon:'✦'}
+];
+export function guildRaidProgress(scores=[]){
+  const totals={days:0,minutes:0,focus:0};
+  for(const score of scores){
+    for(const kind of Object.keys(totals)){
+      const value=score?.[kind];
+      if(Number.isInteger(value)&&value>=0&&value<=10080)totals[kind]+=value;
+    }
+  }
+  return GUILD_RAIDS.map(raid=>({...raid,current:Math.min(raid.target,totals[raid.kind]),
+    complete:totals[raid.kind]>=raid.target}));
+}

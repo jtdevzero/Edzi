@@ -12,7 +12,7 @@ import {performanceOverview,validateRecovery} from '../src/game/performance';
 import {worldProgress,worldUnlockedGear,selectWorldGear} from '../src/game/hunterWorld';
 import {smartLoadAdvice,groupSuperset,workoutWeekSummary} from '../src/game/smartTraining';
 import {mentorBrief} from '../src/game/mentor';
-import {sanitizeGuild,localGuildChallenges} from '../src/game/guild';
+import {sanitizeGuild,localGuildChallenges,guildRaidProgress} from '../src/game/guild';
 import {safeCreatorChoice,portraitOptions} from '../src/game/characterCreator';
 import {minimalAIPayload} from '../src/cloud/ai';
 import {minimalGuildStats} from '../src/cloud/guild';
@@ -353,6 +353,8 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(insight.explanation.length,3);
   assert.equal(sanitizeGuild({name:'  Hunters  ',members:['Anna','Béla']} ).name,'Hunters');
   assert.equal(sanitizeGuild({name:' '}),null);
+  assert.deepEqual(guildRaidProgress([{days:4,minutes:300,focus:100},
+    {days:5,minutes:250,focus:90}]).map(x=>x.complete),[true,true,true]);
   assert.equal(localGuildChallenges(log,'2026-10-21')[0].complete,true);
   const shared=minimalGuildStats(log,'2026-10-21');
   assert.deepEqual(shared,{week:'2026-10-19',days:3,minutes:90,focus:0});

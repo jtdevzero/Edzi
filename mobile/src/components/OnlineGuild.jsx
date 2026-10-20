@@ -4,6 +4,7 @@ import {useCloudSession} from '../cloud/session';
 import {cloudEnabled} from '../cloud/supabase';
 import {createOnlineGuild,joinOnlineGuild,fetchOnlineGuild,uploadGuildContribution,leaveOnlineGuild} from '../cloud/guild';
 import {useGame} from '../game/GameContext';
+import {guildRaidProgress} from '../game/guild';
 import {confirm} from '../utils/notify';
 import {colors,card} from '../theme';
 export default function OnlineGuild(){
@@ -32,6 +33,13 @@ export default function OnlineGuild(){
           <Text style={styles.note}>{score?`${score.days} nap · ${score.minutes} perc · ${score.focus} fókuszperc`:'Nincs beküldött eredmény'}</Text>
         </View>;
       })}
+      <Text style={styles.tag}>COOPERATIVE RAID / SELF REPORTED</Text>
+      {guildRaidProgress(snapshot.scores).map(raid=><View key={raid.id} style={styles.raid}>
+        <View style={styles.raidHead}><Text style={styles.raidName}>{raid.icon} {raid.title}</Text>
+          <Text style={styles.raidCount}>{raid.current}/{raid.target}</Text></View>
+        <View style={styles.raidTrack}><View style={[styles.raidFill,{width:`${100*raid.current/raid.target}%`,
+          backgroundColor:raid.complete?colors.green:colors.gold}]}/></View>
+      </View>)}
       <Pressable style={styles.primary} onPress={()=>confirm('Heti összesítők megosztása',
         'Elküldjük a heti edzésnapjaid számát, edzés- és fókuszperceidet. A többi céhtag ezeket látni fogja. Küldhetjük?',
         ()=>act(async()=>{await uploadGuildContribution(session,snapshot.guild.id,state);
@@ -62,6 +70,12 @@ export default function OnlineGuild(){
   </View>;
 }
 const styles=StyleSheet.create({
+  raid:{gap:7,backgroundColor:'#21253A',padding:12,borderRadius:13},
+  raidHead:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:8},
+  raidName:{color:colors.text,fontSize:12,fontWeight:'900',flex:1},
+  raidCount:{color:colors.gold,fontSize:11,fontWeight:'900'},
+  raidTrack:{height:7,backgroundColor:colors.track,borderRadius:7,overflow:'hidden'},
+  raidFill:{height:'100%',borderRadius:7},
   root:{gap:13,borderColor:'#69607D'},
   tag:{color:colors.gold,fontSize:10,fontWeight:'900',letterSpacing:1.2},
   title:{color:colors.text,fontSize:19,fontWeight:'900'},

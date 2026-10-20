@@ -88,6 +88,9 @@ begin
   if exists(select 1 from public.edzi_guild_members where user_id=v_user)
      then raise exception 'Már egy céh tagja vagy.'; end if;
   select id into v_id from public.edzi_guilds where invite_code=lower(trim(p_code));
+  if v_id is not null and
+    (select count(*) from public.edzi_guild_members where guild_id=v_id)>=6
+    then raise exception 'A céh megtelt (maximum 6 tag).'; end if;
   if v_id is null then raise exception 'Hibás meghívókód.'; end if;
   insert into public.edzi_guild_members(guild_id,user_id,nickname)
     values(v_id,v_user,trim(p_nickname));
