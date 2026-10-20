@@ -1,5 +1,4 @@
 import { normalizeState } from './store';
-import { cleanTrainingPlan } from './fitnessPro';
 import { dayKey } from './gamification';
 
 const BACKUP_APP = 'edzi';

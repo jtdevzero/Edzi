@@ -5,6 +5,10 @@ import { INITIAL_STATE, normalizeState } from '../src/game/store';
 import { parseMeasurement, bodySummary } from '../src/game/body';
 import { setValue, setWeightKg, formatSet } from '../src/game/session';
 import { rewardPresentation } from '../src/game/rewardPresentation';
+import { hunterEvolution, validAppearanceChoice } from '../src/game/evolution';
+import { DEFAULT_TRAINING_PLAN,cleanTrainingPlan,trainingToday,validateDetailedSet,estimatedOneRepMax,exerciseInsights,nextLoadSuggestion } from '../src/game/fitnessPro';
+import { bossCampaigns,earnedBossRewards } from '../src/game/bosses';
+import {performanceOverview,validateRecovery} from '../src/game/performance';
 import { trialsForWeek, earnedWeeklyTrials } from '../src/game/weeklyTrials';
 import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
@@ -92,7 +96,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(stats.heatmap[11][1].future, true);
   assert.equal(stats.heatmap[10][1].level, 2, '30 min on 2026-10-13');
   assert.equal(stats.weeklyXP.length, 8);
-  assert.equal(stats.weeklyXP[6].xp, pr.xpById.a + pr.xpById.b);
+  assert.equal(stats.weeklyXP[6].xp, pr.xpById.a + pr.xpById.b + 35);
   assert.equal(stats.minutesByType.study, 60);
   assert.equal(stats.records.bestWeekMinutes, 60);
   assert.equal(stats.records.activeDays, 3);
@@ -196,10 +200,12 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
 
 {
   const migrated = normalizeState({ version: 1, activities: [], questCompletions: [] });
-  assert.equal(migrated.version, 2);
+  assert.equal(migrated.version, 3);
   assert.deepEqual(migrated.bodyMeasurements, []);
   assert.deepEqual(migrated.profile, { goalWeightKg: null });
   assert.deepEqual(normalizeState(null).programDays, []);
+  assert.deepEqual(normalizeState({version:2}).recoveryEntries, []);
+  assert.equal(normalizeState({}).preferences.appMode,'hunter');
 
   const corrupt = { ...state([]), questCompletions: 'not-an-array' };
   assert.throws(() => parseBackup(serializeBackup(corrupt)), /sérült/);
@@ -242,7 +248,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   const statResult = computeStats(st, computeProgress(st, '2026-10-21'), '2026-10-21');
   assert.equal(statResult.weeklyXP.at(-1).xp,
     entries.reduce((n, a) => n + computeProgress(st, '2026-10-21').xpById[a.id], 0) +
-    computeProgress(st, '2026-10-21').xpById.study + reward.xp);
+    computeProgress(st, '2026-10-21').xpById.study + reward.xp + 80);
   assert.equal(computeProgress(st, '2026-10-21').weeklyTrialXP, 100);
   const removed = { ...st, activities: st.activities.filter((a) => a.id !== 'w2') };
   assert.equal(computeProgress(removed, '2026-10-21').weeklyTrialXP, 40);
@@ -261,5 +267,49 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
   assert.equal(level.xp, 32);
   assert.equal(rewardPresentation({ xpGained: 0, evolved: true }).heading, 'EVOLÚCIÓ!');
   assert.equal(rewardPresentation(null).xp, 0);
+}
+{
+  const basic=state([]);
+  const evolution=hunterEvolution(character,computeProgress(basic,today),0);
+  assert.equal(evolution.style.id,'origin');
+  assert.equal(validAppearanceChoice('style','legend',evolution),false);
+  const higher=hunterEvolution({name:'Teszt',classId:'hero',appearance:{styleId:'vanguard'}},
+    {...computeProgress(basic,today),level:8},2);
+  assert.equal(higher.style.id,'vanguard');
+  assert.equal(higher.trails.find(t=>t.id==='ember').unlocked,true);
+  assert.equal(trainingToday(DEFAULT_TRAINING_PLAN,'2026-10-19').weekday,1);
+  assert.equal(cleanTrainingPlan(null).days.length,3);
+  assert.deepEqual(validateDetailedSet({reps:8,weightKg:60,rpe:8,rir:2,warmup:true}),
+    {reps:8,weightKg:60,rpe:8,rir:2,warmup:true});
+  assert.throws(()=>validateDetailedSet({reps:8,weightKg:60,rpe:11}),/RPE/);
+  assert.equal(estimatedOneRepMax(8,60),76);
+  const w={...workout('bar','2026-10-19'),exercises:[{name:'Fekvenyomás',unit:'reps',sets:[
+    {reps:8,weightKg:60,rpe:7,rir:3},{reps:5,weightKg:70,rpe:9,rir:1,warmup:true}]}]};
+  const data=exerciseInsights([w],'Fekvenyomás');
+  assert.equal(data.volumeKg,480);
+  assert.equal(data.bestEstimated1RM,76);
+  assert.equal(nextLoadSuggestion([w],'Fekvenyomás').weightKg,62.5);
+  const bossState=state([workout('mon','2026-10-19'),workout('tue','2026-10-20'),workout('wed','2026-10-21')]);
+  const bosses=bossCampaigns(bossState,'2026-10-21');
+  assert.deepEqual(bosses.map(b=>b.complete),[true,true,false]);
+  assert.deepEqual(earnedBossRewards(bossState),{xp:80,wins:2});
+  assert.equal(computeProgress(bossState,'2026-10-21').bossXP,80);
+  assert.equal(computeStats(bossState,computeProgress(bossState,'2026-10-21'),'2026-10-21').weeklyXP.at(-1).xp,
+    Object.values(computeProgress(bossState,'2026-10-21').xpById).reduce((a,b)=>a+b,0)
+    +computeProgress(bossState,'2026-10-21').weeklyTrialXP+80);
+  const afterDelete={...bossState,activities:[bossState.activities[0]]};
+  assert.equal(earnedBossRewards(afterDelete).xp,0);
+  const check=validateRecovery(4,'Több energiám volt');
+  assert.deepEqual(check,{readiness:4,note:'Több energiám volt'});
+  assert.throws(()=>validateRecovery(6),/1–5/);
+  const perf=performanceOverview({...bossState,recoveryEntries:[{id:'r',date:at('2026-10-21'),readiness:2}]},'2026-10-21');
+  assert.equal(perf.current.sessions,3);
+  assert.match(perf.insight,/Alacsony/);
+  const v3={...bossState,trainingPlan:DEFAULT_TRAINING_PLAN,recoveryEntries:[{id:'r',date:at(today),readiness:4}],preferences:{appMode:'performance'}};
+  const restored=parseBackup(serializeBackup(v3));
+  assert.equal(restored.preferences.appMode,'performance');
+  assert.equal(restored.trainingPlan.days.length,3);
+  assert.equal(restored.recoveryEntries.length,1);
+  assert.throws(()=>parseBackup(serializeBackup({...v3,recoveryEntries:[{date:'x',readiness:9}]})),/sérült/);
 }
 console.log('Minden játéklogika teszt átment.');

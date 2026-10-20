@@ -26,15 +26,16 @@ export function GameProvider({ children }) {
   const [today, setToday] = useState(dayKey());
   const [session, setSession] = useState(undefined);
   const [storageWarning, setStorageWarning] = useState(false);
+  const [storageBlocked,setStorageBlocked]=useState(false);
 
   useEffect(() => {
-    loadState().then(setState);
+    loadState().then(setState).catch(()=>{setStorageBlocked(true);setStorageWarning(true);setState(INITIAL_STATE);});
     loadJSON(SESSION_KEY).then(setSession);
   }, []);
 
   useEffect(() => {
-    if (state) saveState(state).then(ok=>{if(!ok)setStorageWarning(true);});
-  }, [state]);
+    if (state && !storageBlocked) saveState(state).then(ok=>setStorageWarning(!ok));
+  }, [state, storageBlocked]);
 
   useEffect(() => {
     if (session !== undefined) saveJSON(SESSION_KEY, session);
@@ -230,10 +231,14 @@ export function GameProvider({ children }) {
         setState((s) => ({ ...s, lastBackupAt: new Date().toISOString() }));
       },
       importState(imported) {
+        setStorageBlocked(false);
+        setStorageWarning(false);
         setSession(null);
         setState({ ...imported, lastBackupAt: new Date().toISOString() });
       },
       resetAll() {
+        setStorageBlocked(false);
+        setStorageWarning(false);
         setState(INITIAL_STATE);
       }
     };

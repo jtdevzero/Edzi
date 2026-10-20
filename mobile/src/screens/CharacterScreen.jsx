@@ -4,6 +4,7 @@ import Screen from '../components/Screen';
 import SectionHeading from '../components/SectionHeading';
 import PwaInstall from '../components/PwaInstall';
 import HunterEvolution from '../components/HunterEvolution';
+import CloudBackup from '../components/CloudBackup';
 import AppModeSwitcher from '../components/AppModeSwitcher';
 import CharacterCard from '../components/CharacterCard';
 import StatsRadar from '../components/StatsRadar';
@@ -131,6 +132,8 @@ export default function CharacterScreen() {
       </View>
 
       <PwaInstall />
+      <SectionHeading eyebrow="OPTIONAL / PRIVATE VAULT" title="Felhőmentés" />
+      <CloudBackup />
       <View style={[card, styles.backup]}>
         <Text style={styles.sectionTitle}>💾 Adatmentés</Text>
         <Text style={styles.muted}>

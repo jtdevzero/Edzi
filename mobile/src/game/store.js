@@ -44,9 +44,11 @@ export async function loadState() {
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     if (!raw) return INITIAL_STATE;
-    return normalizeState(JSON.parse(raw));
+    const parsed=JSON.parse(raw);
+    if(!parsed || typeof parsed!=='object' || Array.isArray(parsed))throw new Error('Corrupted state');
+    return normalizeState(parsed);
   } catch {
-    return INITIAL_STATE;
+    throw new Error('A helyi adatokat nem sikerült megnyitni. Visszaállítás szükséges.');
   }
 }
 
