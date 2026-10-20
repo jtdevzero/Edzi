@@ -20,6 +20,8 @@ export default function CinematicArt({scene='hero',height=220,style}){
     style={StyleSheet.absoluteFill} resizeMode="cover"/>}
   {scene==='world'&&<Image testID="cinematic-world-art" accessibilityIgnoresInvertColors source={require('../../assets/art/world-citadel.jpg')}
     style={StyleSheet.absoluteFill} resizeMode="cover"/>}
+  {scene==='ascension'&&<Image testID="cinematic-rank-art" accessibilityIgnoresInvertColors source={require('../../assets/art/rank-evolution.jpg')}
+    style={StyleSheet.absoluteFill} resizeMode="cover"/>
   <Svg width="100%" height="100%" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
    <Defs>
     <LinearGradient id={uid+'sky'} x1="0" x2="1" y1="0" y2="1">
