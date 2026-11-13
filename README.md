@@ -147,3 +147,13 @@ A NIGHTFALL felület teljes illusztrált art-pass kiadása, v4 adatmodell válto
 - Marketing plakát nem képernyőgrafika; nem hamisított UI-szöveget használunk navigációként, hanem valós komponensek mögötti képrészletet.
 
 - Második, különálló AI-generált grafika: `mobile/assets/art/world-citadel.jpg`, amely ténylegesen megjelenik a Hunter World főoldali és térképes jeleneteiben. A böngészős füstteszt külön ellenőrzi mindkét lokális képes elemet.
+
+## Edzi 5.0 — ARSENAL: teljes értékű edzésnapló (2026-11)
+- **Gyakorlattár:** 18 helyett 70+ gyakorlat izomcsoporttal (mell, hát, láb, váll, kar, törzs, kardió, mobilitás) és eszközzel; az edzésmódban izomcsoport-szűrő és kereső. A régi gyakorlatnevek változatlanok, a korábbi rekordok megmaradnak.
+- **Saját gyakorlatok:** név, izomcsoport és mérési mód (súly + ismétlés / csak ismétlés / időre) megadásával, legfeljebb 60 darab. Törléskor a naplózott sorozatok megmaradnak.
+- **Saját rutinok:** edzés befejezésekor vagy az Előzményekből egy edzés rutinként menthető (legfeljebb 30), és egy koppintással újraindítható. „Legutóbbi ismétlése” gyorsgomb.
+- **Legutóbbi teljesítmény:** az edzésmód minden gyakorlatnál mutatja az előző alkalom sorozatait.
+- **Előzmények:** típus szerinti szűrő, lapozás a teljes naplóban, lenyitható részletek (sorozatok, jegyzet), „Újra ez az edzés”.
+- **Izomcsoport-egyensúly:** a Statisztika fülön heti munkasorozatok izomcsoportonként, az előző héthez viszonyítva.
+- **Javítás:** az edzésmód súly- és RPE/RIR-mezői keskeny telefonon kilógtak a kártyából.
+- Helyi séma: **v5** (`customExercises`, `routines`); a v4 adatok automatikusan, veszteség nélkül betöltődnek, a mentés/visszatöltés ellenőrzi az új mezőket. Az XP-számítás nem változott. PWA-cache: `edzi-arsenal-v8`.

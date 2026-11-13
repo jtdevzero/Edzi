@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { validCustomExercise, MAX_CUSTOM_EXERCISES } from './exercises';
+import { validRoutine, MAX_ROUTINES } from './routines';
 
 const STORAGE_KEY = 'animefitness:state';
 
 export const INITIAL_STATE = {
-  version: 4,
+  version: 5,
   character: null,
   activities: [],
   questCompletions: [],
@@ -15,6 +17,8 @@ export const INITIAL_STATE = {
   trainingPlan: null,
   guild: null,
   supersets: [],
+  customExercises: [],
+  routines: [],
   preferences: { appMode: 'hunter' },
   profile: { goalWeightKg: null },
   lastBackupAt: null
@@ -28,13 +32,16 @@ export function normalizeState(raw) {
   return {
     ...INITIAL_STATE,
     ...data,
-    version: 4,
+    version: 5,
     activities: array('activities'),
     questCompletions: array('questCompletions'),
     programDays: array('programDays'),
     bodyMeasurements: array('bodyMeasurements'),
     recoveryEntries: array('recoveryEntries'),
     supersets: array('supersets'),
+    // v5: unknown or malformed entries are dropped instead of blocking the whole state.
+    customExercises: array('customExercises').filter(validCustomExercise).slice(0, MAX_CUSTOM_EXERCISES),
+    routines: array('routines').filter(validRoutine).slice(0, MAX_ROUTINES),
     guild: data.guild && typeof data.guild==='object' && !Array.isArray(data.guild) ? data.guild : null,
     trainingPlan: data.trainingPlan && typeof data.trainingPlan === 'object' ? data.trainingPlan : null,
     preferences: { ...INITIAL_STATE.preferences, ...(data.preferences && typeof data.preferences === 'object' ? data.preferences : {}) },

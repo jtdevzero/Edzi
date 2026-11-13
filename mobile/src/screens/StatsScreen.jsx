@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '../game/GameContext';
 import { computeStats, computeExerciseRecords } from '../game/stats';
 import { formatClock } from '../game/session';
+import { muscleGroupVolume } from '../game/exercises';
 import BodyTracker from '../components/BodyTracker';
 import PerformanceCenter from '../components/PerformanceCenter';
 import { ACTIVITY_TYPES, parseDayKey } from '../game/gamification';
@@ -153,6 +154,28 @@ function ExerciseRecords({ records }) {
   );
 }
 
+function MuscleBalance({ rows }) {
+  const max = Math.max(1, ...rows.map((r) => Math.max(r.sets, r.previousSets)));
+  const any = rows.some((r) => r.sets || r.previousSets);
+  return (
+    <View style={[card, styles.recGap]}>
+      <Text style={styles.sectionTitle}>Izomcsoport-egyensúly</Text>
+      <Text style={styles.muted}>Munkasorozatok az elmúlt 7 napban; a halvány sáv az azt megelőző 7 nap. A bemelegítő sorozatok nem számítanak.</Text>
+      {!any && <Text style={styles.muted}>Még nincs gyakorlatonként naplózott edzésed. Használd az Edzésmódot, és itt látod, mit edzel sokat és mit keveset.</Text>}
+      {any && rows.map((r) => (
+        <View key={r.id} style={styles.muscleRow} accessibilityLabel={`${r.label}: ${r.sets} sorozat, előző héten ${r.previousSets}`}>
+          <Text style={styles.muscleLabel}>{r.label}</Text>
+          <View style={styles.muscleTrack}>
+            <View style={[styles.musclePrev, { width: `${(r.previousSets / max) * 100}%` }]} />
+            <View style={[styles.muscleNow, { width: `${(r.sets / max) * 100}%` }]} />
+          </View>
+          <Text style={styles.muscleValue}>{r.sets}{r.minutes ? ` · ${r.minutes} p` : ''}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function Record({ value, label }) {
   return (
     <View style={[card, styles.record]}>
@@ -166,6 +189,7 @@ export default function StatsScreen() {
   const { state, progress } = useGame();
   const stats = useMemo(() => computeStats(state, progress), [state, progress]);
   const exerciseRecords = useMemo(() => computeExerciseRecords(state), [state]);
+  const muscles = useMemo(() => muscleGroupVolume(state), [state]);
   const { records, minutesByType } = stats;
   const totalTypeMinutes = records.totalMinutes || 1;
 
@@ -191,6 +215,7 @@ export default function StatsScreen() {
       <BodyTracker />
       <SectionHeading eyebrow="PERSONAL RECORDS" title="Gyakorlatok"/>
       <ExerciseRecords records={exerciseRecords} />
+      <MuscleBalance rows={muscles} />
 
       <SectionHeading eyebrow="CONSISTENCY" title="Aktivitási térkép"/>
       <View style={card}>
@@ -236,6 +261,12 @@ const styles = StyleSheet.create({
   heroCaption: { color: colors.gold, fontWeight: '900', fontSize: 10, letterSpacing: 1.7 },
   heroNote: { fontSize: 12, color: colors.textMuted, marginTop: 4 },
   center: { alignItems: 'center', marginTop: 8 },
+  muscleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  muscleLabel: { color: colors.textSoft, fontSize: 12, fontWeight: '700', width: 68 },
+  muscleTrack: { flex: 1, height: 14, borderRadius: 7, backgroundColor: colors.input, overflow: 'hidden', justifyContent: 'center' },
+  musclePrev: { position: 'absolute', left: 0, top: 0, bottom: 0, backgroundColor: '#3B4A57', borderRadius: 7 },
+  muscleNow: { height: 6, backgroundColor: colors.cyan, borderRadius: 3 },
+  muscleValue: { color: colors.text, fontSize: 12, fontWeight: '800', width: 62, textAlign: 'right' },
   recGap: { gap: 10 },
   exChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   exChip: { paddingHorizontal: 12, height: 36, borderRadius: 18, backgroundColor: colors.input, justifyContent: 'center' },

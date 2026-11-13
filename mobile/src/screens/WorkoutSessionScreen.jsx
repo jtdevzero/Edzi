@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Linking, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGame } from '../game/GameContext';
-import { EXERCISE_LIBRARY, youtubeSearchUrl } from '../game/templates';
+import { youtubeSearchUrl } from '../game/templates';
+import { MUSCLE_GROUPS, searchExercises } from '../game/exercises';
+import { lastPerformance } from '../game/routines';
 import {
   REST_OPTIONS, INTERVAL_PRESETS, elapsedSeconds, restRemaining, intervalStatus, formatClock, setValue, formatSet
 } from '../game/session';
@@ -30,7 +32,7 @@ const addSet = (session, index, value) => ({
 
 export default function WorkoutSessionScreen() {
   const insets = useSafeAreaInsets();
-  const { session, updateSession, discardSession, finishSession } = useGame();
+  const { state, session, updateSession, discardSession, finishSession, addCustomExercise, deleteCustomExercise } = useGame();
   const now = useTicker(true);
   const [counter, setCounter] = useState(0);
   const [weightInput, setWeightInput] = useState('');
@@ -39,6 +41,10 @@ export default function WorkoutSessionScreen() {
   const [warmup,setWarmup]=useState(false);
   const [exerciseSearch, setExerciseSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
+  const [muscle, setMuscle] = useState(null);
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState({ muscle: 'chest', kind: 'weighted' });
+  const [saveRoutine, setSaveRoutine] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [intensity, setIntensity] = useState(7);
   const lastPhase = useRef(null);
@@ -82,7 +88,9 @@ export default function WorkoutSessionScreen() {
   }, [interval?.phase, interval?.done]);
 
   const totalSets = session.exercises.reduce((n, e) => n + e.sets.length, 0);
-  const filteredLibrary = EXERCISE_LIBRARY.filter(item => item.name.toLocaleLowerCase('hu-HU').includes(exerciseSearch.trim().toLocaleLowerCase('hu-HU'))).slice(0, 40);
+  const matches = searchExercises(state, exerciseSearch, muscle);
+  const filteredLibrary = matches.slice(0, 40);
+  const previous = ex ? lastPerformance(state, ex.name) : null;
 
   function select(index) {
     updateSession((s) => ({ ...s, current: index }));
@@ -138,11 +146,25 @@ export default function WorkoutSessionScreen() {
     }));
     setShowAdd(false);
     setExerciseSearch('');
+    setCreating(false);
+  }
+
+  function createCustom() {
+    try {
+      const created = addCustomExercise({
+        name: exerciseSearch, muscle: draft.muscle,
+        unit: draft.kind === 'sec' ? 'sec' : 'reps', weighted: draft.kind === 'weighted'
+      });
+      addExercise({ ...created, search: '' });
+    } catch (err) {
+      notify('Nem menthető', err.message);
+    }
   }
 
   function finish() {
-    const result = finishSession(intensity);
+    const result = finishSession(intensity, { saveAsRoutine: saveRoutine });
     const extra = [];
+    if (result.savedRoutine) extra.push('Rutinként is elmentve.');
     if (result.records.length) extra.push(`Új rekord: ${result.records.join(', ')}`);
     if (result.programDay) extra.push(result.finishedProgram ? 'A teljes programot teljesítetted!' : 'A mai programnap is kész.');
     announceReward(result, { title: 'Edzés kész', message: [session.title, ...extra].join('\n') });
@@ -185,14 +207,65 @@ export default function WorkoutSessionScreen() {
             <Text style={styles.sectionTitle}>Gyakorlat hozzáadása</Text>
             <TextInput style={styles.weightInput} value={exerciseSearch} onChangeText={setExerciseSearch}
               placeholder="Gyakorlat keresése…" placeholderTextColor={colors.textMuted} accessibilityLabel="Gyakorlat keresése"/>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+              {[[null, 'Összes'], ...Object.entries(MUSCLE_GROUPS)].map(([id, label]) => (
+                <Pressable key={label} onPress={() => setMuscle(id)} accessibilityRole="button"
+                  accessibilityLabel={`Izomcsoport szűrő: ${label}`}
+                  style={[styles.filterChip, muscle === id && styles.filterOn]}>
+                  <Text style={[styles.filterText, muscle === id && styles.filterTextOn]}>{label}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
             <View style={styles.libGrid}>
               {filteredLibrary.map((item) => (
                 <Pressable key={item.name} onPress={() => addExercise(item)} style={styles.libItem}>
                   <Text style={styles.libText}>{item.name}</Text>
-                  <Text style={styles.muted}>{item.unit === 'sec' ? 'időre' : item.weighted ? 'súlyzós' : 'ismétlés'}</Text>
+                  <Text style={styles.muted}>{MUSCLE_GROUPS[item.muscle]} · {item.unit === 'sec' ? 'időre' : item.weighted ? 'súlyzós' : 'ismétlés'}{item.custom ? ' · saját' : ''}</Text>
+                  {item.custom && (
+                    <Pressable hitSlop={6} style={styles.customDelete} accessibilityLabel={`Saját gyakorlat törlése: ${item.name}`}
+                      onPress={() => confirm('Saját gyakorlat törlése', `Törlöd a listából: „${item.name}”? A korábban naplózott sorozatok megmaradnak.`, () => deleteCustomExercise(item.name))}>
+                      <Text style={styles.customDeleteText}>Törlés ×</Text>
+                    </Pressable>
+                  )}
                 </Pressable>
               ))}
             </View>
+            {matches.length > filteredLibrary.length && (
+              <Text style={styles.muted}>További {matches.length - filteredLibrary.length} találat – szűkítsd kereséssel vagy izomcsoporttal.</Text>
+            )}
+            {matches.length === 0 && <Text style={styles.muted}>Nincs találat. Felveheted saját gyakorlatként.</Text>}
+            {!creating ? (
+              <Pressable onPress={() => setCreating(true)} style={styles.outline}>
+                <Text style={styles.outlineText}>＋ Saját gyakorlat létrehozása</Text>
+              </Pressable>
+            ) : (
+              <View style={styles.customBox}>
+                <Text style={styles.muted}>A fenti keresőmezőbe írt név lesz a gyakorlat neve{exerciseSearch.trim() ? `: „${exerciseSearch.trim()}”` : '.'}</Text>
+                <Text style={styles.muted}>Izomcsoport</Text>
+                <View style={styles.presetRow}>
+                  {Object.entries(MUSCLE_GROUPS).map(([id, label]) => (
+                    <Pressable key={id} onPress={() => setDraft((d) => ({ ...d, muscle: id }))}
+                      accessibilityLabel={`Saját gyakorlat izomcsoportja: ${label}`}
+                      style={[styles.preset, draft.muscle === id && styles.presetOn]}>
+                      <Text style={styles.presetText}>{label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+                <Text style={styles.muted}>Mérés módja</Text>
+                <View style={styles.presetRow}>
+                  {[['weighted', 'Súly + ismétlés'], ['reps', 'Csak ismétlés'], ['sec', 'Időre']].map(([id, label]) => (
+                    <Pressable key={id} onPress={() => setDraft((d) => ({ ...d, kind: id }))}
+                      style={[styles.preset, draft.kind === id && styles.presetOn]}>
+                      <Text style={styles.presetText}>{label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+                <Pressable disabled={exerciseSearch.trim().length < 2} onPress={createCustom}
+                  style={[styles.primary, exerciseSearch.trim().length < 2 && styles.disabled]}>
+                  <Text style={styles.primaryText}>Mentés és hozzáadás</Text>
+                </Pressable>
+              </View>
+            )}
           </View>
         )}
 
@@ -214,6 +287,13 @@ export default function WorkoutSessionScreen() {
                 </Pressable>
               ) : null}
             </View>
+
+            {previous && (
+              <View style={styles.previousBox}>
+                <Text style={styles.previousLabel}>LEGUTÓBB · {previous.date}</Text>
+                <Text style={styles.previousText}>{previous.summary}</Text>
+              </View>
+            )}
 
             <View style={styles.sets}>
               {ex.sets.length === 0 && <Text style={styles.muted}>Még nincs sorozat.</Text>}
@@ -348,6 +428,10 @@ export default function WorkoutSessionScreen() {
                 </Pressable>
               ))}
             </View>
+            <Pressable onPress={() => setSaveRoutine((v) => !v)} style={styles.warmupBtn}
+              accessibilityRole="checkbox" accessibilityState={{ checked: saveRoutine }}>
+              <Text style={styles.warmupText}>{saveRoutine ? '☑' : '□'} Mentés saját rutinként is („{session.title}”)</Text>
+            </Pressable>
             <Pressable onPress={finish} style={styles.primary}>
               <Text style={styles.primaryText}>Mentés és XP</Text>
             </Pressable>
@@ -367,9 +451,20 @@ export default function WorkoutSessionScreen() {
 }
 
 const styles = StyleSheet.create({
+  filterRow: { gap: 6, paddingRight: 8 },
+  filterChip: { height: 44, paddingHorizontal: 13, borderRadius: 22, backgroundColor: colors.input, justifyContent: 'center', borderWidth: 1, borderColor: colors.cardBorder },
+  filterOn: { backgroundColor: '#35453C', borderColor: colors.gold },
+  filterText: { color: colors.textMuted, fontWeight: '700', fontSize: 12 },
+  filterTextOn: { color: colors.gold },
+  customDelete: { minHeight: 32, justifyContent: 'center', alignSelf: 'flex-start' },
+  customDeleteText: { color: colors.red, fontSize: 11, fontWeight: '800' },
+  customBox: { gap: 9, padding: 12, borderRadius: 12, backgroundColor: colors.surface },
+  previousBox: { backgroundColor: '#202E2E', borderRadius: 12, padding: 11, gap: 3 },
+  previousLabel: { color: colors.cyan, fontSize: 10, fontWeight: '900', letterSpacing: 1.2 },
+  previousText: { color: colors.textSoft, fontSize: 13, lineHeight: 19 },
   effortBox:{gap:9,padding:12,borderRadius:12,backgroundColor:colors.surface},
   effortRow:{flexDirection:'row',gap:9},
-  effortInput:{flex:1,paddingHorizontal:11,minHeight:44,borderRadius:10,backgroundColor:colors.input,color:colors.text},
+  effortInput:{flex:1,minWidth:0,paddingHorizontal:11,minHeight:44,borderRadius:10,backgroundColor:colors.input,color:colors.text},
   warmupBtn:{minHeight:40,justifyContent:'center'},
   warmupText:{color:colors.gold,fontSize:12,fontWeight:'800'},
   root: { flex: 1, backgroundColor: colors.bg },
@@ -405,7 +500,7 @@ const styles = StyleSheet.create({
   weightStep: { width: 45, height: 47, backgroundColor: colors.input, borderWidth: 1, borderColor: colors.cardBorder,
     borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   weightStepText: { color: colors.cyan, fontSize: 20, fontWeight: '900' },
-  weightInput: { flex: 1, borderRadius: 12, backgroundColor: colors.input, color: colors.text, height: 48, paddingHorizontal: 14, fontSize: 18 },
+  weightInput: { flex: 1, minWidth: 0, borderRadius: 12, backgroundColor: colors.input, color: colors.text, height: 48, paddingHorizontal: 14, fontSize: 18 },
   counterRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   counter: { flex: 1, color: colors.text, fontSize: 48, fontWeight: '800', textAlign: 'center' },
   counterBtn: { width: 56, height: 56, borderRadius: 14, backgroundColor: colors.input, alignItems: 'center', justifyContent: 'center' },

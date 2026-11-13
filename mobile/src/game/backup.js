@@ -2,6 +2,8 @@ import { normalizeState } from './store';
 import { dayKey } from './gamification';
 import {safeCreatorChoice} from './characterCreator';
 import {WORLD_GEAR} from './hunterWorld';
+import { validCustomExercise, MAX_CUSTOM_EXERCISES } from './exercises';
+import { validRoutine, MAX_ROUTINES } from './routines';
 
 const BACKUP_APP = 'edzi';
 const hasDOM = () => typeof document !== 'undefined';
@@ -65,6 +67,10 @@ export function parseBackup(text) {
     (s.supersets===undefined || (Array.isArray(s.supersets) && s.supersets.length<=12 &&
       s.supersets.every(p=>p&&typeof p.id==='string'&&Array.isArray(p.names)&&p.names.length===2&&
         p.names.every(n=>typeof n==='string'&&n.length<=100)))) &&
+    (s.customExercises===undefined || (Array.isArray(s.customExercises) &&
+      s.customExercises.length<=MAX_CUSTOM_EXERCISES && s.customExercises.every(validCustomExercise))) &&
+    (s.routines===undefined || (Array.isArray(s.routines) && s.routines.length<=MAX_ROUTINES &&
+      s.routines.every(validRoutine))) &&
     (s.character?.appearance===undefined || s.character?.appearance===null || (
       typeof s.character.appearance==='object' && !Array.isArray(s.character.appearance) &&
       (s.character.appearance.visorId===undefined || safeCreatorChoice('visor',s.character.appearance.visorId)) &&

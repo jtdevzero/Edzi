@@ -3,7 +3,7 @@ import {View,Text,TextInput,Pressable,StyleSheet} from 'react-native';
 import {useGame} from '../game/GameContext';
 import {DEFAULT_TRAINING_PLAN,cleanTrainingPlan,trainingToday,nextLoadSuggestion} from '../game/fitnessPro';
 import {createSession} from '../game/session';
-import {EXERCISE_LIBRARY} from '../game/templates';
+import {sessionExercise} from '../game/exercises';
 import {colors,card} from '../theme';
 import {smartLoadAdvice} from '../game/smartTraining';
 const WEEKDAYS=['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
@@ -23,10 +23,7 @@ export default function TrainingPlanner(){
     setTitle('');setExercises('');setEditing(false);
   }
   function start(day){
-    const exercises=day.exercises.map(name=>{
-      const known=EXERCISE_LIBRARY.find(e=>e.name===name);
-      return {name,unit:known?.unit||'reps',weighted:known?.weighted??true,search:known?.search||''};
-    });
+    const exercises=day.exercises.map(name=>sessionExercise(state,name));
     startSession(createSession({title:day.title,exercises}));
   }
   return <View style={[card,styles.box]}>

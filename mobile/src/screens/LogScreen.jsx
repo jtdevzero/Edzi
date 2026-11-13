@@ -6,12 +6,13 @@ import Screen from '../components/Screen';
 import { useGame } from '../game/GameContext';
 import { ACTIVITY_TYPES, baseXP } from '../game/gamification';
 import { WORKOUT_TEMPLATES, youtubeSearchUrl, sessionExercisesFromTemplate } from '../game/templates';
-import { createSession } from '../game/session';
+import { createSession, formatSet } from '../game/session';
+import { routineSessionExercises, lastWorkoutWithExercises, filterHistory, HISTORY_FILTERS } from '../game/routines';
 import { unlockAudio } from '../utils/device';
 import Pomodoro from '../components/Pomodoro';
 import TrainingPlanner from '../components/TrainingPlanner';
 import SmartTrainingPanel from '../components/SmartTrainingPanel';
-import { confirm } from '../utils/notify';
+import { confirm, notify } from '../utils/notify';
 import { announceReward } from '../utils/rewards';
 import { colors, card } from '../theme';
 import {MythicIcon,activityIcon} from '../components/MythicIcon';
@@ -25,15 +26,19 @@ function formatDate(iso) {
 }
 
 export default function LogScreen({ navigation }) {
-  const { state, progress, logActivity, deleteActivity, startSession } = useGame();
+  const { state, progress, logActivity, deleteActivity, startSession, saveRoutine, deleteRoutine } = useGame();
   const [type, setType] = useState('workout');
   const [form, setForm] = useState(EMPTY_FORM);
   const [openTemplate, setOpenTemplate] = useState(null);
+  const [historyFilter, setHistoryFilter] = useState('all');
+  const [historyLimit, setHistoryLimit] = useState(20);
+  const [openActivity, setOpenActivity] = useState(null);
 
   const duration = parseInt(form.duration, 10);
   const valid = form.title.trim() && duration > 0 && duration <= 600;
   const previewXP = valid ? Math.round(baseXP(type, duration, form.intensity) * progress.nextStreakMultiplier) : null;
-  const history = [...state.activities].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 20);
+  const history = filterHistory(state.activities, historyFilter, historyLimit);
+  const lastWorkout = lastWorkoutWithExercises(state);
 
   const update = (patch) => setForm((f) => ({ ...f, ...patch }));
 
@@ -46,6 +51,21 @@ export default function LogScreen({ navigation }) {
     startSession(createSession(template
       ? { title: template.name, templateId: template.id, exercises: sessionExercisesFromTemplate(template) }
       : { title: 'Saját edzés', exercises: [] }));
+  }
+
+  // Starts a fresh session with the exercises of a saved routine or an earlier workout.
+  function startFrom(source) {
+    unlockAudio();
+    startSession(createSession({ title: source.title, exercises: routineSessionExercises(state, source) }));
+  }
+
+  function keepAsRoutine(activity) {
+    try {
+      saveRoutine(activity);
+      notify('Rutin mentve', `„${activity.title}” bekerült a saját rutinjaid közé.`);
+    } catch (err) {
+      notify('Nem menthető', err.message);
+    }
   }
 
   function submit() {
@@ -84,6 +104,11 @@ export default function LogScreen({ navigation }) {
           <Pressable onPress={() => startWorkout(null)} style={styles.sessionBtn}>
             <Text style={styles.sessionText}>▶ Üres edzés indítása</Text>
           </Pressable>
+          {lastWorkout && (
+            <Pressable onPress={() => startFrom(lastWorkout)} style={styles.repeatBtn}>
+              <Text style={styles.repeatText} numberOfLines={1}>↻ Legutóbbi ismétlése: {lastWorkout.title}</Text>
+            </Pressable>
+          )}
           <View style={styles.quickTemplates}>
             {WORKOUT_TEMPLATES.slice(0, 2).map(t => (
               <Pressable key={t.id} style={styles.quickItem} onPress={()=>startWorkout(t)}>
@@ -93,6 +118,31 @@ export default function LogScreen({ navigation }) {
             ))}
           </View>
         </LinearGradient>
+      )}
+
+      {type === 'workout' && (
+        <View style={[card, styles.gap]}>
+          <Text style={styles.miniEyebrow}>MY ROUTINES</Text>
+          <Text style={styles.sectionTitle}>Saját rutinok</Text>
+          {state.routines.length === 0 && (
+            <Text style={styles.muted}>Még nincs mentett rutinod. Edzés befejezésekor jelöld be a „Mentés saját rutinként is” lehetőséget, vagy ments el egy korábbi edzést az Előzményekből.</Text>
+          )}
+          {state.routines.map((r) => (
+            <View key={r.id} style={styles.routineRow}>
+              <View style={styles.flex}>
+                <Text style={styles.templateName} numberOfLines={1}>{r.title}</Text>
+                <Text style={styles.muted} numberOfLines={2}>{r.exercises.map((e) => e.name).join(' · ')}</Text>
+              </View>
+              <Pressable onPress={() => startFrom(r)} style={styles.routineStart} accessibilityLabel={`Rutin indítása: ${r.title}`}>
+                <Text style={styles.sessionText}>▶</Text>
+              </Pressable>
+              <Pressable hitSlop={8} style={styles.deleteBtn} accessibilityLabel={`Rutin törlése: ${r.title}`}
+                onPress={() => confirm('Rutin törlése', `Törlöd a(z) „${r.title}” rutint? A naplózott edzések megmaradnak.`, () => deleteRoutine(r.id))}>
+                <MythicIcon name="delete" size={22} color={colors.red}/>
+              </Pressable>
+            </View>
+          ))}
+        </View>
       )}
 
       {type === 'study' && <Pomodoro onLogged={() => navigation.navigate('Dashboard')} />}
@@ -188,24 +238,67 @@ export default function LogScreen({ navigation }) {
         </Pressable>
       </View>
 
-      {history.length > 0 && (
+      {state.activities.length > 0 && (
         <View style={[card, styles.gap]}>
           <SectionHeading eyebrow="RECENT ACTIVITY" title="Előzmények" />
-          {history.map((a) => (
-            <View key={a.id} style={styles.historyRow}>
-              <View style={styles.flex}>
-                <Text style={styles.historyTitle} numberOfLines={1}>{ACTIVITY_TYPES[a.type].emoji} {a.title}</Text>
-                <Text style={styles.muted}>{formatDate(a.date)} · {a.duration} perc · {a.intensity}/10 · +{progress.xpById[a.id]} XP</Text>
-              </View>
-              <Pressable
-                hitSlop={8}
-                onPress={() => confirm('Törlés', `Biztosan törlöd: „${a.title}”? Az XP is levonódik.`, () => deleteActivity(a.id))}
-                style={styles.deleteBtn}
-              >
-                <MythicIcon name="delete" size={22} color={colors.red}/>
+          <View style={styles.filterRow}>
+            {Object.entries(HISTORY_FILTERS).map(([id, label]) => (
+              <Pressable key={id} onPress={() => { setHistoryFilter(id); setHistoryLimit(20); }}
+                accessibilityLabel={`Előzmények szűrése: ${label}`}
+                style={[styles.filterChip, historyFilter === id && styles.filterOn]}>
+                <Text style={[styles.filterText, historyFilter === id && styles.filterTextOn]}>{label}</Text>
               </Pressable>
-            </View>
-          ))}
+            ))}
+          </View>
+          {history.total === 0 && <Text style={styles.muted}>Ebben a kategóriában még nincs bejegyzés.</Text>}
+          {history.items.map((a) => {
+            const open = openActivity === a.id;
+            const hasDetail = Boolean(a.exercises?.length || a.notes);
+            return (
+              <View key={a.id} style={styles.historyItem}>
+                <View style={styles.historyRow}>
+                  <Pressable style={styles.flex} disabled={!hasDetail} onPress={() => setOpenActivity(open ? null : a.id)}
+                    accessibilityLabel={`Részletek: ${a.title}`}>
+                    <Text style={styles.historyTitle} numberOfLines={1}>{ACTIVITY_TYPES[a.type].emoji} {a.title}{hasDetail ? (open ? '  ▲' : '  ▼') : ''}</Text>
+                    <Text style={styles.muted}>{formatDate(a.date)} · {a.duration} perc · {a.intensity}/10 · +{progress.xpById[a.id]} XP</Text>
+                  </Pressable>
+                  <Pressable
+                    hitSlop={8}
+                    onPress={() => confirm('Törlés', `Biztosan törlöd: „${a.title}”? Az XP is levonódik.`, () => deleteActivity(a.id))}
+                    style={styles.deleteBtn}
+                  >
+                    <MythicIcon name="delete" size={22} color={colors.red}/>
+                  </Pressable>
+                </View>
+                {open && (
+                  <View style={styles.detail}>
+                    {(a.exercises ?? []).map((e, i) => (
+                      <View key={`${e.name}-${i}`}>
+                        <Text style={styles.detailName}>{e.name}</Text>
+                        <Text style={styles.muted}>{e.sets.map((s) => formatSet(s, e.unit)).join('  ·  ')}</Text>
+                      </View>
+                    ))}
+                    {a.notes ? <Text style={styles.detailNote}>{a.notes}</Text> : null}
+                    {a.exercises?.length > 0 && (
+                      <View style={styles.detailActions}>
+                        <Pressable onPress={() => startFrom(a)} style={styles.detailBtn}>
+                          <Text style={styles.useText}>↻ Újra ez az edzés</Text>
+                        </Pressable>
+                        <Pressable onPress={() => keepAsRoutine(a)} style={styles.detailBtn}>
+                          <Text style={styles.useText}>＋ Mentés rutinként</Text>
+                        </Pressable>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+            );
+          })}
+          {history.hasMore && (
+            <Pressable onPress={() => setHistoryLimit((n) => n + 30)} style={styles.useBtn}>
+              <Text style={styles.useText}>Továbbiak betöltése ({history.total - history.items.length})</Text>
+            </Pressable>
+          )}
         </View>
       )}
     </Screen>
@@ -256,7 +349,22 @@ const styles = StyleSheet.create({
   button: { backgroundColor: colors.primary, borderRadius: 14, height: 54, alignItems: 'center', justifyContent: 'center', marginTop: 6 },
   disabled: { opacity: 0.4 },
   buttonText: { color: '#fff', fontSize: 17, fontWeight: '800' },
-  historyRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderTopColor: colors.cardBorder, borderTopWidth: 1, gap: 8 },
+  historyItem: { borderTopColor: colors.cardBorder, borderTopWidth: 1 },
+  historyRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, gap: 8 },
+  detail: { gap: 8, paddingBottom: 12 },
+  detailName: { color: colors.textSoft, fontSize: 13, fontWeight: '800' },
+  detailNote: { color: colors.textSoft, fontSize: 13, lineHeight: 19, fontStyle: 'italic' },
+  detailActions: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  detailBtn: { flexGrow: 1, minHeight: 44, paddingHorizontal: 12, borderRadius: 10, borderWidth: 1, borderColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
+  filterRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  filterChip: { minHeight: 44, paddingHorizontal: 14, borderRadius: 22, backgroundColor: colors.input, justifyContent: 'center', borderWidth: 1, borderColor: colors.cardBorder },
+  filterOn: { backgroundColor: '#35453C', borderColor: colors.gold },
+  filterText: { color: colors.textMuted, fontWeight: '700', fontSize: 12 },
+  filterTextOn: { color: colors.gold },
+  repeatBtn: { borderColor: colors.gold, borderWidth: 1, borderRadius: 14, minHeight: 46, paddingHorizontal: 14, justifyContent: 'center' },
+  repeatText: { color: colors.gold, fontWeight: '800', fontSize: 13 },
+  routineRow: { flexDirection: 'row', alignItems: 'center', gap: 8, borderTopColor: colors.cardBorder, borderTopWidth: 1, paddingTop: 10 },
+  routineStart: { width: 46, height: 44, borderRadius: 12, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center' },
   historyTitle: { color: colors.text, fontSize: 14, fontWeight: '600' },
   deleteBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   deleteText: { fontSize: 18 }

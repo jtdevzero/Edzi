@@ -16,6 +16,8 @@ import {worldProgress,worldUnlockedGear} from './hunterWorld';
 import {safeCreatorChoice} from './characterCreator';
 import {sanitizeGuild} from './guild';
 import {groupSuperset} from './smartTraining';
+import { sanitizeCustomExercise } from './exercises';
+import { buildRoutine, addRoutine } from './routines';
 
 const SESSION_KEY = 'animefitness:session';
 
@@ -138,6 +140,25 @@ export function GameProvider({ children }) {
       clearSuperset(id) {
         setState(s=>({...s,supersets:s.supersets.filter(p=>p.id!==id)}));
       },
+      // Throws a user-facing error for invalid or duplicate names.
+      addCustomExercise(input) {
+        const exercise = sanitizeCustomExercise(input, state.customExercises);
+        setState(s=>({ ...s, customExercises:[...s.customExercises,exercise] }));
+        return exercise;
+      },
+      deleteCustomExercise(name) {
+        setState(s=>({ ...s, customExercises:s.customExercises.filter(e=>e.name!==name) }));
+      },
+      // `source` is a session, a logged activity or a routine draft. Same title replaces.
+      saveRoutine(source,title) {
+        const routine = buildRoutine(source,newId(),title);
+        const routines = addRoutine(state.routines,routine);
+        setState(s=>({ ...s, routines }));
+        return routine;
+      },
+      deleteRoutine(id) {
+        setState(s=>({ ...s, routines:s.routines.filter(r=>r.id!==id) }));
+      },
       setAppMode(mode) {
         if (!['hunter','performance'].includes(mode)) return;
         setState(s=>({ ...s, preferences:{...s.preferences,appMode:mode} }));
@@ -170,7 +191,7 @@ export function GameProvider({ children }) {
       discardSession() {
         setSession(null);
       },
-      finishSession(intensity) {
+      finishSession(intensity, { saveAsRoutine = false } = {}) {
         const exercises = session.exercises
           .filter((e) => e.sets.length)
           .map(({ name, unit, sets }) => ({ name, unit, sets }));
@@ -194,8 +215,16 @@ export function GameProvider({ children }) {
           finishedProgram = entry.day >= programStatus.program.days.length;
           nextState = { ...nextState, programDays: [...state.programDays, entry], program: finishedProgram ? null : state.program };
         }
+        let savedRoutine = false;
+        if (saveAsRoutine) {
+          try {
+            const done = session.exercises.filter((e) => e.sets.length);
+            nextState = { ...nextState, routines: addRoutine(nextState.routines, buildRoutine({ ...session, exercises: done }, newId())) };
+            savedRoutine = true;
+          } catch { /* The workout itself must still be saved. */ }
+        }
         setSession(null);
-        return { ...commit(nextState), programDay: completesProgram, finishedProgram };
+        return { ...commit(nextState), programDay: completesProgram, finishedProgram, savedRoutine };
       },
       deleteActivity(id) {
         setState((s) => ({

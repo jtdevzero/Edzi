@@ -71,26 +71,7 @@ export const WORKOUT_TEMPLATES = [
   }
 ];
 
-export const EXERCISE_LIBRARY = [
-  { name: 'Fekvenyomás', unit: 'reps', weighted: true, search: 'bench press proper form' },
-  { name: 'Guggolás rúddal', unit: 'reps', weighted: true, search: 'barbell squat proper form' },
-  { name: 'Felhúzás', unit: 'reps', weighted: true, search: 'deadlift proper form' },
-  { name: 'Evezés rúddal', unit: 'reps', weighted: true, search: 'barbell row proper form' },
-  { name: 'Vállból nyomás', unit: 'reps', weighted: true, search: 'overhead press proper form' },
-  { name: 'Bicepsz kézisúlyzóval', unit: 'reps', weighted: true, search: 'dumbbell curl form' },
-  { name: 'Fekvőtámasz', unit: 'reps', search: 'push up proper form' },
-  { name: 'Húzódzkodás', unit: 'reps', search: 'pull up proper form' },
-  { name: 'Guggolás', unit: 'reps', search: 'bodyweight squat proper form' },
-  { name: 'Felülés', unit: 'reps', search: 'sit up proper form' },
-  { name: 'Tolódzkodás', unit: 'reps', search: 'dips proper form' },
-  { name: 'Kitörés', unit: 'reps', search: 'lunge proper form' },
-  { name: 'Burpee', unit: 'reps', search: 'burpee proper form' },
-  { name: 'Ugrásos guggolás', unit: 'reps', search: 'jump squat proper form' },
-  { name: 'Plank', unit: 'sec', search: 'plank proper form' },
-  { name: 'Hegymászó', unit: 'sec', search: 'mountain climbers proper form' },
-  { name: 'HIIT kör', unit: 'sec', search: '20 minute hiit no equipment' },
-  { name: 'Nyújtás', unit: 'sec', search: 'full body stretch 10 minutes' }
-];
+export { EXERCISE_LIBRARY } from './exercises';
 
 export function sessionExercisesFromTemplate(template) {
   return template.exercises

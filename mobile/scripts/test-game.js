@@ -21,6 +21,9 @@ import { weekKey } from '../src/game/gamification';
 import { computeStats, computeExerciseRecords, newRecords } from '../src/game/stats';
 import { intervalStatus, pomodoroStatus, sessionMinutes, createSession } from '../src/game/session';
 import { serializeBackup, parseBackup } from '../src/game/backup';
+import { EXERCISE_LIBRARY, MUSCLE_GROUPS, EQUIPMENT, sanitizeCustomExercise, allExercises, findExercise, sessionExercise, searchExercises, muscleGroupVolume } from '../src/game/exercises';
+import { buildRoutine, addRoutine, validRoutine, routineSessionExercises, lastWorkoutWithExercises, lastPerformance, filterHistory, MAX_ROUTINES } from '../src/game/routines';
+import { EXERCISE_LIBRARY as LEGACY_LIBRARY, WORKOUT_TEMPLATES } from '../src/game/templates';
 import { computeAchievements, newlyUnlocked } from '../src/game/achievements';
 import { PROGRAMS, programRunStatus, programDayXP, finishedPrograms, PROGRAM_FINISH_BONUS } from '../src/game/programs';
 
@@ -209,7 +212,7 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
 
 {
   const migrated = normalizeState({ version: 1, activities: [], questCompletions: [] });
-  assert.equal(migrated.version, 4);
+  assert.equal(migrated.version, 5);
   assert.deepEqual(migrated.bodyMeasurements, []);
   assert.deepEqual(migrated.profile, { goalWeightKg: null });
   assert.deepEqual(normalizeState(null).programDays, []);
@@ -370,12 +373,123 @@ assert.equal(dayKey(new Date(2026, 0, 5)), '2026-01-05');
     supersets:[{id:'A::B',names:['A','B']}],
     character:{...character,appearance:{visorId:'ember',helmetId:'shadow',gearId:'origin'}}};
   const backup=parseBackup(serializeBackup(v4));
-  assert.equal(backup.version,4);
+  assert.equal(backup.version,5);
   assert.equal(backup.guild.name,'Ezüst osztag');
   assert.equal(backup.supersets[0].names[1],'B');
   assert.equal(backup.character.appearance.visorId,'ember');
   assert.throws(()=>parseBackup(serializeBackup({...v4,guild:{name:'a',members:[22]}})),/sérült/);
   assert.throws(()=>parseBackup(serializeBackup({...v4,character:{...character,
     appearance:{visorId:'unknown'}}})),/sérült/);
+}
+{
+  // Edzi 5.0: exercise catalogue, custom exercises, routines, history and muscle balance.
+  assert.equal(LEGACY_LIBRARY, EXERCISE_LIBRARY, 'templates keeps re-exporting the library');
+  assert.ok(EXERCISE_LIBRARY.length >= 70);
+  assert.equal(new Set(EXERCISE_LIBRARY.map(e => e.name)).size, EXERCISE_LIBRARY.length, 'unique names');
+  for (const e of EXERCISE_LIBRARY) {
+    assert.ok(MUSCLE_GROUPS[e.muscle] && EQUIPMENT[e.equipment] && ['reps','sec'].includes(e.unit) && e.search, e.name);
+    assert.ok(!(e.weighted && e.unit === 'sec'), e.name);
+  }
+  for (const group of Object.keys(MUSCLE_GROUPS))
+    assert.ok(EXERCISE_LIBRARY.some(e => e.muscle === group), group);
+  // Old logs and plans rely on these exact names and units.
+  assert.deepEqual([findExercise({}, 'Fekvenyomás').weighted, findExercise({}, 'Plank').unit, findExercise({}, 'Húzódzkodás').weighted], [true, 'sec', undefined]);
+  for (const t of WORKOUT_TEMPLATES) for (const e of t.exercises)
+    if (e.unit !== 'none') assert.equal(findExercise({}, e.name)?.unit ?? e.unit, e.unit, e.name);
+
+  const custom = sanitizeCustomExercise({ name: '  Landmine   press ', muscle: 'shoulders', unit: 'reps', weighted: true });
+  assert.deepEqual(custom, { name: 'Landmine press', muscle: 'shoulders', unit: 'reps', weighted: true, custom: true });
+  assert.equal(sanitizeCustomExercise({ name: 'Függés', unit: 'sec', weighted: true, muscle: 'nope' }).weighted, false);
+  assert.equal(sanitizeCustomExercise({ name: 'Függés', muscle: 'nope' }).muscle, 'core');
+  assert.throws(() => sanitizeCustomExercise({ name: 'a' }), /2 karakter/);
+  assert.throws(() => sanitizeCustomExercise({ name: 'fekvenyomás' }), /már van/);
+  assert.throws(() => sanitizeCustomExercise({ name: 'landmine PRESS' }, [custom]), /már van/);
+  assert.throws(() => sanitizeCustomExercise({ name: 'Új' + 'x' }, Array.from({ length: 60 }, (_, i) => ({ name: 'c' + i }))), /Legfeljebb/);
+
+  const withCustom = { ...state([]), customExercises: [custom] };
+  assert.equal(allExercises(withCustom).length, EXERCISE_LIBRARY.length + 1);
+  assert.deepEqual(sessionExercise(withCustom, 'Landmine press'), { name: 'Landmine press', unit: 'reps', weighted: true, search: '' });
+  assert.deepEqual(sessionExercise(withCustom, 'Ismeretlen'), { name: 'Ismeretlen', unit: 'reps', weighted: true, search: '' });
+  assert.equal(sessionExercise(withCustom, 'Fekvőtámasz').weighted, false);
+  assert.deepEqual(searchExercises(withCustom, 'LANDMINE').map(e => e.name), ['Landmine press']);
+  assert.ok(searchExercises(withCustom, '', 'chest').every(e => e.muscle === 'chest'));
+  assert.ok(searchExercises(withCustom, 'fekv', 'chest').some(e => e.name === 'Fekvenyomás'));
+  assert.deepEqual(searchExercises(withCustom, 'zzzz'), []);
+
+  const lift = (id, day, exercises, hour = 12) => ({ ...workout(id, day), date: at(day, hour), title: 'Push nap', exercises });
+  const log = state([
+    lift('a', '2026-11-02', [{ name: 'Fekvenyomás', unit: 'reps', sets: [{ reps: 8, weightKg: 60 }] }]),
+    lift('b', '2026-11-09', [
+      { name: 'Fekvenyomás', unit: 'reps', sets: [{ reps: 5, weightKg: 40, warmup: true }, { reps: 8, weightKg: 62.5, rpe: 8 }, { reps: 7, weightKg: 62.5 }] },
+      { name: 'Húzódzkodás', unit: 'reps', sets: [6, 5] },
+      { name: 'Plank', unit: 'sec', sets: [90, 90] },
+      { name: 'Valami ismeretlen', unit: 'reps', sets: [10] }
+    ]),
+    { id: 'c', type: 'study', title: 'Angol', duration: 25, intensity: 5, date: at('2026-11-10') }
+  ]);
+
+  const routine = buildRoutine(log.activities[1], 'r1');
+  assert.equal(routine.title, 'Push nap');
+  assert.deepEqual(routine.exercises.map(e => [e.name, e.unit, e.weighted]),
+    [['Fekvenyomás', 'reps', true], ['Húzódzkodás', 'reps', false], ['Plank', 'sec', false], ['Valami ismeretlen', 'reps', false]]);
+  assert.ok(validRoutine(routine));
+  assert.ok(!('sets' in routine.exercises[0]), 'routines never copy logged sets');
+  assert.equal(buildRoutine({ title: 'x', exercises: [{ name: 'A', unit: 'reps' }, { name: 'A', unit: 'reps' }] }, 'd').exercises.length, 1);
+  assert.throws(() => buildRoutine({ title: 'Üres', exercises: [] }, 'x'), /legalább egy/);
+  assert.throws(() => buildRoutine({ title: '  ', exercises: routine.exercises }, 'x'), /nevet/);
+  assert.equal(buildRoutine(log.activities[1], 'r2', 'Saját cím').title, 'Saját cím');
+  assert.equal(addRoutine([routine], { ...routine, id: 'r9' }).length, 1, 'same title replaces');
+  assert.equal(addRoutine([routine], { ...routine, id: 'r9', title: 'Másik' }).length, 2);
+  const full = Array.from({ length: MAX_ROUTINES }, (_, i) => ({ ...routine, id: 'f' + i, title: 'R' + i }));
+  assert.throws(() => addRoutine(full, { ...routine, id: 'new', title: 'Új' }), /Legfeljebb/);
+  assert.equal(addRoutine(full, { ...routine, id: 'new', title: 'R3' }).length, MAX_ROUTINES);
+  assert.ok(!validRoutine({ id: 'x', title: 'x', exercises: [] }));
+  assert.ok(!validRoutine({ id: 'x', title: 'x', exercises: [{ name: 'A', unit: 'km' }] }));
+
+  const started = routineSessionExercises(log, routine);
+  assert.deepEqual(started.map(e => e.weighted), [true, false, false, false]);
+  assert.equal(started[0].search, 'bench press proper form');
+  // Repeating a logged activity: an unknown exercise is weighted only if weight was logged.
+  assert.equal(routineSessionExercises(log, log.activities[1])[3].weighted, false);
+  assert.equal(routineSessionExercises(log, { exercises: [{ name: 'Egyedi', unit: 'reps', sets: [{ reps: 5, weightKg: 20 }] }] })[0].weighted, true);
+  const session = createSession({ title: routine.title, exercises: started });
+  assert.deepEqual(session.exercises.map(e => e.sets.length), [0, 0, 0, 0]);
+
+  assert.equal(lastWorkoutWithExercises(log).id, 'b');
+  assert.equal(lastWorkoutWithExercises(state([workout('q', '2026-11-01')])), null);
+  const prev = lastPerformance(log, 'Fekvenyomás');
+  assert.equal(prev.date, '2026-11-09');
+  assert.equal(prev.summary, '5 × 40 kg · Bemelegítés · 8 × 62.5 kg · RPE 8 · 7 × 62.5 kg');
+  assert.equal(lastPerformance(log, 'Fekvenyomás', at('2026-11-09')).date, '2026-11-02');
+  assert.equal(lastPerformance(log, 'Plank').summary, '1:30 · 1:30');
+  assert.equal(lastPerformance(log, 'Soha'), null);
+
+  assert.deepEqual(filterHistory(log.activities).items.map(a => a.id), ['c', 'b', 'a']);
+  assert.deepEqual(filterHistory(log.activities, 'workout', 1), { items: [log.activities[1]], total: 2, hasMore: true });
+  assert.equal(filterHistory(log.activities, 'journal').total, 0);
+
+  const volume = Object.fromEntries(muscleGroupVolume(log, '2026-11-10').map(r => [r.id, r]));
+  assert.deepEqual([volume.chest.sets, volume.chest.previousSets], [2, 1], 'warm-up excluded');
+  assert.equal(volume.back.sets, 2);
+  assert.deepEqual([volume.core.sets, volume.core.minutes], [2, 3]);
+  assert.equal(volume.legs.sets, 0);
+  const later = Object.fromEntries(muscleGroupVolume(log, '2026-11-16').map(r => [r.id, r]));
+  assert.deepEqual([later.chest.sets, later.chest.previousSets], [0, 2]);
+  assert.equal(muscleGroupVolume({ ...log, customExercises: [{ name: 'Valami ismeretlen', muscle: 'arms', unit: 'reps' }] }, '2026-11-10')
+    .find(r => r.id === 'arms').sets, 1, 'custom exercises count toward their group');
+
+  // v5 persistence: new collections survive backup, malformed ones are rejected or dropped.
+  const v5 = { ...log, customExercises: [custom], routines: [routine] };
+  const restored = parseBackup(serializeBackup(v5));
+  assert.equal(restored.version, 5);
+  assert.deepEqual(restored.customExercises, [custom]);
+  assert.deepEqual(restored.routines, [routine]);
+  assert.throws(() => parseBackup(serializeBackup({ ...v5, routines: [{ id: 'x', title: 'x', exercises: [] }] })), /sérült/);
+  assert.throws(() => parseBackup(serializeBackup({ ...v5, customExercises: [{ name: 'A', muscle: 'x', unit: 'reps' }] })), /sérült/);
+  const v4 = normalizeState({ version: 4, activities: log.activities, questCompletions: [] });
+  assert.deepEqual([v4.version, v4.customExercises, v4.routines], [5, [], []]);
+  assert.equal(v4.activities.length, 3, 'v4 logs are kept');
+  assert.deepEqual(normalizeState({ routines: [routine, { bad: true }], customExercises: 'x' }).routines, [routine]);
+  assert.equal(computeProgress(v5, '2026-11-10').totalXP, computeProgress(log, '2026-11-10').totalXP, 'routines never change XP');
 }
 console.log('Minden játéklogika teszt átment.');
